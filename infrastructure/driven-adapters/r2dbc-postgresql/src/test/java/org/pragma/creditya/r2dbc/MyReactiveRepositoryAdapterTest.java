@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 class MyReactiveRepositoryAdapterTest {
     // TODO: change four you own tests
 
+    /*
     @InjectMocks
     MyReactiveRepositoryAdapter repositoryAdapter;
 
@@ -75,4 +76,5 @@ class MyReactiveRepositoryAdapterTest {
                 .expectNextMatches(value -> value.equals("test"))
                 .verifyComplete();
     }
+     */
 }

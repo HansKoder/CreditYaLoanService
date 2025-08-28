@@ -33,4 +33,13 @@ public class Loan extends AggregateRoot<LoanId> {
         );
     }
 
+    public static Loan rebuild(UUID uuid, String document, BigDecimal amount, LocalDate period, LoanStatus status) {
+        return new Loan(
+                new LoanId(uuid),
+                new Document(document),
+                new Amount(amount),
+                new Period(period),
+                status
+        );
+    }
 }
