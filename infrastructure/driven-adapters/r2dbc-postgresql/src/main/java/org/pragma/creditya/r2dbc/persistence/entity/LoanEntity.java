@@ -1,4 +1,4 @@
-package org.pragma.creditya.r2dbc.persistence.loan.entity;
+package org.pragma.creditya.r2dbc.persistence.entity;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
