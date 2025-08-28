@@ -75,10 +75,7 @@ public class LoanUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenRepositoryIsNotWorking () {
-        Mockito.when(userClient.exitByDocument(anyString()))
-                .thenReturn(Mono.just(Boolean.TRUE));
-
-        Mockito.when(loanRepository.save(any()))
+                Mockito.when(loanRepository.save(any()))
                 .thenThrow(new RuntimeException("DB is not working"));
 
         CreateRequestLoanCommand cmd = new CreateRequestLoanCommand("xxx", BigDecimal.ONE, LocalDate.now().plusMonths(1));
@@ -99,9 +96,6 @@ public class LoanUseCaseTest {
                 LocalDate.now().plusMonths(2),
                 LoanStatus.PENDING
         );
-
-        Mockito.when(userClient.exitByDocument(anyString()))
-                .thenReturn(Mono.just(Boolean.TRUE));
 
         Mockito.when(loanRepository.save(any()))
                 .thenReturn(Mono.just(expected));
