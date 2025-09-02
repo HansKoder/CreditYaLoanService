@@ -2,6 +2,6 @@ package org.pragma.creditya.model.loan.gateways;
 
 import reactor.core.publisher.Mono;
 
-public interface UserClient {
+public interface CustomerClient {
     Mono<Boolean> exitByDocument(String document);
 }

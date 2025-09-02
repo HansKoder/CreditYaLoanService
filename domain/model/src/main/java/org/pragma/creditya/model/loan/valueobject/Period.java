@@ -2,14 +2,23 @@ package org.pragma.creditya.model.loan.valueobject;
 
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 
-import java.time.LocalDate;
-
-public record Period(LocalDate period) {
+public record Period(int year, int month) {
     public Period {
-        if (period == null)
-            throw new LoanDomainException("Period must be mandatory");
+        validatePeriod(year, month);
+    }
 
-        if (!period.isAfter(LocalDate.now()))
-            throw new LoanDomainException("Period must be greater than now");
+    private void validatePeriod (int year, int month) {
+        if (year < 0)
+            throw new LoanDomainException("Year must be greater or equal to zero");
+
+        if (month < 0)
+            throw new LoanDomainException("Month must be greater or equal to zero");
+
+        if (year == 0 && month == 0)
+            throw new LoanDomainException("Must be scheduled any period of payment");
+    }
+
+    public int calculateTotalMonths() {
+        return (year * 12) + month;
     }
 }

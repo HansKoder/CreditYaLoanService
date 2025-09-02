@@ -1,10 +1,10 @@
-package org.pragma.creditya.r2dbc.persistence.mapper;
+package org.pragma.creditya.r2dbc.persistence.loan.mapper;
 
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.r2dbc.helper.CustomMapper;
-import org.pragma.creditya.r2dbc.persistence.entity.LoanEntity;
-import org.pragma.creditya.r2dbc.persistence.entity.LoanStatusEntity;
+import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanEntity;
+import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanStatusEntity;
 
 public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
     @Override
@@ -15,19 +15,20 @@ public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
         data.setLoanId(entity.getId().getValue());
         data.setStatus(LoanStatusEntity.valueOf(entity.getLoanStatus().name()));
         data.setAmount(entity.getAmount().amount());
-        data.setPeriod(entity.getPeriod().period());
+
 
         return data;
     }
 
     @Override
     public Loan toEntity(LoanEntity data) {
-        return Loan.rebuild(
-                data.getLoanId(),
-                data.getDocument(),
-                data.getAmount(),
-                data.getPeriod(),
-                LoanStatus.valueOf(data.getStatus().name())
-        );
+        return Loan.LoanBuilder
+                .aLoan()
+                .id(data.getLoanId())
+                .document(data.getDocument())
+                .loanStatus(LoanStatus.valueOf(data.getStatus().name()))
+                .period(data.getYear(), data.getMonth())
+                .build();
+
     }
 }

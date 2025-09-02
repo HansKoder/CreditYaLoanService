@@ -43,26 +43,27 @@ class RestConsumerTest {
         mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
-                .setBody("{\"state\" : \"ok\"}"));
-        var response = restConsumer.testGet();
+                .setBody("{\"exists\" : true}"));
+        var response = restConsumer.customerExistByDocument();
 
         StepVerifier.create(response)
-                .expectNextMatches(objectResponse -> objectResponse.getState().equals("ok"))
+                .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.TRUE)
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("Validate the function testPost.")
-    void validateTestPost() {
+    @DisplayName("Validate the function testGet when customer does not exist")
+    void validateTestGet_WhenResultIsFalse() {
 
         mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
-                .setBody("{\"state\" : \"ok\"}"));
-        var response = restConsumer.testPost();
+                .setBody("{\"exists\" : false}"));
+        var response = restConsumer.customerExistByDocument();
 
         StepVerifier.create(response)
-                .expectNextMatches(objectResponse -> objectResponse.getState().equals("ok"))
+                .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.FALSE)
                 .verifyComplete();
     }
+
 }

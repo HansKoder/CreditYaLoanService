@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9082
 spring:
   application:
     name: "LoanService"
@@ -14,7 +14,7 @@ spring:
 adapter:
   restconsumer:
     timeout: 5000
-    url: "http://localhost:9091/api/users"
+    url: "http://localhost:9081/api/users/exists"
 management:
   health:
     circuitbreakers:

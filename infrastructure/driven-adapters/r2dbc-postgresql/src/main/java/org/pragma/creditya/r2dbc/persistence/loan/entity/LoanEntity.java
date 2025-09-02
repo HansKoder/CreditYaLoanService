@@ -1,4 +1,4 @@
-package org.pragma.creditya.r2dbc.persistence.entity;
+package org.pragma.creditya.r2dbc.persistence.loan.entity;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,7 +10,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Table(name = "loans", schema = "public")
@@ -25,7 +24,9 @@ public class LoanEntity {
 
     private String document;
 
-    private LocalDate period;
+    private int year;
+
+    private int month;
 
     private BigDecimal amount;
 
