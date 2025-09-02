@@ -24,10 +24,15 @@ public class LoanEntity {
     @Column(value = "loan_id")
     private UUID loanId;
 
+    @Column(value = "loan_type_id")
+    private Long loanTypeId;
+
     private String document;
 
+    @Column(value = "year_period")
     private int year;
 
+    @Column(value = "month_period")
     private int month;
 
     private BigDecimal amount;

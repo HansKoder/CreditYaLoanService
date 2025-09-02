@@ -50,3 +50,13 @@ resilience4j:
         waitDurationInOpenState: "10s"
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+
+adapters:
+  r2dbc:
+    host: "${POSTGRES_HOST:localhost}"
+    port: "${POSTGRES_PORT:5434}"
+    database: "${POSTGRES_DB:loan_user_db}"
+    schema: "public"
+    username: "${POSTGRES_USER:loan_user}"
+    password: "${POSTGRES_PASSWORD:loan_pass}"

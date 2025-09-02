@@ -5,7 +5,9 @@ import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.r2dbc.helper.CustomMapper;
 import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanEntity;
 import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanStatusEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
     @Override
     public LoanEntity toData(Loan entity) {
@@ -17,6 +19,7 @@ public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
                 .amount(entity.getAmount().amount())
                 .year(entity.getPeriod().year())
                 .month(entity.getPeriod().month())
+                .loanTypeId(entity.getLoanType().code())
                 .build();
     }
 
@@ -28,6 +31,8 @@ public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
                 .document(data.getDocument())
                 .loanStatus(LoanStatus.valueOf(data.getStatus().name()))
                 .period(data.getYear(), data.getMonth())
+                .amount(data.getAmount())
+                .loanType(data.getLoanTypeId())
                 .build();
 
     }
