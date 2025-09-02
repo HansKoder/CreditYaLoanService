@@ -4,7 +4,7 @@ import org.pragma.creditya.api.dto.response.ErrorResponse;
 import org.pragma.creditya.infracommon.exception.InfrastructureException;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
-import org.pragma.creditya.model.loan.exception.LoanTypeNotFoundDomainException;
+import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;

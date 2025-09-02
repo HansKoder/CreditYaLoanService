@@ -24,7 +24,7 @@ public class Loan extends AggregateRoot<LoanId> {
         this.period = period;
     }
 
-    public void createRequestLoan() {
+    public void checkApplicationLoan() {
         if ( this.getId().getValue() != null )
             throw new LoanDomainException("Must be without ID");
 

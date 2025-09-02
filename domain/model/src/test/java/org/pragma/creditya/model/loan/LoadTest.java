@@ -89,7 +89,7 @@ public class LoadTest {
                 .loanType(1L)
                 .build();
 
-        LoanDomainException exception = assertThrows(LoanDomainException.class, domain::createRequestLoan);
+        LoanDomainException exception = assertThrows(LoanDomainException.class, domain::checkApplicationLoan);
 
         assertEquals("Must be without ID", exception.getMessage());
     }
@@ -105,7 +105,7 @@ public class LoadTest {
                 .loanStatus(LoanStatus.APPROVED)
                 .build();
 
-        LoanDomainException exception = assertThrows(LoanDomainException.class, domain::createRequestLoan);
+        LoanDomainException exception = assertThrows(LoanDomainException.class, domain::checkApplicationLoan);
 
         assertEquals("Invalid status to create request", exception.getMessage());
     }
@@ -121,7 +121,7 @@ public class LoadTest {
                 .loanType(1L)
                 .build();
 
-        domain.createRequestLoan();
+        domain.checkApplicationLoan();
 
         assertNotNull(domain);
         assertInstanceOf(Loan.class, domain);

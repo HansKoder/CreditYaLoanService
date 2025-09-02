@@ -1,4 +1,4 @@
-package org.pragma.creditya.usecase.loan.command;
+package org.pragma.creditya.usecase.command;
 
 import java.math.BigDecimal;
 

@@ -5,7 +5,7 @@ import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.LoanAppliedResponse;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.usecase.loan.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 
 import java.math.BigDecimal;
 import java.util.UUID;
