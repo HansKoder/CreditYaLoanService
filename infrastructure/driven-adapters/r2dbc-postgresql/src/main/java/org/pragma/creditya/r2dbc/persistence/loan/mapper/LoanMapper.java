@@ -9,15 +9,15 @@ import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanStatusEntity;
 public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
     @Override
     public LoanEntity toData(Loan entity) {
-        LoanEntity data = new LoanEntity();
-
-        data.setDocument(entity.getDocument().value());
-        data.setLoanId(entity.getId().getValue());
-        data.setStatus(LoanStatusEntity.valueOf(entity.getLoanStatus().name()));
-        data.setAmount(entity.getAmount().amount());
-
-
-        return data;
+        return LoanEntity
+                .builder()
+                .loanId(entity.getId().getValue())
+                .status(LoanStatusEntity.valueOf(entity.getLoanStatus().name()))
+                .document(entity.getDocument().value())
+                .amount(entity.getAmount().amount())
+                .year(entity.getPeriod().year())
+                .month(entity.getPeriod().month())
+                .build();
     }
 
     @Override
