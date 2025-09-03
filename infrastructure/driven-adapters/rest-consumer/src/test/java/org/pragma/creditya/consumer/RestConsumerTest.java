@@ -44,7 +44,7 @@ class RestConsumerTest {
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
                 .setBody("{\"exists\" : true}"));
-        var response = restConsumer.customerExistByDocument();
+        var response = restConsumer.customerExistByDocument("123");
 
         StepVerifier.create(response)
                 .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.TRUE)
@@ -59,7 +59,7 @@ class RestConsumerTest {
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
                 .setBody("{\"exists\" : false}"));
-        var response = restConsumer.customerExistByDocument();
+        var response = restConsumer.customerExistByDocument("123");
 
         StepVerifier.create(response)
                 .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.FALSE)

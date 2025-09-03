@@ -3,18 +3,18 @@ services:
     image: postgres:15
     container_name: credit_loan_db
     environment:
-      POSTGRES_USER: credit_user
-      POSTGRES_PASSWORD: credit_pass
+      POSTGRES_USER: loan_user
+      POSTGRES_PASSWORD: loan_pass
       POSTGRES_DB: credit_loan_db
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - credit_user_data:/var/lib/postgresql/data
+      - credit_loan_data:/var/lib/postgresql/data
     networks:
       - credit_network
 
 volumes:
-  credit_user_data:
+  credit_loan_data:
 
 networks:
   credit_network:

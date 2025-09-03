@@ -1,12 +1,7 @@
 package org.pragma.creditya.r2dbc.persistence.loan.entity;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -18,10 +13,13 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoanEntity {
 
     @Id
     @Column(value = "loan_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID loanId;
 
     @Column(value = "loan_type_id")

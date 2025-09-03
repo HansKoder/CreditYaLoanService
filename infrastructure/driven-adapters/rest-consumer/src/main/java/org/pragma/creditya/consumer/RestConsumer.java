@@ -16,15 +16,17 @@ public class RestConsumer implements CustomerClient/* implements Gateway from do
     // these methods are an example that illustrates the implementation of WebClient.
     // You should use the methods that you implement from the Gateway from the domain.
     @CircuitBreaker(name = "testGet", fallbackMethod = "testGetOk")
-    public Mono<ObjectResponse> customerExistByDocument() {
+    public Mono<ObjectResponse> customerExistByDocument(String document) {
         return client
                 .get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("document", document).build())
                 .retrieve()
                 .bodyToMono(ObjectResponse.class);
     }
 
     public Mono<String> testGetOk(Exception ignored) {
-        return Mono.error(new InfrastructureException("Client is not working"));
+        return Mono.error(new InfrastructureException("Error Customer Service, detail : " + ignored.getMessage()));
     }
 
     /*
@@ -46,7 +48,7 @@ public class RestConsumer implements CustomerClient/* implements Gateway from do
 
     @Override
     public Mono<Boolean> exitByDocument(String document) {
-        return customerExistByDocument()
+        return customerExistByDocument(document)
                 .map(ObjectResponse::getExists);
     }
 }
