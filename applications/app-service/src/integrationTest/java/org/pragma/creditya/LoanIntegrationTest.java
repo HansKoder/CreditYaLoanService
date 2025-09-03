@@ -62,6 +62,7 @@ public class LoanIntegrationTest {
     @AfterAll
     static void afterAll() {
         postgres.stop();
+        mockServer.stop();
     }
 
     @BeforeEach

@@ -1,5 +1,7 @@
 package org.pragma.creditya.r2dbc.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -13,6 +15,8 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     protected R repository;
     protected CustomMapper<E, D> mapper;
     private final Function<D, E> toEntityFn;
+
+    private final Logger log = LoggerFactory.getLogger(ReactiveAdapterOperations.class);
 
     @SuppressWarnings("unchecked")
     protected ReactiveAdapterOperations(R repository, CustomMapper<E, D> mapper, Function<D, E> toEntityFn) {
@@ -31,8 +35,14 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     }
 
     public Mono<E> save(E entity) {
-        return saveData(toData(entity))
-                .map(this::toEntity);
+        return Mono.deferContextual(ctx -> {
+            String correlationId = ctx.get("X-Correlation-Id");
+            log.info("correlationId[{}] [infra.helper.adapter] 1.0 persist new entity, payload [ entity:{} ]", correlationId, entity);
+            return saveData(toData(entity))
+                    .map(this::toEntity)
+                    .doOnSuccess(response -> log.info("correlationId[{}] [infra.helper.adapter] 1.1 entity was persisted, payload [ entity:{} ]", correlationId, entity));
+        });
+
     }
 
     protected Flux<E> saveAllEntities(Flux<E> entities) {

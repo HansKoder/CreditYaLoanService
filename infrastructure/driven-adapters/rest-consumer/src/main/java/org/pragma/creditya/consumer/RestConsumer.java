@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -16,7 +17,7 @@ public class RestConsumer implements CustomerClient{
 
     private final static Logger log = LoggerFactory.getLogger(RestConsumer.class);
 
-    @CircuitBreaker(name = "testGet", fallbackMethod = "testGetOk")
+    @CircuitBreaker(name = "testGet", fallbackMethod = "operationIsDown")
     public Mono<ObjectResponse> customerExistByDocument(String document) {
 
             return client
@@ -24,12 +25,14 @@ public class RestConsumer implements CustomerClient{
                     .uri(uriBuilder -> uriBuilder
                             .queryParam("document", document).build())
                     .retrieve()
+                    .onStatus(HttpStatusCode::isError,
+                            response -> Mono.error(new RuntimeException("Remote service error: " + response.statusCode())))
                     .bodyToMono(ObjectResponse.class);
 
     }
 
-    public Mono<String> testGetOk(Exception ignored) {
-        return Mono.error(new InfrastructureException("Error Customer Service, detail : " + ignored.getMessage()));
+    public Mono<ObjectResponse> operationIsDown(String document) {
+        return Mono.just(new ObjectResponse(false));
     }
 
 
@@ -41,6 +44,7 @@ public class RestConsumer implements CustomerClient{
             return customerExistByDocument(document)
                     .doOnSuccess(response -> log.info("correlationId[{}] [infra.rest-consumer] 1.1 request was consumed, payload: [ response:{} ]", correlationId, response))
                     .map(ObjectResponse::getExists);
+                    //.onErrorResume(err -> Mono.error(new InfrastructureException("Customer Service is not working, error: " + err.getMessage())));
 
         });
     }

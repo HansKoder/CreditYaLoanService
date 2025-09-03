@@ -32,13 +32,13 @@ resilience4j:
     instances:
       testGet:
         registerHealthIndicator: true
-        failureRateThreshold: 50
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: "2s"
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        minimumNumberOfCalls: 10
-        waitDurationInOpenState: "10s"
+        failureRateThreshold: 1
+        slowCallRateThreshold: 1
+        slowCallDurationThreshold: "1s"
+        permittedNumberOfCallsInHalfOpenState: 1
+        slidingWindowSize: 1
+        minimumNumberOfCalls: 1
+        waitDurationInOpenState: "1s"
       testPost:
         registerHealthIndicator: true
         failureRateThreshold: 50
