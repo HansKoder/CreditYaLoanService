@@ -1,6 +1,7 @@
 package org.pragma.creditya.r2dbc.helper;
 
-import org.reactivecommons.utils.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -12,21 +13,21 @@ import java.util.function.Function;
 
 public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I> & ReactiveQueryByExampleExecutor<D>> {
     protected R repository;
-    protected ObjectMapper mapper;
-    private final Class<D> dataClass;
+    protected CustomMapper<E, D> mapper;
     private final Function<D, E> toEntityFn;
 
+    private final Logger log = LoggerFactory.getLogger(ReactiveAdapterOperations.class);
+
     @SuppressWarnings("unchecked")
-    protected ReactiveAdapterOperations(R repository, ObjectMapper mapper, Function<D, E> toEntityFn) {
+    protected ReactiveAdapterOperations(R repository, CustomMapper<E, D> mapper, Function<D, E> toEntityFn) {
         this.repository = repository;
         this.mapper = mapper;
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        this.dataClass = (Class<D>) genericSuperclass.getActualTypeArguments()[1];
         this.toEntityFn = toEntityFn;
     }
 
     protected D toData(E entity) {
-        return mapper.map(entity, dataClass);
+        return mapper.toData(entity);
     }
 
     protected E toEntity(D data) {
@@ -34,8 +35,10 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     }
 
     public Mono<E> save(E entity) {
-        return saveData(toData(entity))
-                .map(this::toEntity);
+            log.info("[infra.helper.adapter] 1.0 persist new entity, payload [ entity:{} ]", entity);
+            return saveData(toData(entity))
+                    .map(this::toEntity)
+                    .doOnSuccess(response -> log.info("[infra.helper.adapter] 1.1 entity was persisted, payload [ entity:{} ]", entity));
     }
 
     protected Flux<E> saveAllEntities(Flux<E> entities) {

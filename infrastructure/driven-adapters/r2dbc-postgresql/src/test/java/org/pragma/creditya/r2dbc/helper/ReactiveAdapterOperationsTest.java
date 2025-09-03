@@ -3,7 +3,6 @@ package org.pragma.creditya.r2dbc.helper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
@@ -17,15 +16,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class ReactiveAdapterOperationsTest {
-
     private DummyRepository repository;
-    private ObjectMapper mapper;
+    private CustomMapper<DummyEntity, DummyData> mapper;
     private ReactiveAdapterOperations<DummyEntity, DummyData, String, DummyRepository> operations;
 
     @BeforeEach
     void setUp() {
         repository = Mockito.mock(DummyRepository.class);
-        mapper = Mockito.mock(ObjectMapper.class);
+        mapper = Mockito.mock(DummyCustomerMapper.class);
         operations = new ReactiveAdapterOperations<DummyEntity, DummyData, String, DummyRepository>(
                 repository, mapper, DummyEntity::toEntity) {};
     }
@@ -35,7 +33,7 @@ class ReactiveAdapterOperationsTest {
         DummyEntity entity = new DummyEntity("1", "test");
         DummyData data = new DummyData("1", "test");
 
-        when(mapper.map(entity, DummyData.class)).thenReturn(data);
+        when(mapper.toData(entity)).thenReturn(data);
         when(repository.save(data)).thenReturn(Mono.just(data));
 
         StepVerifier.create(operations.save(entity))
@@ -50,8 +48,9 @@ class ReactiveAdapterOperationsTest {
         DummyData data1 = new DummyData("1", "test1");
         DummyData data2 = new DummyData("2", "test2");
 
-        when(mapper.map(entity1, DummyData.class)).thenReturn(data1);
-        when(mapper.map(entity2, DummyData.class)).thenReturn(data2);
+        when(mapper.toData(entity1)).thenReturn(data1);
+        when(mapper.toData(entity2)).thenReturn(data2);
+
         when(repository.saveAll(any(Flux.class))).thenReturn(Flux.just(data1, data2));
 
         StepVerifier.create(operations.saveAllEntities(Flux.just(entity1, entity2)))
@@ -76,7 +75,8 @@ class ReactiveAdapterOperationsTest {
         DummyEntity entity = new DummyEntity("1", "test");
         DummyData data = new DummyData("1", "test");
 
-        when(mapper.map(entity, DummyData.class)).thenReturn(data);
+        // when(mapper.map(entity, DummyData.class)).thenReturn(data);
+        when(mapper.toData(entity)).thenReturn(data);
         when(repository.findAll(any(Example.class))).thenReturn(Flux.just(data));
 
         StepVerifier.create(operations.findByExample(entity))
@@ -164,5 +164,20 @@ class ReactiveAdapterOperationsTest {
         }
     }
 
+    static class DummyCustomerMapper implements CustomMapper<DummyEntity, DummyData> {
+
+        @Override
+        public DummyData toData(DummyEntity entity) {
+            return new DummyData(entity.id, entity.name);
+        }
+
+        @Override
+        public DummyEntity toEntity(DummyData data) {
+            return new DummyEntity(data.id, data.name);
+        }
+    }
+
+
     interface DummyRepository extends ReactiveCrudRepository<DummyData, String>, ReactiveQueryByExampleExecutor<DummyData> {}
+
 }

@@ -1,0 +1,21 @@
+meta {
+  name: create-application-loan
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:9082/api/loan
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "document": "123",
+    "amount": 500000,
+    "loanTypeId" : 1,
+    "month": 6,
+    "year": 1
+  }
+}
