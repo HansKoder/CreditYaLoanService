@@ -38,14 +38,11 @@ public class RestConsumer implements CustomerClient{
 
     @Override
     public Mono<Boolean> exitByDocument(String document) {
-        return Mono.deferContextual(ctx -> {
-            String correlationId = ctx.get("X-Correlation-Id");
-            log.info("correlationId[{}] [infra.rest-consumer] 1.0 make request to user-service, payload: [ document:{} ]", correlationId, document);
+            log.info("[infra.rest-consumer] 1.0 make request to user-service, payload: [ document:{} ]", document);
             return customerExistByDocument(document)
-                    .doOnSuccess(response -> log.info("correlationId[{}] [infra.rest-consumer] 1.1 request was consumed, payload: [ response:{} ]", correlationId, response))
+                    .doOnSuccess(response -> log.info("[infra.rest-consumer] 1.1 request was consumed, payload: [ response:{} ]", response))
                     .map(ObjectResponse::getExists);
                     //.onErrorResume(err -> Mono.error(new InfrastructureException("Customer Service is not working, error: " + err.getMessage())));
 
-        });
     }
 }

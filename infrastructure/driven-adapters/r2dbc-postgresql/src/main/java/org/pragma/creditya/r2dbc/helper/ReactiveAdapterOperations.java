@@ -35,14 +35,10 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     }
 
     public Mono<E> save(E entity) {
-        return Mono.deferContextual(ctx -> {
-            String correlationId = ctx.get("X-Correlation-Id");
-            log.info("correlationId[{}] [infra.helper.adapter] 1.0 persist new entity, payload [ entity:{} ]", correlationId, entity);
+            log.info("[infra.helper.adapter] 1.0 persist new entity, payload [ entity:{} ]", entity);
             return saveData(toData(entity))
                     .map(this::toEntity)
-                    .doOnSuccess(response -> log.info("correlationId[{}] [infra.helper.adapter] 1.1 entity was persisted, payload [ entity:{} ]", correlationId, entity));
-        });
-
+                    .doOnSuccess(response -> log.info("[infra.helper.adapter] 1.1 entity was persisted, payload [ entity:{} ]", entity));
     }
 
     protected Flux<E> saveAllEntities(Flux<E> entities) {

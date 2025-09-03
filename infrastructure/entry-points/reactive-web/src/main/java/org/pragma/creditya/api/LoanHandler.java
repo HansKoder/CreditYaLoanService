@@ -21,18 +21,14 @@ public class LoanHandler {
     private final static Logger log = LoggerFactory.getLogger(LoanHandler.class);
 
     public Mono<ServerResponse> applicationLoan(ServerRequest serverRequest) {
-        return Mono.deferContextual(ctx -> {
-            String correlationId = ctx.get("X-Correlation-Id");
-            log.info("CorrelationId[{}] [infra.reactive-web] (applicationLoan) 1 - create new application", correlationId);
             return serverRequest.bodyToMono(CreateApplicationLoanRequest.class)
                     .map(LoanRestMapper::toCommand)
-                    .doOnSuccess(response -> log.info("CorrelationId[{}] [infra.reactive-web] (applicationLoan) 1.2 - map to command, payload= command:{}", correlationId, response))
+                    .doOnSuccess(response -> log.info("[infra.reactive-web] (applicationLoan) 1.2 - map to command, payload= command:{}", response))
                     .flatMap(useCase::applicationLoan)
                     .map(LoanRestMapper::toResponse)
-                    .doOnSuccess(response -> log.info("CorrelationId[{}] [infra.reactive-web] (applicationLoan) 1.3 - application was persisted with successful, payload=response:{}", correlationId, response))
+                    .doOnSuccess(response -> log.info("[infra.reactive-web] (applicationLoan) 1.3 - application was persisted with successful, payload=response:{}", response))
                     .flatMap(data -> ServerResponse.status(HttpStatus.CREATED).bodyValue(data));
 
-        });
 
     }
 }
