@@ -1,6 +1,5 @@
 package org.pragma.creditya.r2dbc.helper;
 
-import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -13,7 +12,6 @@ import java.util.function.Function;
 public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I> & ReactiveQueryByExampleExecutor<D>> {
     protected R repository;
     protected CustomMapper<E, D> mapper;
-    private final Class<D> dataClass;
     private final Function<D, E> toEntityFn;
 
     @SuppressWarnings("unchecked")
@@ -21,13 +19,11 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
         this.repository = repository;
         this.mapper = mapper;
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        this.dataClass = (Class<D>) genericSuperclass.getActualTypeArguments()[1];
         this.toEntityFn = toEntityFn;
     }
 
     protected D toData(E entity) {
         return mapper.toData(entity);
-        // return mapper.map(entity, dataClass);
     }
 
     protected E toEntity(D data) {
