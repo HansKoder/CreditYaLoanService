@@ -1,9 +1,13 @@
 package org.pragma.creditya.r2dbc.persistence.loan.entity;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,7 +23,6 @@ public class LoanEntity {
 
     @Id
     @Column(value = "loan_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID loanId;
 
     @Column(value = "loan_type_id")

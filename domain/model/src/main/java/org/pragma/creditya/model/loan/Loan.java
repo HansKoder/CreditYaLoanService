@@ -1,5 +1,6 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
+import lombok.ToString;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.*;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
@@ -7,6 +8,7 @@ import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@ToString
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
     private final Document document;

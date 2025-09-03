@@ -16,11 +16,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -56,7 +54,6 @@ public class LoanIntegrationTest {
     @BeforeAll
     static void beforeAll() {
         postgres.start();
-
         mockServer.start();
 
         mockServerClient = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
@@ -85,8 +82,9 @@ public class LoanIntegrationTest {
             "103", BigDecimal.valueOf(4_000_000), 1001L, 1, 0
     );
 
+
     @Test
-    void shouldBeStatus200_becauseApplicationIsValid () {
+    void shouldBeStatus200_becauseApplicationIsValid() {
         mockServerClient.when(request()
                         .withMethod("GET")
                         .withPath(ENDPOINT_USER_EXIST))
@@ -104,6 +102,11 @@ public class LoanIntegrationTest {
                 .expectBody(LoanAppliedResponse.class)
                 .value(persisted -> {
                     assertNotNull(persisted.loanId());
+                    assertFalse(persisted.loanId().isBlank());
+                    assertEquals("PENDING", persisted.status());
+                    assertEquals("103", persisted.document());
+                    assertEquals(BigDecimal.valueOf(4_000_000), persisted.amount());
+                    assertEquals(1L, persisted.loanTypeId());
                 });
     }
 

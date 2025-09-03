@@ -14,8 +14,12 @@ import java.util.UUID;
 public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
     @Override
     public LoanEntity toData(Loan entity) {
+        System.out.printf("[Infra.r2dbc] (mapper) toData payload{ entity:%s } \n", entity);
+
         UUID loanId = entity.getId().getValue() == null ? null
                 : entity.getId().getValue();
+
+        System.out.printf("[Infra.r2dbc] (mapper) loanId was mapped payload{ loanId:%s } \n", loanId);
 
         return LoanEntity
                 .builder()
@@ -31,6 +35,7 @@ public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
 
     @Override
     public Loan toEntity(LoanEntity data) {
+        System.out.printf("[Infra.r2dbc] (mapper) toEntity payload{ data:%s } \n", data);
         return Loan.LoanBuilder
                 .aLoan()
                 .id(data.getLoanId())

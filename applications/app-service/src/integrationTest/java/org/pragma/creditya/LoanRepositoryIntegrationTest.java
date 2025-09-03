@@ -52,15 +52,12 @@ public class LoanRepositoryIntegrationTest {
     @Autowired
     private LoanRepository repository;
 
-    private final UUID LOAN_ID_EXAMPLE = UUID.fromString("5b87a0d6-2fed-4db7-aa49-49663f719659");
-
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
-            .id(LOAN_ID_EXAMPLE)
             .loanType(1L)
             .loanStatus(LoanStatus.PENDING)
             .document("103")
             .period(1,0)
-            .amount(BigDecimal.ONE)
+            .amount(BigDecimal.valueOf(1_000_000))
             .build();
 
 
@@ -69,8 +66,13 @@ public class LoanRepositoryIntegrationTest {
 
         StepVerifier.create(repository.save(LOAN_EXAMPLE))
                 .expectNextMatches(persisted -> !Objects.isNull(persisted)
-                        && persisted.getId() != null
-                        && persisted.getDocument() != null
+                        && persisted.getId().getValue() != null
+                        && !persisted.getId().getValue().toString().isBlank()
+                        && persisted.getDocument().value().equals("103")
+                        && persisted.getAmount().amount().equals(BigDecimal.valueOf(1_000_000))
+                        && persisted.getLoanStatus().equals(LoanStatus.PENDING)
+                        && persisted.getPeriod().year() == 1
+                        && persisted.getPeriod().month() == 0
                 )
                 .verifyComplete();
     }

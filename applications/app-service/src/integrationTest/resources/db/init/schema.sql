@@ -1,5 +1,5 @@
 CREATE TABLE loans (
-    loan_id UUID PRIMARY KEY,
+    loan_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     loan_type_id INTEGER NOT NULL,
     document VARCHAR(100) NOT NULL,
     month_period INTEGER NOT NULL,
@@ -7,9 +7,6 @@ CREATE TABLE loans (
     status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
     amount NUMERIC
 );
-
-ALTER TABLE public.loans
-    ALTER COLUMN loan_id SET DEFAULT gen_random_uuid();
 
 CREATE TABLE loan_types (
     id BIGSERIAL PRIMARY KEY,
