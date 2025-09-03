@@ -7,3 +7,14 @@ CREATE TABLE loans (
     status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
     amount NUMERIC
 );
+
+ALTER TABLE public.loans
+    ALTER COLUMN loan_id SET DEFAULT gen_random_uuid();
+
+CREATE TABLE loan_types (
+    id BIGSERIAL PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    interest_rate NUMERIC(5,2) NOT NULL
+);
+
+INSERT INTO loan_types (description, interest_rate) VALUES ('Casa', 1);

@@ -5,6 +5,8 @@ import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.mapper.LoanRestMapper;
 import org.pragma.creditya.usecase.IOrchestratorUseCase;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;

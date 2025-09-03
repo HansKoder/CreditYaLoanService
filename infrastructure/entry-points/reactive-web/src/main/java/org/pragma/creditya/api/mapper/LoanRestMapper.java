@@ -18,8 +18,9 @@ public class LoanRestMapper {
     }
 
     public static LoanAppliedResponse toResponse (Loan entity) {
+        String loanId = entity.getId().getValue() != null ? entity.getId().getValue().toString() : "";
         return new LoanAppliedResponse(
-                entity.getId().getValue().toString(),
+                loanId,
                 entity.getDocument().value(),
                 entity.getAmount().amount(),
                 entity.getLoanType().code(),

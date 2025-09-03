@@ -1,19 +1,25 @@
 package org.pragma.creditya.r2dbc.persistence.loan.mapper;
 
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.valueobject.LoanId;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.r2dbc.helper.CustomMapper;
 import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanEntity;
 import org.pragma.creditya.r2dbc.persistence.loan.entity.LoanStatusEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class LoanMapper implements CustomMapper<Loan, LoanEntity> {
     @Override
     public LoanEntity toData(Loan entity) {
+        UUID loanId = entity.getId().getValue() == null ? null
+                : entity.getId().getValue();
+
         return LoanEntity
                 .builder()
-                .loanId(entity.getId().getValue())
+                .loanId(loanId)
                 .status(LoanStatusEntity.valueOf(entity.getLoanStatus().name()))
                 .document(entity.getDocument().value())
                 .amount(entity.getAmount().amount())
