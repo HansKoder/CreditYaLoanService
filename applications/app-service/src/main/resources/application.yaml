@@ -51,7 +51,6 @@ resilience4j:
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 
-
 adapters:
   r2dbc:
     host: "${POSTGRES_HOST:localhost}"
@@ -60,3 +59,7 @@ adapters:
     schema: "public"
     username: "${POSTGRES_USER:loan_user}"
     password: "${POSTGRES_PASSWORD:loan_pass}"
+
+jwt:
+  secret: ${SECRET_KEY:uO8lC2VhP3nZ6kF9Q1tWjR7yX5aT2sVb0mGhN8oJzK4cE6rLwBqD3pUyHfMxZaSd}
+  expiration: "${EXPIRATION:3600000}"

@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,17 +22,25 @@ public class RestConsumer implements CustomerClient{
 
     @CircuitBreaker(name = "testGet", fallbackMethod = "operationIsDown")
     public Mono<ObjectResponse> customerExistByDocument(String document) {
+            return Mono.deferContextual(ctx -> {
+                String token = Optional.ofNullable(ctx.get("token")
+                        .toString()).orElse("");
 
-            return client
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .queryParam("document", document).build())
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError,
-                            response -> Mono.error(new RuntimeException("Remote service error: " + response.statusCode())))
-                    .bodyToMono(ObjectResponse.class);
+                log.info("[infra.rest-consumer] (extract-token) token: {}", token);
 
+                return client
+                        .get()
+                        .uri(uriBuilder -> uriBuilder
+                                .queryParam("document", document).build())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .retrieve()
+                        .onStatus(HttpStatusCode::isError,
+                                response -> Mono.error(new RuntimeException("Remote service error: " + response.statusCode())))
+                        .bodyToMono(ObjectResponse.class);
+            });
     }
+
+
 
     public Mono<ObjectResponse> operationIsDown(String document) {
         return Mono.just(new ObjectResponse(false));
@@ -45,4 +56,5 @@ public class RestConsumer implements CustomerClient{
                     //.onErrorResume(err -> Mono.error(new InfrastructureException("Customer Service is not working, error: " + err.getMessage())));
 
     }
+
 }
