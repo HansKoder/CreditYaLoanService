@@ -28,7 +28,6 @@ public class JwtProvider {
 
     @PostConstruct
     private void init () {
-        LOGGER.info("INIT KEY.. ");
         if (SECRET_KEY == null) return;
 
         this.KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));

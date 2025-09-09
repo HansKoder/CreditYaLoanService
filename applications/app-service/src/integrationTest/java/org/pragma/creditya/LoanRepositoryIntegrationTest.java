@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
+import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.LoanRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -52,6 +55,9 @@ public class LoanRepositoryIntegrationTest {
     @Autowired
     private LoanRepository repository;
 
+    @Autowired
+    private EventStoreRepository eventStoreRepository;
+
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .loanType(1L)
             .loanStatus(LoanStatus.PENDING)
@@ -74,6 +80,23 @@ public class LoanRepositoryIntegrationTest {
                         && persisted.getPeriod().year() == 1
                         && persisted.getPeriod().month() == 0
                 )
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldBePersistedWithSuccessful_eventApplicationLoan() {
+
+        LoanApplicationSubmitted event = LoanApplicationSubmitted.LoanBuilder
+                .aLoanApplicationSubmitted()
+                .aggregateType("LOAN")
+                .eventType(LoanApplicationSubmitted.class.getSimpleName())
+                .document("123")
+                .typeLoan(1L)
+                .amount(BigDecimal.valueOf(1))
+                .status("PENDING")
+                .build();
+
+        StepVerifier.create(eventStoreRepository.saveAll(List.of(event)))
                 .verifyComplete();
     }
 
