@@ -6,6 +6,7 @@ import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.pragma.creditya.mongo.helper.AdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -27,5 +28,10 @@ implements LoanReadRepository
     public Mono<Void> saveLoanRead(LoanRead read) {
         return repository.save(this.toData(read))
                 .then();
+    }
+
+    @Override
+    public Flux<LoanRead> getLoan() {
+        return null;
     }
 }
