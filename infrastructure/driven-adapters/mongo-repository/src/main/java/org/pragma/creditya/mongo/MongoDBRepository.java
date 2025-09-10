@@ -1,7 +1,9 @@
 package org.pragma.creditya.mongo;
 
+import org.pragma.creditya.model.loanread.LoanRead;
+import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 
-public interface MongoDBRepository extends ReactiveMongoRepository<Object/* change for adapter model */, String>, ReactiveQueryByExampleExecutor<Object/* change for adapter model */> {
+public interface MongoDBRepository extends ReactiveMongoRepository<LoanReadCollection, String>, ReactiveQueryByExampleExecutor<LoanReadCollection> {
 }

@@ -1,12 +1,16 @@
 package org.pragma.creditya.mongo;
 
+import org.pragma.creditya.model.loanread.LoanRead;
+import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
+import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.pragma.creditya.mongo.helper.AdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 @Repository
-public class MongoRepositoryAdapter extends AdapterOperations<Object/* change for domain model */, Object/* change for adapter model */, String, MongoDBRepository>
-// implements ModelRepository from domain
+public class MongoRepositoryAdapter extends AdapterOperations<LoanRead, LoanReadCollection, String, MongoDBRepository>
+implements LoanReadRepository
 {
 
     public MongoRepositoryAdapter(MongoDBRepository repository, ObjectMapper mapper) {
@@ -15,6 +19,13 @@ public class MongoRepositoryAdapter extends AdapterOperations<Object/* change fo
          *  super(repository, mapper, d -> mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build());
          *  Or using mapper.map with the class of the object model
          */
-        super(repository, mapper, d -> mapper.map(d, Object.class/* change for domain model */));
+        super(repository, mapper, d -> mapper.map(d, LoanRead.class/* change for domain model */));
+    }
+
+
+    @Override
+    public Mono<Void> saveLoanRead(LoanRead read) {
+        return repository.save(this.toData(read))
+                .then();
     }
 }
