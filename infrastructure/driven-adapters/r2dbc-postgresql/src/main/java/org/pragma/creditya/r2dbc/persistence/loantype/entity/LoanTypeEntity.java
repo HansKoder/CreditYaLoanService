@@ -1,4 +1,4 @@
-package org.pragma.creditya.r2dbc.persistence.type.entity;
+package org.pragma.creditya.r2dbc.persistence.loantype.entity;
 
 import jakarta.persistence.Id;
 import lombok.Builder;

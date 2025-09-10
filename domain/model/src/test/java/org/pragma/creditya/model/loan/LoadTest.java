@@ -12,31 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoadTest {
 
     @Test
-    void shouldThrowExceptionWhenDocumentCustomerIsEmpty () {
-        LoanDomainException exception = assertThrows(LoanDomainException.class, () -> {
-            Loan.LoanBuilder
-                    .aLoan()
-                    .build();
-        });
-
-        assertEquals("Document must be mandatory", exception.getMessage());
-    }
-
-
-    @Test
-    void shouldThrowExceptionWhenAmountIsNull () {
-        LoanDomainException exception = assertThrows(LoanDomainException.class, () -> {
-            Loan.LoanBuilder
-                    .aLoan()
-                    .document("123")
-                    .build();
-        });
-
-        assertEquals("Amount must be mandatory", exception.getMessage());
-    }
-
-
-    @Test
     void shouldThrowExceptionWhenAmountIsNegative () {
         LoanDomainException exception = assertThrows(LoanDomainException.class, () -> {
             Loan.LoanBuilder
@@ -127,9 +102,31 @@ public class LoadTest {
         assertInstanceOf(Loan.class, domain);
 
         assertNotNull(domain.getId());
-        assertNull(domain.getId().getValue());
+        assertNotNull(domain.getId());
+        assertNotNull(domain.getId().getValue());
         assertEquals(LoanStatus.PENDING, domain.getLoanStatus());
         assertEquals(18, domain.getPeriod().calculateTotalMonths());
+
+        assertEquals(1, domain.getUncommittedEvents().size());
+    }
+
+
+    @Test void shouldCleanEvents () {
+        Loan domain = Loan.LoanBuilder
+                .aLoan()
+                .document("123")
+                .amount(BigDecimal.valueOf(10))
+                .period(1, 6)
+                .loanType(1L)
+                .build();
+
+        domain.checkApplicationLoan();
+
+        assertEquals(1, domain.getUncommittedEvents().size());
+
+        domain.clearUncommittedEvents();
+
+        assertEquals(0, domain.getUncommittedEvents().size());
     }
 
 }

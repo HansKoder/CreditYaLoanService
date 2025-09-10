@@ -8,9 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.gateways.LoanTypeRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
+import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
+import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,7 +45,7 @@ public class LoanTypeUseCaseTest {
 
     @Test
     void shouldThrowException_whenLoanTypeIsNotFound () {
-        Mockito.when(loanTypeRepository.existLoanType(1L))
+        Mockito.when(loanTypeRepository.existLoanType(new LoanTypeId(1L)))
                 .thenReturn(Mono.just(Boolean.FALSE));
 
         StepVerifier.create(loanTypeUseCase.checkLoanTypeExists(LOAN_EXAMPLE))
@@ -57,7 +58,7 @@ public class LoanTypeUseCaseTest {
 
     @Test
     void shouldReturnLoan_becauseLoanTypeExist () {
-        Mockito.when(loanTypeRepository.existLoanType(1L))
+        Mockito.when(loanTypeRepository.existLoanType(new LoanTypeId(1L)))
                 .thenReturn(Mono.just(Boolean.TRUE));
 
         var response = loanTypeUseCase.checkLoanTypeExists(LOAN_EXAMPLE);

@@ -4,9 +4,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.gateways.LoanRepository;
-import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
+import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -17,13 +16,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.List;
 
 @SpringBootTest
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class LoanRepositoryIntegrationTest {
+public class EventStoringRepositoryIntegrationTest {
 
     @Container
     private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
@@ -50,30 +48,22 @@ public class LoanRepositoryIntegrationTest {
     }
 
     @Autowired
-    private LoanRepository repository;
-
-    private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
-            .loanType(1L)
-            .loanStatus(LoanStatus.PENDING)
-            .document("103")
-            .period(1,0)
-            .amount(BigDecimal.valueOf(1_000_000))
-            .build();
-
+    private EventStoreRepository eventStoreRepository;
 
     @Test
-    void shouldBePersistedWithSuccessful() {
+    void shouldBePersistedWithSuccessful_eventApplicationLoan() {
 
-        StepVerifier.create(repository.save(LOAN_EXAMPLE))
-                .expectNextMatches(persisted -> !Objects.isNull(persisted)
-                        && persisted.getId().getValue() != null
-                        && !persisted.getId().getValue().toString().isBlank()
-                        && persisted.getDocument().value().equals("103")
-                        && persisted.getAmount().amount().equals(BigDecimal.valueOf(1_000_000))
-                        && persisted.getLoanStatus().equals(LoanStatus.PENDING)
-                        && persisted.getPeriod().year() == 1
-                        && persisted.getPeriod().month() == 0
-                )
+        LoanApplicationSubmitted event = LoanApplicationSubmitted.LoanBuilder
+                .aLoanApplicationSubmitted()
+                .aggregateType("LOAN")
+                .eventType(LoanApplicationSubmitted.class.getSimpleName())
+                .document("123")
+                .typeLoan(1L)
+                .amount(BigDecimal.valueOf(1))
+                .status("PENDING")
+                .build();
+
+        StepVerifier.create(eventStoreRepository.saveAll(List.of(event)))
                 .verifyComplete();
     }
 

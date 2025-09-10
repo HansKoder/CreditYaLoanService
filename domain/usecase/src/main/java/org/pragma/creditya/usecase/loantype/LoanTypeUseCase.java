@@ -3,7 +3,8 @@ package org.pragma.creditya.usecase.loantype;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
-import org.pragma.creditya.model.loan.gateways.LoanTypeRepository;
+import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
+import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -13,7 +14,7 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
     @Override
     public Mono<Loan> checkLoanTypeExists(Loan loan) {
-        return loanTypeRepository.existLoanType(loan.getLoanType().code())
+        return loanTypeRepository.existLoanType(new LoanTypeId(loan.getLoanType().code()))
                 .flatMap(exist -> {
                     if (exist)
                         return Mono.just(loan);
