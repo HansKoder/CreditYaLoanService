@@ -1,6 +1,9 @@
 package org.pragma.creditya.mongo.helper;
 
+import org.pragma.creditya.mongo.mapper.CustomMapper;
 import org.reactivecommons.utils.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -14,25 +17,25 @@ import static org.springframework.data.domain.Example.of;
 public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I> & ReactiveQueryByExampleExecutor<D>> {
 
     protected R repository;
-    protected ObjectMapper mapper;
-    private final Class<D> dataClass;
+    protected CustomMapper<E, D> mapper;
     private final Function<D, E> toEntityFn;
 
+    private final Logger logger = LoggerFactory.getLogger(AdapterOperations.class.getName());
+
     @SuppressWarnings("unchecked")
-    protected AdapterOperations(R repository, ObjectMapper mapper, Function<D, E> toEntityFn) {
+    protected AdapterOperations(R repository, CustomMapper<E, D> mapper, Function<D, E> toEntityFn) {
         this.repository = repository;
         this.mapper = mapper;
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        this.dataClass = (Class<D>) genericSuperclass.getActualTypeArguments()[1];
         this.toEntityFn = toEntityFn;
     }
 
     public Mono<E> save(E entity) {
         return Mono.just(entity)
+                .doOnSuccess(e -> logger.info("[infra.mongodb.helper] (save) before map to data, Entity: {}", e))
                 .map(this::toData)
-                .log()
+                .doOnSuccess(e -> logger.info("[infra.mongodb.helper] (save) after map to data, Data: {}", e))
                 .flatMap(this::saveData)
-                .log()
                 .map(this::toEntity);
     }
 
@@ -69,10 +72,12 @@ public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepositor
     }
 
     protected D toData(E entity) {
-        return mapper.map(entity, dataClass);
+        logger.info("[infra.mongodb.helper] (toData) payload: {}", entity);
+        return mapper.toData(entity);
     }
 
     protected E toEntity(D data) {
+        logger.info("[infra.mongodb.helper] (toEntity) payload: {}", data);
         return toEntityFn.apply(data);
     }
 
