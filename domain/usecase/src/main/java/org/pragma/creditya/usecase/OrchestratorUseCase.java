@@ -26,7 +26,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                     List<LoanEvent> events = loan.getUncommittedEvents();
                     return eventRepository.saveAll(events)
                             .then(Mono.just(loan))
-                            .doOnSuccess(Loan::getUncommittedEvents);
+                            .doOnSuccess(Loan::clearUncommittedEvents);
                 });
     }
 }

@@ -1,4 +1,4 @@
-package org.pragma.creditya.r2dbc.persistence.event.adapter;
+package org.pragma.creditya.r2dbc.persistence.eventstoring.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.r2dbc.postgresql.codec.Json;
@@ -7,8 +7,8 @@ import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
-import org.pragma.creditya.r2dbc.persistence.event.entity.EventEntity;
-import org.pragma.creditya.r2dbc.persistence.event.repository.EventReactiveRepository;
+import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
+import org.pragma.creditya.r2dbc.persistence.eventstoring.repository.EventReactiveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

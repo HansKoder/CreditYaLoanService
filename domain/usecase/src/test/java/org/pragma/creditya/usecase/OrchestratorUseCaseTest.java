@@ -63,9 +63,8 @@ public class OrchestratorUseCaseTest {
         Mockito.when(loanTypeUseCase.checkLoanTypeExists(LOAN_EXAMPLE))
                 .thenReturn(Mono.just(LOAN_EXAMPLE));
 
-        Mockito.when(loanUseCase.persist(LOAN_EXAMPLE))
-                .thenReturn(Mono.just(LOAN_EXAMPLE));
-
+        Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))
+                .thenReturn(Mono.empty());
 
         var response = orchestratorUseCase.applicationLoan(createRequestLoanCommand);
 

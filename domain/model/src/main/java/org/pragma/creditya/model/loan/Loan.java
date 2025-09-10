@@ -18,15 +18,13 @@ import java.util.UUID;
 @ToString
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
-    private Document document;
-    private Amount amount;
-    private Period period;
-    private LoanType loanType;
+    private final Document document;
+    private final Amount amount;
+    private final Period period;
+    private final LoanType loanType;
     private LoanStatus loanStatus;
 
-    // list of events generated
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
-
     private final String LOAN_EVEN_TYPE =  "LOAN";
 
     private Loan(LoanBuilder builder) {
@@ -38,16 +36,7 @@ public class Loan extends AggregateRoot<LoanId> {
         this.setId(builder.id);
     }
 
-    public void checkApplicationLoan() {
-        if ( this.getId() != null &&  this.getId().getValue() != null )
-            throw new LoanDomainException("Must be without ID");
-
-        if ( this.loanStatus != null && !this.loanStatus.equals(LoanStatus.PENDING) )
-            throw new LoanDomainException("Invalid status to create request");
-
-        this.loanStatus = LoanStatus.PENDING;
-        this.setId(new LoanId(UUID.randomUUID()));
-
+    private void createEventApplicationLoan () {
         LoanApplicationSubmitted event = LoanApplicationSubmitted.LoanBuilder.
                 aLoanApplicationSubmitted()
                 .aggregateId(getId().getValue())
@@ -63,15 +52,17 @@ public class Loan extends AggregateRoot<LoanId> {
         this.uncommittedEvents.add(event);
     }
 
-    public void checkResolution () {
-        // check status must be pending.
+    public void checkApplicationLoan() {
+        if ( this.getId() != null &&  this.getId().getValue() != null )
+            throw new LoanDomainException("Must be without ID");
 
-        // check type resolution (REJECTED - APPROVED) in case, does not continue.
+        if ( this.loanStatus != null && !this.loanStatus.equals(LoanStatus.PENDING) )
+            throw new LoanDomainException("Invalid status to create request");
 
-        // if rejected must be mandatory reason.
+        this.loanStatus = LoanStatus.PENDING;
+        this.setId(new LoanId(UUID.randomUUID()));
 
-        // all rules are ok change status must be RESOLUTION (APPROVED, REJECTED)
-        // this section should return a LoanType -> ? like LonRejected ? LoanApproved ? instead void.
+        createEventApplicationLoan();
     }
 
     public List<LoanEvent> getUncommittedEvents() {

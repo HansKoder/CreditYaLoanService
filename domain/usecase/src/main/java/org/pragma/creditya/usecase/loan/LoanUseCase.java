@@ -3,9 +3,6 @@ package org.pragma.creditya.usecase.loan;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
-import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
-import org.pragma.creditya.model.loan.gateways.LoanRepository;
-import org.pragma.creditya.model.loan.gateways.LoanTypeRepository;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import reactor.core.publisher.Mono;
@@ -13,18 +10,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class LoanUseCase implements ILoanUseCase {
 
-    private final LoanRepository loanRepository;
     private final CustomerClient userClient;
 
     @Override
     public Mono<Loan> checkApplication(CreateRequestLoanCommand cmd) {
         return Mono.fromCallable(() -> checkLoan(cmd))
                 .flatMap(this::checkDocument);
-    }
-
-    @Override
-    public Mono<Loan> persist(Loan loan) {
-        return loanRepository.save(loan);
     }
 
     private Loan checkLoan (CreateRequestLoanCommand cmd) {

@@ -1,4 +1,4 @@
-package org.pragma.creditya.r2dbc.persistence.event.entity;
+package org.pragma.creditya.r2dbc.persistence.eventstoring.entity;
 
 import io.r2dbc.postgresql.codec.Json;
 import lombok.*;
