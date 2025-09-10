@@ -1,8 +1,7 @@
 package org.pragma.creditya.model.loan;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.*;
@@ -37,11 +36,11 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     private void createEventApplicationLoan () {
-        LoanApplicationSubmitted event = LoanApplicationSubmitted.LoanBuilder.
+        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder.
                 aLoanApplicationSubmitted()
                 .aggregateId(getId().getValue())
                 .aggregateType(LOAN_EVEN_TYPE)
-                .eventType(LoanApplicationSubmitted.class.getSimpleName())
+                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
                 .timestamp(Instant.now())
                 .document(this.document.value())
                 .status(loanStatus.name())

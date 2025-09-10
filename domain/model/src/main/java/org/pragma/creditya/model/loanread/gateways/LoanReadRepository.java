@@ -6,8 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface LoanReadRepository {
 
-    Mono<Void> saveLoanRead (LoanRead read);
-
+    Mono<LoanRead> saveLoanRead (LoanRead read);
     Flux<LoanRead> getLoan ();
 
 }

@@ -18,7 +18,7 @@ spring:
         format_sql: true
   data:
     mongodb:
-      uri: "mongodb://localhost:27017/test"
+      uri: "mongodb://loan_mongo_user:loan_mongo_pass@localhost:27018/credit_loan_mongo?authSource=admin"
 logging:
   level:
     org.hibernate.SQL: "DEBUG"

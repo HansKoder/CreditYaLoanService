@@ -1,16 +1,18 @@
 package org.pragma.creditya.mongo.collection;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Document(collection = "loanReadCollection")
+@Document(collection = "LoanReadCollection")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@ToString
 public class LoanReadCollection {
 
     @MongoId

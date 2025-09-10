@@ -13,6 +13,8 @@ import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.loan.LoanUseCase;
+import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
+import org.pragma.creditya.usecase.loanread.LoanReadUseCase;
 import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
 import org.pragma.creditya.usecase.loantype.LoanTypeUseCase;
 import reactor.core.publisher.Mono;
@@ -32,6 +34,9 @@ public class OrchestratorUseCaseTest {
     @Mock
     private EventStoreRepository eventStoreRepository;
 
+    @Mock
+    private ILoanReadUseCase loanReadUseCase;
+
     @InjectMocks
     private OrchestratorUseCase orchestratorUseCase;
 
@@ -48,8 +53,9 @@ public class OrchestratorUseCaseTest {
         loanUseCase = Mockito.mock(LoanUseCase.class);
         loanTypeUseCase = Mockito.mock(LoanTypeUseCase.class);
         eventStoreRepository = Mockito.mock(EventStoreRepository.class);
+        loanReadUseCase = Mockito.mock(LoanReadUseCase.class);
 
-        orchestratorUseCase = new OrchestratorUseCase(loanTypeUseCase, loanUseCase, eventStoreRepository);
+        // orchestratorUseCase = new OrchestratorUseCase(loanTypeUseCase, loanUseCase, eventStoreRepository, loanReadUseCase);
     }
 
 

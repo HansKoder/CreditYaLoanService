@@ -30,7 +30,9 @@ public abstract class AdapterOperations<E, D, I, R extends ReactiveCrudRepositor
     public Mono<E> save(E entity) {
         return Mono.just(entity)
                 .map(this::toData)
+                .log()
                 .flatMap(this::saveData)
+                .log()
                 .map(this::toEntity);
     }
 

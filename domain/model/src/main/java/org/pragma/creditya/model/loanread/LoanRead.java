@@ -1,12 +1,16 @@
 package org.pragma.creditya.model.loanread;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public record LoanRead (
-        UUID loanId,
-        String document,
-        BigDecimal amount
-) { }
+public class LoanRead {
+    private UUID loanId;
+    private String document;
+    private BigDecimal amount;
+}

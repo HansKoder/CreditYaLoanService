@@ -2,6 +2,7 @@ package org.pragma.creditya.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loanread.LoanRead;
@@ -22,6 +23,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final ILoanUseCase loanUseCase;
     private final EventStoreRepository eventRepository;
     private final ILoanReadUseCase loanReadUseCase;
+    private final EventBus eventBus;
 
     @Override
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
@@ -30,6 +32,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(loan -> {
                     List<LoanEvent> events = loan.getUncommittedEvents();
                     return eventRepository.saveAll(events)
+                            .doOnSuccess(v -> events.forEach(eventBus::publish))
                             .then(Mono.just(loan))
                             .doOnSuccess(Loan::clearUncommittedEvents);
                 });

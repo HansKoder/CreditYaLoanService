@@ -5,6 +5,8 @@ import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
 import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.pragma.creditya.mongo.helper.AdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,6 +15,8 @@ import reactor.core.publisher.Mono;
 public class MongoRepositoryAdapter extends AdapterOperations<LoanRead, LoanReadCollection, String, MongoDBRepository>
 implements LoanReadRepository
 {
+
+    private final Logger logger = LoggerFactory.getLogger(MongoRepositoryAdapter.class);
 
     public MongoRepositoryAdapter(MongoDBRepository repository, ObjectMapper mapper) {
         /**
@@ -25,13 +29,16 @@ implements LoanReadRepository
 
 
     @Override
-    public Mono<Void> saveLoanRead(LoanRead read) {
-        return repository.save(this.toData(read))
-                .then();
+    public Mono<LoanRead> saveLoanRead(LoanRead read) {
+        logger.info("[infra.mongodb] (saveLoanRead) payload: {}", read);
+        return this.save(read)
+                .log()
+                .doOnSuccess(v -> logger.info("[infra.mongodb] (adapter.saveLoanRead) Loan Read was persisted with successful, payload: {}", v))
+                .doOnError(e -> logger.error("[infra.mongodb] (adapter.saveLoanRead) Loan Read was not persisted with successful, payload: readModel:{}, errorMessage:{}", read, e.getMessage()));
     }
 
     @Override
     public Flux<LoanRead> getLoan() {
-        return null;
+        return this.repository.findAll().map(this::toEntity);
     }
 }

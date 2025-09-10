@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
@@ -34,7 +34,7 @@ public class EventRepositoryAdapter implements EventStoreRepository {
     }
 
     @Override
-    public Mono<Void> saveEvent(LoanApplicationSubmitted event) {
+    public Mono<Void> saveEvent(LoanApplicationSubmittedEvent event) {
         log.info("[infra.r2dbc] (event) save event payload: {}", event);
         return Mono.fromCallable(() -> this.mapToPersist(event))
                 .flatMap(repository::save)
