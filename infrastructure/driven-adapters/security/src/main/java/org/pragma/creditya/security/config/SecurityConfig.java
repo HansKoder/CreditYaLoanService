@@ -3,15 +3,13 @@ package org.pragma.creditya.security.config;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.security.jwt.filter.JwtFilter;
 import org.pragma.creditya.security.repository.SecurityContextRepository;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
@@ -27,8 +25,10 @@ public class SecurityConfig {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchangeSpec -> exchangeSpec.pathMatchers("/api/loan")
+                .authorizeExchange(exchangeSpec -> exchangeSpec.pathMatchers("/api/v1/loan")
                         .hasAnyAuthority("CUSTOMER")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/loans")
+                        .hasAnyAuthority("ADVISOR")
                         .anyExchange().authenticated())
                 .addFilterAfter(jwtFilter, SecurityWebFiltersOrder.FIRST)
                 .securityContextRepository(securityContextRepository)
