@@ -5,15 +5,12 @@ import org.pragma.creditya.model.loanread.query.LoanQuery;
 import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.pragma.creditya.mongo.helper.AdapterOperations;
 import org.pragma.creditya.mongo.mapper.LoanReadCustomMapper;
-import org.reactivecommons.utils.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,12 +45,11 @@ implements org.pragma.creditya.model.loanread.gateways.LoanReadRepository
 
         LoanReadCollection probe = LoanReadCollection.builder()
                 .document(query.document())
-                // .status(query.status())
                 .build();
 
         ExampleMatcher matcher = ExampleMatcher.matchingAll()
                 .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
         Example<LoanReadCollection> example = Example.of(probe, matcher);
 

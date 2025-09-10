@@ -1,9 +1,9 @@
 package org.pragma.creditya.usecase.loanread;
 
 import org.pragma.creditya.model.loanread.LoanRead;
-import org.pragma.creditya.usecase.query.GetLoanQuery;
+import org.pragma.creditya.model.loanread.query.LoanQuery;
 import reactor.core.publisher.Flux;
 
 public interface ILoanReadUseCase {
-    Flux<LoanRead> getLoan (GetLoanQuery query);
+    Flux<LoanRead> getLoan (LoanQuery query);
 }

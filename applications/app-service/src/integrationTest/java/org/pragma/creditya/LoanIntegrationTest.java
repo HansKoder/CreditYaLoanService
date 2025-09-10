@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.ErrorResponse;
-import org.pragma.creditya.api.dto.response.LoanAppliedResponse;
+import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -104,7 +104,7 @@ public class LoanIntegrationTest {
                 .bodyValue(REQUEST_EXAMPLE)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(LoanAppliedResponse.class)
+                .expectBody(LoanApplicationResponse.class)
                 .value(persisted -> {
                     assertNotNull(persisted.loanId());
                     assertFalse(persisted.loanId().isBlank());

@@ -2,7 +2,7 @@ package org.pragma.creditya.api.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
-import org.pragma.creditya.api.dto.response.LoanAppliedResponse;
+import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
@@ -46,7 +46,7 @@ public class LoanRestMapperTest {
 
     @Test
     void shouldBeMappedToResponse () {
-        LoanAppliedResponse response = LoanRestMapper.toResponse(LOAN_EXAMPLE);
+        LoanApplicationResponse response = LoanRestMapper.toResponse(LOAN_EXAMPLE);
 
         assertEquals("103", response.document());
         assertEquals(BigDecimal.ONE, response.amount());

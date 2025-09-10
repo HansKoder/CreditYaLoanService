@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.server.HandlerFilterFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -20,7 +21,10 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class LoanRouterRest {
     @Bean
     public RouterFunction<ServerResponse> routerFunction(LoanHandler handler) {
-        return route(POST("/api/loan"), handler::applicationLoan)
+        return route(POST("/api/v1/loan"), handler::applicationLoan)
+                .filter(domainHandlerExceptions())
+                .filter(infraHandlerExceptions())
+                .andRoute(GET("/api/v1/loans"), handler::getLoans)
                 .filter(domainHandlerExceptions())
                 .filter(infraHandlerExceptions());
     }

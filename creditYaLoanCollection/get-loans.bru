@@ -1,0 +1,21 @@
+meta {
+  name: get-loans
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:9082/api/v1/loans?page=1&size=3&document=3
+  body: json
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  size: 3
+  document: 3
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyb2JpbkBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTc1MzkyOTUsImV4cCI6MTc1NzU0Mjg5NX0.N7x8BMLsPVLT2w_IUofwHRDhCyvhE0a0qVRxPJhelEM
+}

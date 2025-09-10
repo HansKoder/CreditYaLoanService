@@ -2,7 +2,10 @@ package org.pragma.creditya.api;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
+import org.pragma.creditya.api.dto.request.GetLoanRequest;
+import org.pragma.creditya.api.mapper.GetLoanMapper;
 import org.pragma.creditya.api.mapper.LoanRestMapper;
+import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.usecase.IOrchestratorUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,4 +34,22 @@ public class LoanHandler {
 
 
     }
+
+    public Mono<ServerResponse> getLoans(ServerRequest serverRequest) {
+
+        int page = Integer.parseInt(serverRequest.queryParam("page").orElse("0"));
+        int size = Integer.parseInt(serverRequest.queryParam("size").orElse("10"));
+        String document = serverRequest.queryParam("document").orElse("");
+        String status = serverRequest.queryParam("status").orElse("");
+
+        GetLoanRequest request = new GetLoanRequest(status, document, page, size);
+
+        log.info("[infra.reactive-web] (getLoansQuery) filters: {}", request);
+
+        return useCase.getLoans(GetLoanMapper.toQuery(request))
+                .doOnNext(response -> log.info("[infra.reactive-web] (getLoansQuery) result: {}", response))
+                .as(data -> ServerResponse.ok().body(data, LoanRead.class));
+    }
+
+
 }
