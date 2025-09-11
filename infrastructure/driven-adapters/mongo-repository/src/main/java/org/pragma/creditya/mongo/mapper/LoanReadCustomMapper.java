@@ -14,6 +14,11 @@ public class LoanReadCustomMapper implements CustomMapper<LoanRead, LoanReadColl
                 .loanId(entity.getLoanId())
                 .amount(entity.getAmount())
                 .document(entity.getDocument())
+                .totalMonthlyDebt(entity.getTotalMonthlyDebt())
+                .months(entity.getMonths())
+                .typeLoan(entity.getTypeLoan())
+                .status(entity.getStatus())
+                .timestamp(entity.getTimestamp())
                 .build();
     }
 
@@ -25,6 +30,11 @@ public class LoanReadCustomMapper implements CustomMapper<LoanRead, LoanReadColl
                 .loanId(data.getLoanId())
                 .document(data.getDocument())
                 .amount(data.getAmount())
+                .status(data.getStatus())
+                .months(data.getMonths())
+                .timestamp(data.getTimestamp())
+                .typeLoan(data.getTypeLoan())
+                .totalMonthlyDebt(data.getTotalMonthlyDebt())
                 .build();
     }
 }

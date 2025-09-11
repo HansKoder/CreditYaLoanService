@@ -1,12 +1,11 @@
 package org.pragma.creditya.model.loanread;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -16,13 +15,10 @@ public class LoanRead {
     private UUID loanId;
     private String document;
     private BigDecimal amount;
+    private Long typeLoan;
+    private Integer months;
+    private String status;
+    private BigDecimal totalMonthlyDebt;
+    private Instant timestamp;
 
-    @Override
-    public String toString() {
-        return "LoanRead{" +
-                "amount=" + amount +
-                ", loanId=" + loanId +
-                ", document='" + document + '\'' +
-                '}';
-    }
 }

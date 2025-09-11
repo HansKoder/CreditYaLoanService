@@ -46,6 +46,7 @@ public class Loan extends AggregateRoot<LoanId> {
                 .status(loanStatus.name())
                 .amount(this.amount.amount())
                 .typeLoan(this.loanType.code())
+                .period(this.period.calculateTotalMonths())
                 .build();
 
         this.uncommittedEvents.add(event);

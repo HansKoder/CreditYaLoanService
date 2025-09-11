@@ -12,6 +12,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
     private final BigDecimal amount;
     private final Long typeLoan;
     private final String status;
+    private final int period;
 
     private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
         super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
@@ -20,6 +21,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         this.amount = loanBuilder.amount;
         this.typeLoan = loanBuilder.typeLoan;
         this.status = loanBuilder.status;
+        this.period = loanBuilder.period;
     }
 
     public static final class LoanBuilder {
@@ -32,6 +34,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         private Instant timestamp;
         private String eventType;
         private String aggregateType;
+        private int period;
 
         public static LoanBuilder aLoanApplicationSubmitted() {
             return new LoanBuilder();
@@ -79,6 +82,11 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
 
         public LoanBuilder aggregateType(String value) {
             this.aggregateType = value;
+            return this;
+        }
+
+        public LoanBuilder period(int value) {
+            this.period = value;
             return this;
         }
 

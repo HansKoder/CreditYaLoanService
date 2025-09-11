@@ -5,17 +5,18 @@ meta {
 }
 
 get {
-  url: http://localhost:9082/api/v1/loans?page=1&size=3&document=3
+  url: http://localhost:9082/api/v1/loans?page=0&size=2&document=123&status=PENDING
   body: json
   auth: bearer
 }
 
 params:query {
-  page: 1
-  size: 3
-  document: 3
+  page: 0
+  size: 2
+  document: 123
+  status: PENDING
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU3NTQzOTg0LCJleHAiOjE3NTc1NDc1ODR9.K7TOlhsmsnSNoqlwcHO0X5SspjKrSQwIlL1WMemoWQ0
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU3NTQ4MTg0LCJleHAiOjE3NTc1NTE3ODR9.IvzGpJu4gV7ePsPIHAQQCGc4wWX_LwfQ2wB2HCsb8TQ
 }
