@@ -2,52 +2,58 @@ package org.pragma.creditya.model.loan.event;
 
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class LoanResolutionApproved extends LoanEvent{
+public class LoanApplicationSubmittedEvent extends LoanEvent{
+    private final String document;
+    private final BigDecimal amount;
+    private final Long typeLoan;
     private final String status;
-    private final String reason;
-    private final String approvedBy;
 
-    public LoanResolutionApproved(LoanBuilder loanBuilder) {
+    private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
         super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
 
+        this.document = loanBuilder.document;
+        this.amount = loanBuilder.amount;
+        this.typeLoan = loanBuilder.typeLoan;
         this.status = loanBuilder.status;
-        this.reason = loanBuilder.reason;
-        this.approvedBy = loanBuilder.approvedBy;
     }
 
     public static final class LoanBuilder {
-        private String approvedBy;
+        private BigDecimal amount;
+        private String document;
+        private Long typeLoan;
         private String status;
-        private String reason;
         private UUID aggregateId;
         private int version;
         private Instant timestamp;
         private String eventType;
         private String aggregateType;
 
-        private LoanBuilder() {
-        }
-
-        public static LoanBuilder aLoanResolutionApproved() {
+        public static LoanBuilder aLoanApplicationSubmitted() {
             return new LoanBuilder();
         }
 
-        public LoanBuilder approvedBy(String approvedBy) {
-            this.approvedBy = approvedBy;
+        public LoanBuilder amount(BigDecimal amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public LoanBuilder document(String document) {
+            this.document = document;
+            return this;
+        }
+
+        public LoanBuilder typeLoan(Long typeLoan) {
+            this.typeLoan = typeLoan;
             return this;
         }
 
         public LoanBuilder status(String status) {
             this.status = status;
-            return this;
-        }
-
-        public LoanBuilder reason(String reason) {
-            this.reason = reason;
             return this;
         }
 
@@ -76,8 +82,8 @@ public class LoanResolutionApproved extends LoanEvent{
             return this;
         }
 
-        public LoanResolutionApproved build() {
-            return new LoanResolutionApproved(this);
+        public LoanApplicationSubmittedEvent build() {
+            return new LoanApplicationSubmittedEvent(this);
         }
     }
 }

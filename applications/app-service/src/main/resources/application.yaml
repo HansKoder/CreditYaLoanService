@@ -16,12 +16,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  data:
+    mongodb:
+      uri: "mongodb://loan_mongo_user:loan_mongo_pass@localhost:27018/credit_loan_mongo?authSource=admin"
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
+    org.hibernate.SQL: "DEBUG"
+    org.hibernate.type.descriptor.sql.BasicBinder: "TRACE"
 adapter:
   restconsumer:
     timeout: 5000
@@ -61,7 +62,6 @@ resilience4j:
         waitDurationInOpenState: "10s"
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
-
 adapters:
   r2dbc:
     host: "${POSTGRES_HOST:localhost}"
@@ -70,7 +70,6 @@ adapters:
     schema: "public"
     username: "${POSTGRES_USER:loan_user}"
     password: "${POSTGRES_PASSWORD:loan_pass}"
-
 jwt:
-  secret: ${SECRET_KEY:uO8lC2VhP3nZ6kF9Q1tWjR7yX5aT2sVb0mGhN8oJzK4cE6rLwBqD3pUyHfMxZaSd}
+  secret: "${SECRET_KEY:uO8lC2VhP3nZ6kF9Q1tWjR7yX5aT2sVb0mGhN8oJzK4cE6rLwBqD3pUyHfMxZaSd}"
   expiration: "${EXPIRATION:3600000}"

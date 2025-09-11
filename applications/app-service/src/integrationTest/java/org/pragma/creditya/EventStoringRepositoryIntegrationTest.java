@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmitted;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,10 +53,10 @@ public class EventStoringRepositoryIntegrationTest {
     @Test
     void shouldBePersistedWithSuccessful_eventApplicationLoan() {
 
-        LoanApplicationSubmitted event = LoanApplicationSubmitted.LoanBuilder
+        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder
                 .aLoanApplicationSubmitted()
                 .aggregateType("LOAN")
-                .eventType(LoanApplicationSubmitted.class.getSimpleName())
+                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
                 .document("123")
                 .typeLoan(1L)
                 .amount(BigDecimal.valueOf(1))

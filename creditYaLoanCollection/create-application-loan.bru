@@ -5,21 +5,21 @@ meta {
 }
 
 post {
-  url: http://localhost:9082/api/loan
+  url: http://localhost:9082/api/v1/loan
   body: json
   auth: bearer
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyb2JpbkBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTczOTMzMDEsImV4cCI6MTc1NzM5NjkwMX0.NOCsmPZbJsKITMwYkQX07PYUgZKLFRyFYlwSY7P9D0k
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyb2JpbkBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTc1MzkyOTUsImV4cCI6MTc1NzU0Mjg5NX0.N7x8BMLsPVLT2w_IUofwHRDhCyvhE0a0qVRxPJhelEM
 }
 
 body:json {
   {
     "document": "123",
-    "amount": 500000,
+    "amount": 400000,
     "loanTypeId" : 1,
-    "month": 6,
-    "year": 1
+    "month": 8,
+    "year": 0
   }
 }

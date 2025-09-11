@@ -3,7 +3,7 @@ package org.pragma.creditya.api;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.ErrorResponse;
-import org.pragma.creditya.api.dto.response.LoanAppliedResponse;
+import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.pragma.creditya.infracommon.exception.InfrastructureException;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
@@ -11,7 +11,6 @@ import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.IOrchestratorUseCase;
-import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -73,7 +72,7 @@ class RouterRestTest {
                 .bodyValue(REQUEST_EXAMPLE)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(LoanAppliedResponse.class)
+                .expectBody(LoanApplicationResponse.class)
                 .value(persisted -> {
                     assertEquals("5b87a0d6-2fed-4db7-aa49-49663f719659", persisted.loanId());
                 });

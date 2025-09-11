@@ -30,3 +30,7 @@ include ':infra-common'
 project(':infra-common').projectDir = file('./infrastructure/helpers/infra-common')
 include ':security'
 project(':security').projectDir = file('./infrastructure/driven-adapters/security')
+include ':mongo-repository'
+project(':mongo-repository').projectDir = file('./infrastructure/driven-adapters/mongo-repository')
+include ':async-event-bus'
+project(':async-event-bus').projectDir = file('./infrastructure/driven-adapters/async-event-bus')

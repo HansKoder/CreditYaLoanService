@@ -6,13 +6,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class LoanResolutionRejected extends LoanEvent{
+public class LoanResolutionRejectedEvent extends LoanEvent{
     private final String status;
     private final String reason;
     private final String rejectedBy;
 
 
-    public LoanResolutionRejected(LoanBuilder loanBuilder) {
+    public LoanResolutionRejectedEvent(LoanBuilder loanBuilder) {
         super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
 
         this.status = loanBuilder.status;
@@ -79,8 +79,8 @@ public class LoanResolutionRejected extends LoanEvent{
         }
 
 
-        public LoanResolutionRejected build() {
-            return new LoanResolutionRejected(this);
+        public LoanResolutionRejectedEvent build() {
+            return new LoanResolutionRejectedEvent(this);
         }
     }
 }
