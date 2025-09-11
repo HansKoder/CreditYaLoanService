@@ -42,9 +42,9 @@ implements org.pragma.creditya.model.loanread.gateways.LoanReadRepository
 
     @Override
     public Flux<LoanRead> getLoan(LoanQuery query) {
-
         LoanReadCollection probe = LoanReadCollection.builder()
                 .document(query.document())
+                .status(query.status())
                 .build();
 
         ExampleMatcher matcher = ExampleMatcher.matchingAll()
@@ -55,9 +55,10 @@ implements org.pragma.creditya.model.loanread.gateways.LoanReadRepository
 
         Pageable pageable = PageRequest.of(query.pagination().page(), query.pagination().size());
 
+        // return repository.findAll().map(this::toEntity);
+
         return repository.findBy(example, q -> q.page(pageable))
                 .flatMapMany(pageResult -> Flux.fromIterable(pageResult.getContent()))
                 .map(this::toEntity);
-
     }
 }

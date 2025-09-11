@@ -7,6 +7,8 @@ import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanApplicationSubmittedEvent> {
 
@@ -23,18 +25,15 @@ public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanAp
     public void onEvent(LoanApplicationSubmittedEvent event) {
         System.out.println("[infra.event.handler] (onEvent) (1) register a new event, payload: " + event);
 
-        System.out.printf("[infra.event.handler] (onEvent) (2) aggregateId=%s, doc=%s, amount=%s, typeLoan=%s, status=%s%n",
-                event.getAggregateId(),
-                event.getDocument(),
-                event.getAmount(),
-                event.getTypeLoan(),
-                event.getStatus()
-        );
-
         LoanRead read = LoanRead.builder()
                 .loanId(event.getAggregateId())
                 .amount(event.getAmount())
                 .document(event.getDocument())
+                .status(event.getStatus())
+                .months(event.getPeriod())
+                .typeLoan(event.getTypeLoan())
+                .totalMonthlyDebt(event.getAmount().divide(BigDecimal.valueOf(event.getPeriod())))
+                .timestamp(event.getTimestamp())
                 .build();
 
         System.out.printf("[infra.event.handler] (onEvent) (3) LeanRead=%s", read);

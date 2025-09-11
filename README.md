@@ -1,47 +1,85 @@
-# Proyecto Base Implementando Clean Architecture
+# Loan Service
 
-## Antes de Iniciar
+## 📌 Overview
+The **Loan Service** manages the lifecycle of loans for each customer.  
+It is responsible for:
+- Create loan applications (Customer side)
+- Retrieve loans (Advisor side)
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
+This service is built following **Clean Architecture** principles to ensure testability, maintainability, and scalability.
 
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+---
 
-# Arquitectura
+## 🏛️ Architecture & Patterns
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+This service applies **Event Sourcing** and **CQRS** to separate responsibilities and provide traceability:
 
-## Domain
+- **Event Sourcing**  
+  Every important change (e.g. *LoanApplicationSubmitted*, *LoanApproved*) is stored as an **event** rather than only keeping the latest state.  
+  This allows:
+    - A full history of loan changes.
+    - Replayability of events to rebuild state.
+    - Auditability.
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+- **CQRS (Command Query Responsibility Segregation)**  
+  Separation of responsibilities between:
+    - **Write model (Loan Aggregate)** → Validates commands, applies business rules, and persists events in **PostgreSQL** (Event Store).
+    - **Read model (LoanRead)** → Stores projections in **MongoDB** for fast queries, filtering, and pagination.
 
-## Usecases
+👉 This way:
+- **Loan - Write** → reliable and consistent business decisions.
+- **Loan - Read** → optimized, flexible views for queries.
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+> 📌 A diagram will be included in the future to illustrate the flow.
 
-## Infrastructure
+---
 
-### Helpers
+## ⚙️ Tech Stack
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+| Layer              | Technology                                                                                                                             |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| **Language**       | Java 21                                                                                                                                |
+| **Framework**      | Spring Boot 3.5 + Spring WebFlux (Reactive stack)                                                                                      |
+| **Security**       | Spring Security (Reactive), JWT, BCrypt                                                                                                |
+| **Persistence**    | PostgreSQL (Event Store - Write), MongoDB (Projections - Read)                                                                         |
+| **Build Tool**     | Gradle                                                                                                                                 |
+| **Containers**     | Docker                                                                                                                                 |
+| **TestContainers** | Integration Test Mock Postgres - Mongodb etc                                                                                           |
+| **Architecture**   | Clean Architecture (Bancolombia’s Open Source Tool) [More Info](https://bancolombia.github.io/scaffold-clean-architecture/docs/intro/) |
 
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+---
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+## 📂 Architecture Structure
+- **Domain Layer**: Business rules (entities, value objects, domain events, contracts).
+- **Application Layer**: Use cases (loan application, loan query, projections).
+- **Infrastructure Layer**:
+    - **Driven Adapters**:
+        - R2dbc-postgresql (Postgres R2DBC)
+        - Mongo (Mongo Reactive)
+        - Security (JWT)
+        - Event Dispatcher (publishes domain events to projections)
+        - Rest Consumer (in order to check customer exist make request to customer-service)
+    - **Entry Points**:
+        - Reactive Web (WebFlux handlers / routers) 
 
-### Driven Adapters
+---
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+## 🚀 Getting Started
 
-### Entry Points
+### Prerequisites
+- JDK 21+
+- Docker 
+- Generate a Token using auth-service, read its readme for more details and set token (Bearer) in each request.
 
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
+## Testing
 
-## Application
+### Test
+```bash
+./gradlew test
+```
 
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+### Integration Test
+```bash
+./gradlew integrationTest
+```

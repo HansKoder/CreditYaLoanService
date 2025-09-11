@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Document(collection = "LoanReadCollection")
@@ -20,5 +21,10 @@ public class LoanReadCollection {
     private UUID loanId;
     private String document;
     private BigDecimal amount;
+    private Long typeLoan;
+    private Integer months;
+    private String status;
+    private BigDecimal totalMonthlyDebt;
+    private Instant timestamp;
 
 }
