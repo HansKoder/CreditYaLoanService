@@ -5,8 +5,7 @@ import org.pragma.creditya.model.loan.exception.LoanDomainException;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AmountTest {
 
@@ -27,6 +26,19 @@ public class AmountTest {
 
         assertEquals("Amount must be positive", exception.getMessage());
     }
+
+    @Test
+    void shouldBeFalseAmountIsLowerThanAnotherAmount () {
+        BigDecimal greater = new BigDecimal(10);
+        assertFalse(new Amount(BigDecimal.valueOf(3)).isGreaterThan(greater));
+    }
+
+    @Test
+    void shouldBeTrueAmountIsGreaterThanAnotherAmount () {
+        BigDecimal greater = new BigDecimal(10);
+        assertTrue(new Amount(BigDecimal.valueOf(30)).isGreaterThan(greater));
+    }
+
 
     @Test
     void shouldCreateAmountWithSuccessful () {

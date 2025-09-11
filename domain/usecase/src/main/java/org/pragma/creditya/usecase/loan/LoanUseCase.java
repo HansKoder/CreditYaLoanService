@@ -3,7 +3,9 @@ package org.pragma.creditya.usecase.loan;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
+import org.pragma.creditya.model.loan.exception.UsernameNotFoundDomainException;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
+import org.pragma.creditya.model.loan.gateways.UserInfoRepository;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import reactor.core.publisher.Mono;
 
@@ -11,25 +13,45 @@ import reactor.core.publisher.Mono;
 public class LoanUseCase implements ILoanUseCase {
 
     private final CustomerClient userClient;
+    private final UserInfoRepository userInfoRepository;
 
     @Override
     public Mono<Loan> checkApplication(CreateRequestLoanCommand cmd) {
-        return Mono.fromCallable(() -> checkLoan(cmd))
-                .flatMap(this::checkDocument);
+        return Mono.fromCallable(() -> checkApplicationLoan(cmd));
     }
 
-    private Loan checkLoan (CreateRequestLoanCommand cmd) {
+    @Override
+    public Mono<Loan> verifyOwnershipCustomer(Loan loan) {
+        return  userInfoRepository.getUsername()
+                .flatMap(email -> userClient.verifyOwnershipCustomer(loan.getDocument().value(), email))
+                .map(consumerResponse -> {
+                    loan.loadCustomer(consumerResponse);
+                    return loan;
+                });
+    }
+
+    @Override
+    public Mono<Loan> markAsPending(Loan loan) {
+        return Mono.fromCallable(() -> {
+            loan.markAsPending();
+            return loan;
+        });
+    }
+
+
+    private Loan checkApplicationLoan (CreateRequestLoanCommand cmd) {
         Loan domain = Loan.LoanBuilder.aLoan()
                 .document(cmd.document())
                 .amount(cmd.amount())
                 .period(cmd.year(), cmd.month())
-                .loanType(cmd.loanTypeId())
+                .loanTypeCode(cmd.loanTypeId())
                 .build();
 
         domain.checkApplicationLoan();
 
         return domain;
     }
+
 
     private Mono<Loan> checkDocument (Loan entity) {
         return userClient.exitByDocument(entity.getDocument().value())

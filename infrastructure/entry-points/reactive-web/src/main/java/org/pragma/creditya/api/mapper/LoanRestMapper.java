@@ -23,7 +23,7 @@ public class LoanRestMapper {
                 loanId,
                 entity.getDocument().value(),
                 entity.getAmount().amount(),
-                entity.getLoanType().code(),
+                entity.getLoanTypeCode().code(),
                 entity.getPeriod().year(),
                 entity.getPeriod().month(),
                 entity.getLoanStatus().name()

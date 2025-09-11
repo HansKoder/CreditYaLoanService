@@ -1,13 +1,17 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
+import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.*;
+import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,38 +24,29 @@ public class Loan extends AggregateRoot<LoanId> {
     private final Document document;
     private final Amount amount;
     private final Period period;
-    private final LoanType loanType;
+    private final LoanTypeCode loanTypeCode;
     private LoanStatus loanStatus;
 
+    // snapshots - for building rich events - projections
+    private CustomerRead customer;
+    private LoanType loanType;
+
+    // calculate data
+    private Amount totalMonthlyDebt;
+
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
-    private final String LOAN_EVEN_TYPE =  "LOAN";
+    private final String  AGGREGATE_TYPE =  "LOAN";
 
     private Loan(LoanBuilder builder) {
         this.document = builder.document;
         this.amount = builder.amount;
         this.period = builder.period;
-        this.loanType = builder.loanType;
+        this.loanTypeCode = builder.loanTypeCode;
         this.loanStatus = builder.loanStatus;
         this.setId(builder.id);
     }
 
-    private void createEventApplicationLoan () {
-        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder.
-                aLoanApplicationSubmitted()
-                .aggregateId(getId().getValue())
-                .aggregateType(LOAN_EVEN_TYPE)
-                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                .timestamp(Instant.now())
-                .document(this.document.value())
-                .status(loanStatus.name())
-                .amount(this.amount.amount())
-                .typeLoan(this.loanType.code())
-                .period(this.period.calculateTotalMonths())
-                .build();
-
-        this.uncommittedEvents.add(event);
-    }
-
+    // Business Rules
     public void checkApplicationLoan() {
         if ( this.getId() != null &&  this.getId().getValue() != null )
             throw new LoanDomainException("Must be without ID");
@@ -59,12 +54,62 @@ public class Loan extends AggregateRoot<LoanId> {
         if ( this.loanStatus != null && !this.loanStatus.equals(LoanStatus.PENDING) )
             throw new LoanDomainException("Invalid status to create request");
 
+        calculateTotalMonthlyDebt();
+    }
+
+    public void markAsPending () {
         this.loanStatus = LoanStatus.PENDING;
         this.setId(new LoanId(UUID.randomUUID()));
 
         createEventApplicationLoan();
     }
 
+    // Load read customer and loanType (snapshots)
+    public void loadCustomer (CustomerRead customer) {
+        this.customer = customer;
+    }
+
+    public void loadLoanType (LoanType loanType) {
+        this.loanType = loanType;
+    }
+
+    // private methods business rules
+    private void calculateTotalMonthlyDebt () {
+        int totalMonths = period.calculateTotalMonths();
+
+        if (!amount.isGreaterThan(new BigDecimal(totalMonths)))
+            throw new AmountLoanIsNotEnoughDomainException("Amount is not enough, Total months is greater than amount loan");
+
+        BigDecimal debt = amount.amount()
+                .divide(BigDecimal.valueOf(totalMonths), 2, RoundingMode.HALF_UP);
+
+        totalMonthlyDebt = new Amount(debt);
+    }
+
+    private void createEventApplicationLoan () {
+        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder.
+                aLoanApplicationSubmitted()
+                .aggregateId(getId().getValue())
+                .aggregateType(AGGREGATE_TYPE)
+                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
+                .timestamp(Instant.now())
+                .document(this.document.value())
+                .status(loanStatus.name())
+                .amount(this.amount.amount())
+                .typeLoan(this.loanTypeCode.code())
+                .period(this.period.calculateTotalMonths())
+                .baseSalary(this.customer.getBaseSalary())
+                .email(this.customer.getEmail())
+                .name(this.customer.getName())
+                .interestRate(this.loanType.getInterestRate().value())
+                .typeLoanDescription(this.loanType.getDescription().value())
+                .totalMonthlyDebt(this.totalMonthlyDebt.amount())
+                .build();
+
+        this.uncommittedEvents.add(event);
+    }
+
+    // Events publisher
     public List<LoanEvent> getUncommittedEvents() {
         return Collections.unmodifiableList(uncommittedEvents);
     }
@@ -73,11 +118,12 @@ public class Loan extends AggregateRoot<LoanId> {
         this.uncommittedEvents.clear();
     }
 
+    // Builder custom
     public static final class LoanBuilder {
         private Amount amount;
         private Document document;
         private Period period;
-        private LoanType loanType;
+        private LoanTypeCode loanTypeCode;
         private LoanStatus loanStatus;
         private LoanId id;
 
@@ -103,8 +149,8 @@ public class Loan extends AggregateRoot<LoanId> {
             return this;
         }
 
-        public LoanBuilder loanType(Long loanType) {
-            this.loanType = new LoanType(loanType);
+        public LoanBuilder loanTypeCode(Long loanType) {
+            this.loanTypeCode = new LoanTypeCode(loanType);
             return this;
         }
 

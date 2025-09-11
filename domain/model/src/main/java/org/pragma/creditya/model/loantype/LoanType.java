@@ -5,13 +5,15 @@ import org.pragma.creditya.model.loantype.valueobject.InterestRate;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 
+import java.util.UUID;
+
 @Getter
 public class LoanType extends AggregateRoot<LoanTypeId> {
 
     private final Description description;
     private final InterestRate interestRate;
 
-    private LoanType(Description description, InterestRate interestRate) {
+    public LoanType(Description description, InterestRate interestRate) {
         this.description = description;
         this.interestRate = interestRate;
     }
@@ -28,13 +30,13 @@ public class LoanType extends AggregateRoot<LoanTypeId> {
             return new LoanTypeBuilder();
         }
 
-        public LoanTypeBuilder description(String description) {
-            this.description = description;
+        public LoanTypeBuilder description(String value) {
+            this.description = value;
             return this;
         }
 
-        public LoanTypeBuilder interestRate(Double interestRate) {
-            this.interestRate = interestRate;
+        public LoanTypeBuilder interestRate(Double value) {
+            this.interestRate = value;
             return this;
         }
 
@@ -44,9 +46,14 @@ public class LoanType extends AggregateRoot<LoanTypeId> {
         }
 
         public LoanType build() {
-            LoanType loanType = new LoanType(new Description(description), new InterestRate(interestRate));
-            loanType.setId(new LoanTypeId(id));
-            return loanType;
+            LoanType entity = new LoanType(
+                    new Description(this.description),
+                    new InterestRate(this.interestRate)
+            );
+
+            entity.setId(new LoanTypeId(id));
+
+            return entity;
         }
     }
 }

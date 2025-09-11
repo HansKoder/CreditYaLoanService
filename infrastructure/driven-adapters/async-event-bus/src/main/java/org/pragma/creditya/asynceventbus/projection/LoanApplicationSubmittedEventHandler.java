@@ -7,8 +7,6 @@ import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-
 @Component
 public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanApplicationSubmittedEvent> {
 
@@ -32,7 +30,12 @@ public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanAp
                 .status(event.getStatus())
                 .months(event.getPeriod())
                 .typeLoan(event.getTypeLoan())
-                .totalMonthlyDebt(event.getAmount().divide(BigDecimal.valueOf(event.getPeriod())))
+                .totalMonthlyDebt(event.getTotalMonthlyDebt())
+                .interestRate(event.getInterestRate())
+                .name(event.getName())
+                .email(event.getEmail())
+                .baseSalary(event.getBaseSalary())
+                .typeLoanDescription(event.getTypeLoanDescription())
                 .timestamp(event.getTimestamp())
                 .build();
 

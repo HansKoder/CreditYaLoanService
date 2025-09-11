@@ -38,7 +38,7 @@ public class LoanTypeUseCaseTest {
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .loanStatus(LoanStatus.PENDING)
             .amount(BigDecimal.valueOf(4_000_000))
-            .loanType(1L)
+            .loanTypeCode(1L)
             .period(1,0)
             .document("103")
             .build();

@@ -1,8 +1,11 @@
 package org.pragma.creditya.model.loan;
 
 import org.junit.jupiter.api.Test;
+import org.pragma.creditya.model.loan.entity.CustomerRead;
+import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loantype.LoanType;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -46,7 +49,7 @@ public class LoadTest {
                     .document("123")
                     .amount(BigDecimal.valueOf(10))
                     .period(1, 6)
-                    .loanType(null)
+                    .loanTypeCode(null)
                     .build();
         });
 
@@ -61,7 +64,7 @@ public class LoadTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanType(1L)
+                .loanTypeCode(1L)
                 .build();
 
         LoanDomainException exception = assertThrows(LoanDomainException.class, domain::checkApplicationLoan);
@@ -76,7 +79,7 @@ public class LoadTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanType(1L)
+                .loanTypeCode(1L)
                 .loanStatus(LoanStatus.APPROVED)
                 .build();
 
@@ -85,15 +88,30 @@ public class LoadTest {
         assertEquals("Invalid status to create request", exception.getMessage());
     }
 
-
     @Test
-    void shouldReturnLoanWithSuccessful () {
+    void shouldThrowException_WhenTotalMonthsIsGreaterThanAmount () {
         Loan domain = Loan.LoanBuilder
                 .aLoan()
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanType(1L)
+                .loanTypeCode(1L)
+                .build();
+
+        AmountLoanIsNotEnoughDomainException exception = assertThrows(AmountLoanIsNotEnoughDomainException.class, domain::checkApplicationLoan);
+
+        assertEquals("Amount is not enough, Total months is greater than amount loan", exception.getMessage());
+    }
+
+
+    @Test
+    void shouldReturnLoanWithSuccessful_whenCheckApplication () {
+        Loan domain = Loan.LoanBuilder
+                .aLoan()
+                .document("123")
+                .amount(BigDecimal.valueOf(10000))
+                .period(1, 6)
+                .loanTypeCode(1L)
                 .build();
 
         domain.checkApplicationLoan();
@@ -101,31 +119,84 @@ public class LoadTest {
         assertNotNull(domain);
         assertInstanceOf(Loan.class, domain);
 
-        assertNotNull(domain.getId());
-        assertNotNull(domain.getId());
-        assertNotNull(domain.getId().getValue());
-        assertEquals(LoanStatus.PENDING, domain.getLoanStatus());
+        assertNull(domain.getId());
+        // assertEquals(LoanStatus.PENDING, domain.getLoanStatus());
+        assertNull(domain.getLoanStatus());
         assertEquals(18, domain.getPeriod().calculateTotalMonths());
 
-        assertEquals(1, domain.getUncommittedEvents().size());
+        assertEquals(0, domain.getUncommittedEvents().size());
     }
 
 
-    @Test void shouldCleanEvents () {
+    @Test void shouldBeSuccess_whenLoadCustomerAndLoanType () {
         Loan domain = Loan.LoanBuilder
                 .aLoan()
                 .document("123")
-                .amount(BigDecimal.valueOf(10))
+                .amount(BigDecimal.valueOf(100000))
                 .period(1, 6)
-                .loanType(1L)
+                .loanTypeCode(1L)
                 .build();
 
         domain.checkApplicationLoan();
 
+        assertEquals(0, domain.getUncommittedEvents().size());
+
+        CustomerRead customerRead =CustomerRead.builder()
+                .email("example@gmail.com")
+                .name("example")
+                .document("123")
+                .baseSalary(BigDecimal.valueOf(20))
+                .build();
+
+        domain.loadCustomer(customerRead);
+        assertEquals(0, domain.getUncommittedEvents().size());
+
+        LoanType loanType = LoanType.LoanTypeBuilder.aLoanType()
+                .description("Example")
+                .id(1L)
+                .interestRate(1.0D)
+                .build();
+
+        domain.loadLoanType(loanType);
+        assertEquals(0, domain.getUncommittedEvents().size());
+    }
+
+    @Test void shouldHavePendingStatus_whenMarkAsPending_afterCheckAndLoading () {
+        Loan domain = Loan.LoanBuilder
+                .aLoan()
+                .document("123")
+                .amount(BigDecimal.valueOf(100000))
+                .period(1, 6)
+                .loanTypeCode(1L)
+                .build();
+
+        domain.checkApplicationLoan();
+
+        assertEquals(0, domain.getUncommittedEvents().size());
+
+        CustomerRead customerRead =CustomerRead.builder()
+                .email("example@gmail.com")
+                .name("example")
+                .document("123")
+                .baseSalary(BigDecimal.valueOf(20))
+                .build();
+
+        domain.loadCustomer(customerRead);
+        assertEquals(0, domain.getUncommittedEvents().size());
+
+        LoanType loanType = LoanType.LoanTypeBuilder.aLoanType()
+                .description("Example")
+                .id(1L)
+                .interestRate(1.0D)
+                .build();
+
+        domain.loadLoanType(loanType);
+        assertEquals(0, domain.getUncommittedEvents().size());
+
+        domain.markAsPending();
         assertEquals(1, domain.getUncommittedEvents().size());
 
         domain.clearUncommittedEvents();
-
         assertEquals(0, domain.getUncommittedEvents().size());
     }
 

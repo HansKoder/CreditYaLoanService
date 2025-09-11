@@ -9,8 +9,16 @@ import java.util.UUID;
 @Getter
 public class LoanApplicationSubmittedEvent extends LoanEvent{
     private final String document;
+    private final String name;
+    private final String email;
+    private final BigDecimal baseSalary;
     private final BigDecimal amount;
+    private final BigDecimal totalMonthlyDebt;
+
     private final Long typeLoan;
+    private final String typeLoanDescription;
+    private final Double interestRate;
+
     private final String status;
     private final int period;
 
@@ -22,9 +30,23 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         this.typeLoan = loanBuilder.typeLoan;
         this.status = loanBuilder.status;
         this.period = loanBuilder.period;
+        this.name = loanBuilder.name;
+        this.email = loanBuilder.email;
+        this.baseSalary = loanBuilder.baseSalary;
+        this.typeLoanDescription = loanBuilder.typeLoanDescription;
+        this.interestRate = loanBuilder.interestRate;
+        this.totalMonthlyDebt = loanBuilder.totalMonthlyDebt;
     }
 
     public static final class LoanBuilder {
+        private BigDecimal totalMonthlyDebt;
+        private String name;
+        private String email;
+        private BigDecimal baseSalary;
+
+        private String typeLoanDescription;
+        private Double interestRate;
+
         private BigDecimal amount;
         private String document;
         private Long typeLoan;
@@ -87,6 +109,37 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
 
         public LoanBuilder period(int value) {
             this.period = value;
+            return this;
+        }
+
+        public LoanBuilder name(String value) {
+            this.name = value;
+            return this;
+        }
+
+        public LoanBuilder typeLoanDescription(String value) {
+            this.typeLoanDescription = value;
+            return this;
+        }
+
+        public LoanBuilder baseSalary(BigDecimal value) {
+            this.baseSalary = value;
+            return this;
+        }
+
+
+        public LoanBuilder interestRate(Double value) {
+            this.interestRate = value;
+            return this;
+        }
+
+        public LoanBuilder email(String value) {
+            this.email = value;
+            return this;
+        }
+
+        public LoanBuilder totalMonthlyDebt(BigDecimal value) {
+            this.totalMonthlyDebt = value;
             return this;
         }
 

@@ -6,5 +6,6 @@ import reactor.core.publisher.Mono;
 public interface ILoanTypeUseCase {
 
     Mono<Loan> checkLoanTypeExists (Loan loan);
+    Mono<Loan> checkLoanTypeAndLoad (Loan loan);
 
 }

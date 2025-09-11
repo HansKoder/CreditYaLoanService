@@ -14,13 +14,27 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
     @Override
     public Mono<Loan> checkLoanTypeExists(Loan loan) {
-        return loanTypeRepository.existLoanType(new LoanTypeId(loan.getLoanType().code()))
+        Long id = loan.getLoanTypeCode().code();
+        return loanTypeRepository.existLoanType(new LoanTypeId(id))
                 .flatMap(exist -> {
                     if (exist)
                         return Mono.just(loan);
 
-                    String err = String.format("Type Loan code %s does not exist, you need to check", loan.getLoanType().code());
+                    String err = String.format("Type Loan code %s does not exist, you need to check", id);
                     return Mono.error(new LoanTypeNotFoundDomainException(err));
                 });
     }
+
+    @Override
+    public Mono<Loan> checkLoanTypeAndLoad(Loan loan) {
+        Long id = loan.getLoanTypeCode().code();
+        return loanTypeRepository.findById(id)
+                .switchIfEmpty(Mono.error(new LoanTypeNotFoundDomainException("Type Loan code " + id + " does not exist, you need to check")))
+                .map(e -> {
+                    loan.loadLoanType(e);
+                    return loan;
+                });
+
+    }
+
 }
