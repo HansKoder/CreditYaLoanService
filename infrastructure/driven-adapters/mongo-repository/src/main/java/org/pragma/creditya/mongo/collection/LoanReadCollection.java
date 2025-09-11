@@ -27,4 +27,10 @@ public class LoanReadCollection {
     private BigDecimal totalMonthlyDebt;
     private Instant timestamp;
 
+    private String name;
+    private String email;
+    private BigDecimal baseSalary;
+    private String loanTypeDescription;
+    private Double interestRate;
+
 }

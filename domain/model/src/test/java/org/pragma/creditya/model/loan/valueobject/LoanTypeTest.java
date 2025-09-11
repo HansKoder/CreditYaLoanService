@@ -11,7 +11,7 @@ public class LoanTypeTest {
     @Test
     void shouldThrowExceptionLoanTypeIsNull () {
         LoanDomainException exception = assertThrows(LoanDomainException.class, () -> {
-            new LoanType(null);
+            new LoanTypeCode(null);
         });
 
         assertEquals("Loan Type must be mandatory", exception.getMessage());
@@ -19,7 +19,7 @@ public class LoanTypeTest {
 
     @Test
     void shouldCreateLoanTypeWithSuccessful () {
-        LoanType vo = new LoanType(1L);
+        LoanTypeCode vo = new LoanTypeCode(1L);
 
         assertEquals(1L, vo.code());
     }

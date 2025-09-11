@@ -28,7 +28,9 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     @Override
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
         return loanUseCase.checkApplication(command)
-                .flatMap(loanTypeUseCase::checkLoanTypeExists)
+                .flatMap(loanUseCase::verifyOwnershipCustomer)
+                .flatMap(loanTypeUseCase::checkLoanTypeAndLoad)
+                .flatMap(loanUseCase::markAsPending)
                 .flatMap(loan -> {
                     List<LoanEvent> events = loan.getUncommittedEvents();
                     return eventRepository.saveAll(events)

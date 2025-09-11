@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface ILoanUseCase {
     Mono<Loan> checkApplication(CreateRequestLoanCommand cmd);
+    Mono<Loan> verifyOwnershipCustomer (Loan loan);
+    Mono<Loan> markAsPending (Loan loan);
 }

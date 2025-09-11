@@ -13,12 +13,24 @@ import java.util.UUID;
 public class LoanRead {
     private String id;
     private UUID loanId;
-    private String document;
     private BigDecimal amount;
-    private Long typeLoan;
     private Integer months;
     private String status;
+
+    // calculate
     private BigDecimal totalMonthlyDebt;
+
+    // customer
+    private String document;
+    private String name;
+    private String email;
+    private BigDecimal baseSalary;
+
+    // loan type
+    private Long typeLoan;
+    private String typeLoanDescription;
+    private Double interestRate;
+
     private Instant timestamp;
 
 }

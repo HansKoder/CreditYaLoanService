@@ -55,7 +55,12 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     }
 
     public Mono<E> findById(I id) {
-        return repository.findById(id).map(this::toEntity);
+        log.info("[infra.helper.adapter] 1.0 find by id payload [ id:{} ]", id);
+        return repository.findById(id)
+                .doOnSuccess(d -> log.info("[infra.helper.adapter] (findById) success find by id before map to entity, payload: [ data:{} ]", d))
+                .doOnError(e -> log.info("[infra.helper.adapter] (findById) error find by id, payload: [ errorMessage:{} ]", e.getMessage()))
+                .map(this::toEntity)
+                .doOnError(e -> log.info("[infra.helper.adapter] (findById) mapper, payload: [ errorMessage:{} ]", e.getMessage()));
     }
 
     public Flux<E> findByExample(E entity) {

@@ -1,0 +1,9 @@
+package org.pragma.creditya.consumer.exception;
+
+import org.pragma.creditya.infracommon.exception.InfrastructureException;
+
+public class CustomerBadRequestException extends InfrastructureException {
+    public CustomerBadRequestException(String message) {
+        super(message);
+    }
+}
