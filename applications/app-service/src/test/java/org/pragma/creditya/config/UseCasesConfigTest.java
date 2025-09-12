@@ -2,9 +2,12 @@ package org.pragma.creditya.config;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
+import org.pragma.creditya.model.loan.gateways.UserInfoRepository;
 import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
+import org.pragma.creditya.usecase.loanread.LoanReadUseCase;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +54,19 @@ public class UseCasesConfigTest {
 
         @Bean
         public EventStoreRepository eventStoreRepository () { return Mockito.mock(EventStoreRepository.class); }
+
+        @Bean
+        public UserInfoRepository userInfoRepository () {
+            return Mockito.mock(UserInfoRepository.class);
+        }
+
+        @Bean
+        public LoanReadUseCase loanReadUseCase () {
+            return Mockito.mock(LoanReadUseCase.class);
+        }
+
+        @Bean
+        public EventBus eventBus () { return Mockito.mock(EventBus.class); }
 
     }
 

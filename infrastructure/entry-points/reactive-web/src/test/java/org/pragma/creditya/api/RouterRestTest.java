@@ -40,13 +40,13 @@ class RouterRestTest {
     @MockitoBean
     IOrchestratorUseCase useCase;
 
-    private final String URL_POST_APPLICATION_LOAN = "/api/loan";
+    private final String URL_POST_APPLICATION_LOAN = "/api/v1/loan";
 
     private final UUID LOAN_ID_EXAMPLE = UUID.fromString("5b87a0d6-2fed-4db7-aa49-49663f719659");
 
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .id(LOAN_ID_EXAMPLE)
-            .loanType(1L)
+            .loanTypeCode(1L)
             .loanStatus(LoanStatus.PENDING)
             .document("103")
             .period(1,0)
