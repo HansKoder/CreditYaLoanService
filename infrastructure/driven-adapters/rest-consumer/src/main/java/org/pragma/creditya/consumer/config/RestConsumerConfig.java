@@ -31,14 +31,22 @@ public class RestConsumerConfig {
 
     public RestConsumerConfig(@Value("${adapter.restconsumer.url}") String url,
                               @Value("${adapter.restconsumer.timeout}") int timeout) {
+        logger.info("[infra.rest-consume] (construct) extract env vars payload=[ url:{}, timeout:{} ]", url, timeout);
         this.url = url;
         this.timeout = timeout;
     }
 
     @Bean
     public WebClient getWebClient(WebClient.Builder builder) {
+        logger.info("[infra.rest-consume] (getWebClient) consume user-service to check identify payload [ url:{}, timeout:{} ]", url, timeout);
+
+        String urlCheck = "http://creditya-user-service:9081/api/v1/users/verify-ownership-customer";
+        // String urlCheck = "http://creditya-user-service:9081";
+
+        logger.info("[infra.rest-consume] (getWebClient) compare url and url constant custom [ url:{}, url-custom:{}, equals:{} ]", url, urlCheck, url.equals(urlCheck));
+
         return builder
-            .baseUrl(url)
+            .baseUrl(urlCheck)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
             .clientConnector(getClientHttpConnector())
             .build();

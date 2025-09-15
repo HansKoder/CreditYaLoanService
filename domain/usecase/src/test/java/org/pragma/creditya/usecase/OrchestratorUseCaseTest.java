@@ -8,8 +8,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.bus.EventBus;
+import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.loan.LoanUseCase;
@@ -37,6 +40,9 @@ public class OrchestratorUseCaseTest {
     @Mock
     private ILoanReadUseCase loanReadUseCase;
 
+    @Mock
+    private EventBus eventBus;
+
     @InjectMocks
     private OrchestratorUseCase orchestratorUseCase;
 
@@ -48,14 +54,28 @@ public class OrchestratorUseCaseTest {
             .document("103")
             .build();
 
+    private final CustomerRead CUSTOMER_LOAD = CustomerRead.builder()
+            .name("doe")
+            .email("doe@gmail.com")
+            .baseSalary(BigDecimal.valueOf(1_000_000))
+            .document("103")
+            .build();
+
+    private final LoanType LOAN_TYPE_LOAD = LoanType.LoanTypeBuilder.aLoanType()
+            .id(1L)
+            .interestRate(2.0)
+            .description("PERSONAL")
+            .build();
+
     @BeforeEach
     void setup() {
         loanUseCase = Mockito.mock(LoanUseCase.class);
         loanTypeUseCase = Mockito.mock(LoanTypeUseCase.class);
         eventStoreRepository = Mockito.mock(EventStoreRepository.class);
         loanReadUseCase = Mockito.mock(LoanReadUseCase.class);
+        eventBus = Mockito.mock(EventBus.class);
 
-        // orchestratorUseCase = new OrchestratorUseCase(loanTypeUseCase, loanUseCase, eventStoreRepository, loanReadUseCase);
+        orchestratorUseCase = new OrchestratorUseCase(loanTypeUseCase, loanUseCase, eventStoreRepository, loanReadUseCase, eventBus);
     }
 
 
@@ -66,11 +86,22 @@ public class OrchestratorUseCaseTest {
         Mockito.when(loanUseCase.checkApplication(createRequestLoanCommand))
                 .thenReturn(Mono.just(LOAN_EXAMPLE));
 
-        Mockito.when(loanTypeUseCase.checkLoanTypeExists(LOAN_EXAMPLE))
+        LOAN_EXAMPLE.loadCustomer(CUSTOMER_LOAD);
+        Mockito.when(loanUseCase.verifyOwnershipCustomer(LOAN_EXAMPLE))
+                        .thenReturn(Mono.just(LOAN_EXAMPLE));
+
+        Mockito.when(loanTypeUseCase.checkLoanTypeAndLoad(LOAN_EXAMPLE))
                 .thenReturn(Mono.just(LOAN_EXAMPLE));
 
-        Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))
-                .thenReturn(Mono.empty());
+        LOAN_EXAMPLE.loadLoanType(LOAN_TYPE_LOAD);
+
+        Mockito.when(loanUseCase.markAsPending(LOAN_EXAMPLE))
+                .thenReturn(Mono.just(LOAN_EXAMPLE));
+
+
+        // Mockito.when(eventStoreRepository.saveAll(Mockito.anyList())).thenReturn(Mono.empty());
+
+        // Mockito.doNothing().when(eventBus).publish(Mockito.any());
 
         var response = orchestratorUseCase.applicationLoan(createRequestLoanCommand);
 

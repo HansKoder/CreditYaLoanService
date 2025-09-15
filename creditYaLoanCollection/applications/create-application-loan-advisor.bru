@@ -1,0 +1,25 @@
+meta {
+  name: create-application-loan-advisor
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYXZlbkBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTc2Mzg1NjgsImV4cCI6MTc1NzY0MjE2OH0.tIvxHDVJsIaSgMBH-qqW2vX72i4gCs75c76mjz5ZK5c
+}
+
+body:json {
+  {
+    "document": "222",
+    "amount": 335000,
+    "loanTypeId" : 2,
+    "month": 10,
+    "year": 1
+  }
+}

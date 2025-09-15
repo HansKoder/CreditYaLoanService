@@ -31,13 +31,18 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(loanUseCase::verifyOwnershipCustomer)
                 .flatMap(loanTypeUseCase::checkLoanTypeAndLoad)
                 .flatMap(loanUseCase::markAsPending)
-                .flatMap(loan -> {
-                    List<LoanEvent> events = loan.getUncommittedEvents();
-                    return eventRepository.saveAll(events)
-                            .doOnSuccess(v -> events.forEach(eventBus::publish))
-                            .then(Mono.just(loan))
-                            .doOnSuccess(Loan::clearUncommittedEvents);
-                });
+                .flatMap(this::persistAndPublishEvents);
+    }
+
+    private Mono<Loan> persistAndPublishEvents (Loan loan) {
+        List<LoanEvent> events = loan.getUncommittedEvents();
+
+        if (events.isEmpty()) return Mono.just(loan);
+
+        return eventRepository.saveAll(events)
+                .doOnSuccess(v -> events.forEach(eventBus::publish))
+                .thenReturn(loan)
+                .doOnSuccess(Loan::clearUncommittedEvents);
     }
 
     @Override

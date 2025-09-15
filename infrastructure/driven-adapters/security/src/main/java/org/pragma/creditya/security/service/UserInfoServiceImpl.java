@@ -16,8 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserInfoServiceImpl implements UserInfoRepository {
 
-    private Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
-
+    private final Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
     private final JwtProvider jwtProvider;
 
     @Override

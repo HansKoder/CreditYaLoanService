@@ -28,7 +28,6 @@ public class RestConsumer implements CustomerClient{
 
     private final static Logger log = LoggerFactory.getLogger(RestConsumer.class);
 
-
     @CircuitBreaker(name = "testGet", fallbackMethod = "operationIsDown")
     public Mono<CustomerResponse> getVerifyOwnershipCustomer(String document, String email) {
         return Mono.deferContextual(ctx -> {
@@ -40,7 +39,9 @@ public class RestConsumer implements CustomerClient{
 
             return client
                     .get()
+                    // .uri("/api/v1/users/verify-ownership-customer")
                     .uri(uriBuilder -> uriBuilder
+
                             .queryParam("document", document)
                             .queryParam("email", email)
                             .build())
@@ -86,13 +87,16 @@ public class RestConsumer implements CustomerClient{
 
     @Override
     public Mono<CustomerRead> verifyOwnershipCustomer(String document, String email) {
+        log.info("[infra.rest-consumer] (verifyOwnershipCustomer), payload: [ document:{}, email:{} ]", document, email);
         return getVerifyOwnershipCustomer(document, email)
                 .map(r -> CustomerRead.builder()
                         .document(r.document())
                         .baseSalary(r.baseSalary())
                         .name(r.name())
                         .email(r.email())
-                        .build());
+                        .build())
+                .doOnSuccess(customer -> log.info("[infra.rest-consumer] (verifyOwnershipCustomer), success customer was identified, payload: [ customer:{} ]", customer))
+                .doOnError(e -> log.info("[infra.rest-consumer] (verifyOwnershipCustomer), fail, unexpected error,  payload=[ error:{} ]", e.getMessage()));
     }
 
 }

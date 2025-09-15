@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 import reactor.util.context.Context;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 
 
@@ -39,37 +41,41 @@ class RestConsumerTest {
     }
 
     @Test
-    @DisplayName("Validate the function testGet.")
-    void validateTestGet() {
+    @DisplayName("Should get customer with successful")
+    void shouldBeSuccess_becauseCustomerExist() {
 
         mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
-                .setBody("{\"exists\" : true}"));
+                .setBody("{\"name\" : \"jhon\", \"email\" : \"example@gmail.com\", \"baseSalary\" : 12000, \"document\" : \"123\"   }"));
 
         Context context = Context.of("token", TOKEN_EXAMPLE);
 
-        var response = restConsumer.customerExistByDocument("123");
+        var response = restConsumer.verifyOwnershipCustomer("123", "example@gmail.com");
 
         StepVerifier.create(response.contextWrite(context))
-                .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.TRUE)
+                .expectNextMatches(objectResponse -> objectResponse.getDocument().equals("123"))
                 .verifyComplete();
     }
 
     @Test
-    @DisplayName("Validate the function testGet when customer does not exist")
-    void validateTestGet_WhenResultIsFalse() {
-        Context context = Context.of("token", TOKEN_EXAMPLE);
+    @DisplayName("Should Throw Exception when customer is not authorized")
+    void shouldThrowException_whenCustomerIsInvalid() {
 
         mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setResponseCode(HttpStatus.OK.value())
-                .setBody("{\"exists\" : false}"));
-        var response = restConsumer.customerExistByDocument("123");
+                .setResponseCode(HttpStatus.UNAUTHORIZED.value())
+                .setBody("{\"status\" : 403, \"error\" : \"Invalid Operation\"}"));
+
+        Context context = Context.of("token", TOKEN_EXAMPLE);
+
+        var response = restConsumer.verifyOwnershipCustomer("123", "example@gmail.com");
 
         StepVerifier.create(response.contextWrite(context))
-                .expectNextMatches(objectResponse -> objectResponse.getExists() == Boolean.FALSE)
-                .verifyComplete();
+                .expectErrorSatisfies(err ->
+                    assertEquals(err.getMessage(), "Invalid Operation")
+                )
+                .verify();
     }
 
 }
