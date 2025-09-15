@@ -23,10 +23,10 @@ import java.util.UUID;
 @ToString
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
-    private final Document document;
-    private final Amount amount;
-    private final Period period;
-    private final LoanTypeCode loanTypeCode;
+    private Document document;
+    private Amount amount;
+    private Period period;
+    private LoanTypeCode loanTypeCode;
     private LoanStatus loanStatus;
 
     // those snapshot must be removed since, projections should add webclient request using document for getting all customer data (CQRS)
@@ -70,6 +70,38 @@ public class Loan extends AggregateRoot<LoanId> {
         this.setId(new LoanId(UUID.randomUUID()));
 
         createEventApplicationLoan();
+    }
+
+    public void loadAuthorResolutionLoan (String username) {
+        this.responsible = username;
+    }
+
+    public void checkApprovedLoan(String reason) {
+        checkBeforeBeingResolved(APPROVED);
+
+        this.loanStatus = LoanStatus.APPROVED;
+
+        LoanResolutionApprovedEvent event = LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
+                .approvedBy(responsible)
+                .aggregateId(getId().getValue())
+                .reason(reason)
+                .build();
+
+        uncommittedEvents.add(event);
+    }
+
+    public void checkRejectedLoan(String reason) {
+        checkBeforeBeingResolved(REJECTED);
+
+        this.loanStatus = LoanStatus.REJECTED;
+
+        LoanResolutionRejectedEvent event = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
+                .rejectedBy(responsible)
+                .aggregateId(getId().getValue())
+                .reason(reason)
+                .build();
+
+        uncommittedEvents.add(event);
     }
 
     // Load read customer and loanType (snapshots) // next iteration must be removed
@@ -118,6 +150,49 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     // Events publisher
+    public static Loan rehydrate(List<LoanEvent> history) {
+        if (history == null || history.isEmpty())
+            throw new LoanDomainException("Cannot rehydrate Loan without events");
+
+        Loan loan = new LoanBuilder().build();
+
+        for (LoanEvent event : history)
+            loan.apply(event);
+
+        loan.clearUncommittedEvents(); // clear
+        return loan;
+    }
+
+    private void apply(LoanEvent event) {
+        switch (event) {
+            case LoanApplicationSubmittedEvent e -> applyLoanApplicationSubmitted(e);
+            case LoanResolutionApprovedEvent e -> applyLoanApproved(e);
+            case LoanResolutionRejectedEvent e -> applyLoanRejected(e);
+            default -> throw new LoanDomainException("Unknown event type: " + event.getClass().getName());
+        }
+    }
+
+    private void applyLoanApplicationSubmitted(LoanApplicationSubmittedEvent e) {
+        this.setId(new LoanId(e.getAggregateId()));
+        this.loanStatus = LoanStatus.valueOf(e.getStatus());
+        this.document = new Document(e.getDocument());
+        this.amount = new Amount(e.getAmount());
+        this.period = new Period(0, e.getPeriod());
+        this.loanTypeCode = new LoanTypeCode(e.getTypeLoan());
+
+        this.totalMonthlyDebt = new Amount(e.getTotalMonthlyDebt());
+    }
+
+    private void applyLoanApproved(LoanResolutionApprovedEvent e) {
+        this.loanStatus = LoanStatus.APPROVED;
+        this.responsible = e.getApprovedBy();
+    }
+
+    private void applyLoanRejected(LoanResolutionRejectedEvent e) {
+        this.loanStatus = LoanStatus.REJECTED;
+        this.responsible = e.getRejectedBy();
+    }
+
     public List<LoanEvent> getUncommittedEvents() {
         return Collections.unmodifiableList(uncommittedEvents);
     }
@@ -149,39 +224,7 @@ public class Loan extends AggregateRoot<LoanId> {
             throw new LoanDomainException("Must have ID Loan for being " + resolution);
     }
 
-    public void loadAuthorResolutionLoan (String username) {
-        this.responsible = username;
-    }
 
-    public void checkApprovedLoan(String reason) {
-        checkBeforeBeingResolved(APPROVED);
-
-        this.loanStatus = LoanStatus.APPROVED;
-
-        LoanResolutionApprovedEvent event = LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
-                .approvedBy(responsible)
-                .aggregateId(getId().getValue())
-                .reason("")
-                .build();
-
-        uncommittedEvents.add(event);
-    }
-
-    public void checkRejectedLoan(String reason) {
-        checkBeforeBeingResolved(REJECTED);
-
-        // Condition reason for being rejected
-
-        this.loanStatus = LoanStatus.REJECTED;
-
-        LoanResolutionRejectedEvent event = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
-                .rejectedBy("")
-                .aggregateId(getId().getValue())
-                .reason(reason)
-                .build();
-
-        uncommittedEvents.add(event);
-    }
 
     // Builder custom
     public static final class LoanBuilder {
