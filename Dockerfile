@@ -20,20 +20,21 @@ COPY infrastructure ./infrastructure
 RUN ./gradlew :app-service:clean :app-service:build -x test
 
 
-# ---------- Stage 2: Runtime ----------
-FROM eclipse-temurin:21-jre-jammy AS runtime
+# ---------- Stage 2: Runtime (Distroless) ----------
+FROM gcr.io/distroless/java21-debian12:nonroot
 WORKDIR /app
 
-# Create user no-root
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-
-# Copy jar from stage (builder)
+# Copy jar from builder
 COPY --from=builder /workspace/applications/app-service/build/libs/*.jar app.jar
 
-# JVM
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+# setting JVM for containers
+ENV JAVA_TOOL_OPTIONS="\
+  -XX:MaxRAMPercentage=75.0 \
+  -Djava.security.egd=file:/dev/./urandom \
+  -XX:+UseContainerSupport \
+  -XX:+ExitOnOutOfMemoryError \
+"
 
 EXPOSE 9082
-USER appuser
-
+# Distroless nonroot ya corre con un usuario no root
 ENTRYPOINT ["java","-jar","/app/app.jar"]
