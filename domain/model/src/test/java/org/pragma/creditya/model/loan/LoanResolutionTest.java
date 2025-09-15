@@ -85,4 +85,45 @@ public class LoanResolutionTest {
         assertInstanceOf(LoanResolutionApprovedEvent.class, loan.getUncommittedEvents().getFirst());
     }
 
+    @Test
+    void shouldThrowException_WhenStatusIsNotPending_ForBeingRejected () {
+        LoanDomainException exception = assertThrows(LoanDomainException.class,
+                () -> LOAN_STATUS_DIFF_PENDING.checkRejectedLoan(AUTHOR, ""));
+
+        assertEquals("Must have status Pending for being rejected", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowException_WithoutId_ForBeingRejected () {
+        LoanDomainException exception = assertThrows(LoanDomainException.class,
+                () -> LOAN_WITHOUT_ID.checkRejectedLoan(AUTHOR, ""));
+
+        assertEquals("Must have ID Loan for being rejected", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowException_WhoIsResponsible_ForBeingRejected () {
+        LoanDomainException exception = assertThrows(LoanDomainException.class,
+                () -> LOAN_PENDING_STATUS.checkRejectedLoan(null, null));
+
+        assertEquals("Who is responsible for this loan, Must have a responsible for being rejected", exception.getMessage());
+    }
+
+    @Test
+    void shouldBeRejectedWithSuccessful () {
+        Loan loan = Loan.LoanBuilder
+                .aLoan()
+                .id(LOAN_ID_EXAMPLE)
+                .document("123")
+                .amount(BigDecimal.valueOf(1000))
+                .loanStatus(LoanStatus.PENDING)
+                .build();
+
+        loan.checkRejectedLoan(AUTHOR, "");
+
+        assertEquals(LoanStatus.REJECTED, loan.getLoanStatus());
+        assertEquals(1, loan.getUncommittedEvents().size());
+        assertInstanceOf(LoanResolutionRejectedEvent.class, loan.getUncommittedEvents().getFirst());
+    }
+
 }

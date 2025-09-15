@@ -169,7 +169,7 @@ public class Loan extends AggregateRoot<LoanId> {
         LoanResolutionRejectedEvent event = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
                 .rejectedBy("")
                 .aggregateId(getId().getValue())
-                .reason("")
+                .reason(reason)
                 .build();
 
         uncommittedEvents.add(event);
