@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadTest {
+public class LoanTest {
 
     @Test
     void shouldThrowExceptionWhenAmountIsNegative () {
@@ -120,7 +120,6 @@ public class LoadTest {
         assertInstanceOf(Loan.class, domain);
 
         assertNull(domain.getId());
-        // assertEquals(LoanStatus.PENDING, domain.getLoanStatus());
         assertNull(domain.getLoanStatus());
         assertEquals(18, domain.getPeriod().calculateTotalMonths());
 

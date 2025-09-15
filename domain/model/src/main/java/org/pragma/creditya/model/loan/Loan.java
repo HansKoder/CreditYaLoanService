@@ -4,6 +4,8 @@ import lombok.ToString;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.*;
@@ -36,6 +38,9 @@ public class Loan extends AggregateRoot<LoanId> {
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
     private final String  AGGREGATE_TYPE =  "LOAN";
+
+    private final String APPROVED = "approved";
+    private final String REJECTED = "rejected";
 
     private Loan(LoanBuilder builder) {
         this.document = builder.document;
@@ -116,6 +121,58 @@ public class Loan extends AggregateRoot<LoanId> {
 
     public void clearUncommittedEvents() {
         this.uncommittedEvents.clear();
+    }
+
+    private void checkBeforeBeingResolved (String author, String resolution) {
+        checkIdBeforeBeingResolved(resolution);
+        checkStatusBeforeBeingResolved(resolution);
+        checkResponsible(author, resolution);
+    }
+
+    private void checkResponsible (String author, String resolution) {
+        if (author == null || author.isBlank()) {
+            String err = "Who is responsible for this loan, Must have a responsible for being " + resolution;
+            throw new LoanDomainException(err);
+        }
+    }
+
+    private void checkStatusBeforeBeingResolved (String  resolution) {
+        if (this.loanStatus != LoanStatus.PENDING)
+            throw new LoanDomainException("Must have status Pending for being " + resolution);
+    }
+
+    private void checkIdBeforeBeingResolved (String  resolution) {
+        if (this.getId() == null || this.getId().getValue() == null)
+            throw new LoanDomainException("Must have ID Loan for being " + resolution);
+    }
+
+
+    public void checkApprovedLoan(String author) {
+        checkBeforeBeingResolved(author, APPROVED);
+
+        this.loanStatus = LoanStatus.APPROVED;
+
+        LoanResolutionApprovedEvent event = LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
+                .approvedBy("author")
+                .aggregateId(getId().getValue())
+                .reason("")
+                .build();
+
+        uncommittedEvents.add(event);
+    }
+
+    public void checkRejectedLoan(String author, String reason) {
+        checkBeforeBeingResolved(author, REJECTED);
+
+        this.loanStatus = LoanStatus.REJECTED;
+
+        LoanResolutionRejectedEvent event = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
+                .rejectedBy("")
+                .aggregateId(getId().getValue())
+                .reason("")
+                .build();
+
+        uncommittedEvents.add(event);
     }
 
     // Builder custom
