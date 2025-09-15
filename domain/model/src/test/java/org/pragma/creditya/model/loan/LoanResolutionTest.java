@@ -43,11 +43,13 @@ public class LoanResolutionTest {
             .build();
 
     private final String AUTHOR = "Doe";
+    private final String REASON_APPROVED = "";
+    private final String REASON_REJECTED = "";
 
     @Test
     void shouldThrowException_WhenStatusIsNotPending_ForBeingApproved () {
         LoanDomainException exception = assertThrows(LoanDomainException.class,
-                () -> LOAN_STATUS_DIFF_PENDING.checkApprovedLoan(AUTHOR));
+                () -> LOAN_STATUS_DIFF_PENDING.checkApprovedLoan(REASON_APPROVED));
 
         assertEquals("Must have status Pending for being approved", exception.getMessage());
     }
@@ -55,7 +57,7 @@ public class LoanResolutionTest {
     @Test
     void shouldThrowException_WithoutId_ForBeingApproved () {
         LoanDomainException exception = assertThrows(LoanDomainException.class,
-                () -> LOAN_WITHOUT_ID.checkApprovedLoan(AUTHOR));
+                () -> LOAN_WITHOUT_ID.checkApprovedLoan(REASON_APPROVED));
 
         assertEquals("Must have ID Loan for being approved", exception.getMessage());
     }
@@ -78,7 +80,8 @@ public class LoanResolutionTest {
                 .loanStatus(LoanStatus.PENDING)
                 .build();
 
-        loan.checkApprovedLoan(AUTHOR);
+        loan.loadAuthorResolutionLoan(AUTHOR);
+        loan.checkApprovedLoan(REASON_APPROVED);
 
         assertEquals(LoanStatus.APPROVED, loan.getLoanStatus());
         assertEquals(1, loan.getUncommittedEvents().size());
@@ -88,7 +91,7 @@ public class LoanResolutionTest {
     @Test
     void shouldThrowException_WhenStatusIsNotPending_ForBeingRejected () {
         LoanDomainException exception = assertThrows(LoanDomainException.class,
-                () -> LOAN_STATUS_DIFF_PENDING.checkRejectedLoan(AUTHOR, ""));
+                () -> LOAN_STATUS_DIFF_PENDING.checkRejectedLoan(REASON_REJECTED));
 
         assertEquals("Must have status Pending for being rejected", exception.getMessage());
     }
@@ -96,7 +99,7 @@ public class LoanResolutionTest {
     @Test
     void shouldThrowException_WithoutId_ForBeingRejected () {
         LoanDomainException exception = assertThrows(LoanDomainException.class,
-                () -> LOAN_WITHOUT_ID.checkRejectedLoan(AUTHOR, ""));
+                () -> LOAN_WITHOUT_ID.checkRejectedLoan(REASON_REJECTED));
 
         assertEquals("Must have ID Loan for being rejected", exception.getMessage());
     }
@@ -104,7 +107,7 @@ public class LoanResolutionTest {
     @Test
     void shouldThrowException_WhoIsResponsible_ForBeingRejected () {
         LoanDomainException exception = assertThrows(LoanDomainException.class,
-                () -> LOAN_PENDING_STATUS.checkRejectedLoan(null, null));
+                () -> LOAN_PENDING_STATUS.checkRejectedLoan(REASON_REJECTED));
 
         assertEquals("Who is responsible for this loan, Must have a responsible for being rejected", exception.getMessage());
     }
@@ -119,7 +122,8 @@ public class LoanResolutionTest {
                 .loanStatus(LoanStatus.PENDING)
                 .build();
 
-        loan.checkRejectedLoan(AUTHOR, "");
+        loan.loadAuthorResolutionLoan(AUTHOR);
+        loan.checkRejectedLoan(REASON_REJECTED);
 
         assertEquals(LoanStatus.REJECTED, loan.getLoanStatus());
         assertEquals(1, loan.getUncommittedEvents().size());

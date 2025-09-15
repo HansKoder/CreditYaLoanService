@@ -29,9 +29,12 @@ public class Loan extends AggregateRoot<LoanId> {
     private final LoanTypeCode loanTypeCode;
     private LoanStatus loanStatus;
 
+    // those snapshot must be removed since, projections should add webclient request using document for getting all customer data (CQRS)
     // snapshots - for building rich events - projections
     private CustomerRead customer;
     private LoanType loanType;
+
+    private String responsible;
 
     // calculate data
     private Amount totalMonthlyDebt;
@@ -69,7 +72,7 @@ public class Loan extends AggregateRoot<LoanId> {
         createEventApplicationLoan();
     }
 
-    // Load read customer and loanType (snapshots)
+    // Load read customer and loanType (snapshots) // next iteration must be removed
     public void loadCustomer (CustomerRead customer) {
         this.customer = customer;
     }
@@ -123,14 +126,14 @@ public class Loan extends AggregateRoot<LoanId> {
         this.uncommittedEvents.clear();
     }
 
-    private void checkBeforeBeingResolved (String author, String resolution) {
+    private void checkBeforeBeingResolved (String resolution) {
         checkIdBeforeBeingResolved(resolution);
         checkStatusBeforeBeingResolved(resolution);
-        checkResponsible(author, resolution);
+        checkResponsible(resolution);
     }
 
-    private void checkResponsible (String author, String resolution) {
-        if (author == null || author.isBlank()) {
+    private void checkResponsible (String resolution) {
+        if (responsible == null || responsible.isBlank()) {
             String err = "Who is responsible for this loan, Must have a responsible for being " + resolution;
             throw new LoanDomainException(err);
         }
@@ -146,14 +149,17 @@ public class Loan extends AggregateRoot<LoanId> {
             throw new LoanDomainException("Must have ID Loan for being " + resolution);
     }
 
+    public void loadAuthorResolutionLoan (String username) {
+        this.responsible = username;
+    }
 
-    public void checkApprovedLoan(String author) {
-        checkBeforeBeingResolved(author, APPROVED);
+    public void checkApprovedLoan(String reason) {
+        checkBeforeBeingResolved(APPROVED);
 
         this.loanStatus = LoanStatus.APPROVED;
 
         LoanResolutionApprovedEvent event = LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
-                .approvedBy("author")
+                .approvedBy(responsible)
                 .aggregateId(getId().getValue())
                 .reason("")
                 .build();
@@ -161,8 +167,10 @@ public class Loan extends AggregateRoot<LoanId> {
         uncommittedEvents.add(event);
     }
 
-    public void checkRejectedLoan(String author, String reason) {
-        checkBeforeBeingResolved(author, REJECTED);
+    public void checkRejectedLoan(String reason) {
+        checkBeforeBeingResolved(REJECTED);
+
+        // Condition reason for being rejected
 
         this.loanStatus = LoanStatus.REJECTED;
 

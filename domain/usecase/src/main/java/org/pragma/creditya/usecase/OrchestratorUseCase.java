@@ -34,6 +34,22 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(this::persistAndPublishEvents);
     }
 
+    // resolutionLoan
+    // command -> ResolutionLoanCommand ( loanId: string (uuid), type: string enum ['APPROVED', 'REJECTED'], reason string (optional)
+    // check type of resolution (param) -> method private - check type-resolution -> this is null or other loanDomException type resolution is unknown
+    //                             using loanStatus -> must be equals.
+    // check loanId (param) -> null -> exception.
+    // get Loan using eventRepository -> getByAggregateId
+    // getAuthor -> using jwt claims get username - responsible by
+    // check resolution (approved - rejected)
+    // persist and publish events (event storing - outbox)
+
+
+    @Override
+    public Flux<LoanRead> getLoans(LoanQuery query) {
+        return loanReadUseCase.getLoan(query);
+    }
+
     private Mono<Loan> persistAndPublishEvents (Loan loan) {
         List<LoanEvent> events = loan.getUncommittedEvents();
 
@@ -45,8 +61,5 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .doOnSuccess(Loan::clearUncommittedEvents);
     }
 
-    @Override
-    public Flux<LoanRead> getLoans(LoanQuery query) {
-        return loanReadUseCase.getLoan(query);
-    }
+
 }
