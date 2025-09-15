@@ -83,3 +83,9 @@ This service applies **Event Sourcing** and **CQRS** to separate responsibilitie
 ```bash
 ./gradlew integrationTest
 ```
+
+### Create new image
+```cmd
+chmod +x build-image.sh
+./setup.sh
+```
