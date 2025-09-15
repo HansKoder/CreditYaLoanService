@@ -39,10 +39,12 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     // check type of resolution (param) -> method private - check type-resolution -> this is null or other loanDomException type resolution is unknown
     //                             using loanStatus -> must be equals.
     // check loanId (param) -> null -> exception.
-    // get Loan using eventRepository -> getByAggregateId
+    // get Loan using eventRepository -> getByAggregateId (rehydrate)
     // getAuthor -> using jwt claims get username - responsible by
     // check resolution (approved - rejected)
-    // persist and publish events (event storing - outbox)
+    // persist and publish events (event storing)
+    // get customer by document - extract fullName - email
+    // outbox pattern
 
 
     @Override

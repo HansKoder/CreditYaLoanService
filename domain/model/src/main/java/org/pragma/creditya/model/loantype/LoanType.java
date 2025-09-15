@@ -4,11 +4,12 @@ import org.pragma.creditya.model.loantype.valueobject.Description;
 import org.pragma.creditya.model.loantype.valueobject.InterestRate;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
+import org.pragma.creditya.model.shared.domain.model.entity.BaseEntity;
 
 import java.util.UUID;
 
 @Getter
-public class LoanType extends AggregateRoot<LoanTypeId> {
+public class LoanType extends BaseEntity<LoanTypeId> {
 
     private final Description description;
     private final InterestRate interestRate;
