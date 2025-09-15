@@ -2,34 +2,35 @@
 FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /workspace
 
-# Copiamos gradle wrapper y config de raíz
+# Copy graddle wrapper and setup root
 COPY gradlew .
 COPY gradle gradle
 COPY settings.gradle .
 COPY build.gradle .
 COPY main.gradle .
+COPY gradle.properties .
 RUN chmod +x ./gradlew
 
-# Copiamos todos los módulos (Gradle necesita verlos)
+# Copy each layer clean, since gradle needs to see them
 COPY applications ./applications
 COPY domain ./domain
 COPY infrastructure ./infrastructure
 
-# Compilamos y generamos el bootJar del app-service
-RUN ./gradlew :app-service:clean :app-service:bootJar -x test --no-daemon --parallel
+# Compile and generate Jar
+RUN ./gradlew :app-service:clean :app-service:build -x test
 
 
 # ---------- Stage 2: Runtime ----------
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
-# Crear usuario no-root
+# Create user no-root
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-# Copiamos el bootJar desde la etapa builder
+# Copy jar from stage (builder)
 COPY --from=builder /workspace/applications/app-service/build/libs/*.jar app.jar
 
-# Ajustes JVM (optimizado para contenedores)
+# JVM
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
 EXPOSE 9082

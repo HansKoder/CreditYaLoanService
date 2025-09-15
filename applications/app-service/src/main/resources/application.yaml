@@ -18,15 +18,25 @@ spring:
         format_sql: true
   data:
     mongodb:
-      uri: "mongodb://loan_mongo_user:loan_mongo_pass@localhost:27018/credit_loan_mongo?authSource=admin"
+      # uri: "mongodb://loan_mongo_user:loan_mongo_pass@localhost:27018/credit_loan_mongo?authSource=admin"
+      uri: "mongodb://${MONGO_USER:${MONGO_USER:loan_mongo_user}}:${MONGO_PASSWORD:${MONGO_PASSWORD:loan_mongo_pass}}@${MONGO_HOST:${MONGO_HOST:localhost}}:${MONGO_PORT:${MONGO_PORT:27018}}/${MONGO_DB:${MONGO_DB:credit_loan_mongo}}?authSource=admin"
 logging:
   level:
-    org.hibernate.SQL: "DEBUG"
-    org.hibernate.type.descriptor.sql.BasicBinder: "TRACE"
+    # Hibernate SQL
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # WebClient / Spring WebFlux
+    org.springframework.web.reactive.function.client: TRACE
+    # Reactor Netty / Netty (DNS resolver + cliente HTTP)
+    reactor.netty: DEBUG
+    reactor.netty.http.client: DEBUG
+    io.netty.resolver.dns: DEBUG
+
 adapter:
   restconsumer:
     timeout: 5000
-    url: "http://localhost:9081/api/v1/users/verify-ownership-customer"
+    # url: "http://localhost:9081/api/v1/users/verify-ownership-customer"
+    url: "${CUSTOMER_URL:http://localhost:9081/api/v1/users/verify-ownership-customer}"
 management:
   health:
     circuitbreakers:

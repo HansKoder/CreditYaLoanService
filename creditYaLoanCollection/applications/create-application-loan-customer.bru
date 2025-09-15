@@ -1,0 +1,25 @@
+meta {
+  name: create-application-loan-customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lckBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTc3NDg5NzAsImV4cCI6MTc1Nzc1MjU3MH0.ZlRx_7UhUMYJefY1KXy2E8fOTLQEk-CALSihcKiBdAw
+}
+
+body:json {
+  {
+    "document": "114001",
+    "amount": 335000,
+    "loanTypeId" : 2,
+    "month": 10,
+    "year": 1
+  }
+}
