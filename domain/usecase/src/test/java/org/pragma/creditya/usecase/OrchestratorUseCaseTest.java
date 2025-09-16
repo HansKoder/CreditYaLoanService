@@ -139,33 +139,45 @@ public class OrchestratorUseCaseTest {
 
     @Test
     void shouldBePersisted_becauseApplicationLoanIsValid () {
-        CreateRequestLoanCommand createRequestLoanCommand = new CreateRequestLoanCommand("103", BigDecimal.valueOf(4_000_000), 1L, 1,6);
+        Loan loanMock = Mockito.mock(Loan.class);
 
-        Mockito.when(loanUseCase.checkApplication(createRequestLoanCommand))
-                .thenReturn(Mono.just(LOAN_STATUS_PENDING));
+        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.LoanBuilder
+                .aLoanApplicationSubmitted()
+                .aggregateId(UUID.fromString(LOAN_ID_EXAMPLE))
+                .build();
 
-        LOAN_STATUS_PENDING.loadCustomer(CUSTOMER_LOAD);
-        Mockito.when(loanUseCase.verifyOwnershipCustomer(LOAN_STATUS_PENDING))
-                        .thenReturn(Mono.just(LOAN_STATUS_PENDING));
+        Mockito.when(loanMock.getUncommittedEvents())
+                .thenReturn(List.of(submittedEvent));
 
-        Mockito.when(loanTypeUseCase.checkLoanTypeAndLoad(LOAN_STATUS_PENDING))
-                .thenReturn(Mono.just(LOAN_STATUS_PENDING));
+        Mockito.when(loanUseCase.checkApplication(Mockito.any()))
+                .thenReturn(Mono.just(loanMock));
 
-        LOAN_STATUS_PENDING.loadLoanType(LOAN_TYPE_LOAD);
+        Mockito.when(loanUseCase.verifyOwnershipCustomer(loanMock))
+                        .thenReturn(Mono.just(loanMock));
 
-        Mockito.when(loanUseCase.markAsPending(LOAN_STATUS_PENDING))
-                .thenReturn(Mono.just(LOAN_STATUS_PENDING));
+        Mockito.when(loanUseCase.markAsPending(loanMock))
+                .thenReturn(Mono.just(loanMock));
 
+        Mockito.when(loanTypeUseCase.checkLoanTypeAndLoad(loanMock))
+                .thenReturn(Mono.just(loanMock));
 
-        // Mockito.when(eventStoreRepository.saveAll(Mockito.anyList())).thenReturn(Mono.empty());
+        Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))
+                .thenReturn(Mono.empty());
 
-        // Mockito.doNothing().when(eventBus).publish(Mockito.any());
+        Mockito.doNothing()
+                .when(eventBus).publish(Mockito.any());
+
+        CreateRequestLoanCommand createRequestLoanCommand =
+                new CreateRequestLoanCommand("103", BigDecimal.valueOf(4_000_000), 1L, 1,6);
 
         var response = orchestratorUseCase.applicationLoan(createRequestLoanCommand);
 
         StepVerifier.create(response)
                 .expectNext(LOAN_STATUS_PENDING)
                 .verifyComplete();
+
+        Mockito.verify(eventStoreRepository, Mockito.times(1)).saveAll(List.of(submittedEvent));
+        Mockito.verify(eventBus, Mockito.times(1)).publish(submittedEvent);
     }
 
     @Test
@@ -256,24 +268,23 @@ public class OrchestratorUseCaseTest {
                         .reason("OK")
                         .build();
 
-        Mockito.when(eventStoreRepository.findByAggregateId(aggregateId))
-                .thenReturn(Flux.just(SUBMITTED_EVENT));
+        Mockito.when(loanMock.getLoanStatus())
+                .thenReturn(LoanStatus.APPROVED);
 
-        List<LoanEvent> events = List.of(SUBMITTED_EVENT);
-        Mockito.when(loanUseCase.rehydrate(events))
+        Mockito.when(loanUseCase.rehydrate(List.of(SUBMITTED_EVENT)))
                 .thenReturn(Mono.just(loanMock));
 
         Mockito.when(loanUseCase.loadUsername(LOAN_STATUS_PENDING))
                 .thenReturn(Mono.just(loanMock));
-
-        Mockito.when(loanMock.getLoanStatus())
-                        .thenReturn(LoanStatus.APPROVED);
 
         Mockito.when(loanUseCase.approvedLoan(loanMock, "OK"))
                         .thenReturn(Mono.just(loanMock));
 
         Mockito.when(loanMock.getUncommittedEvents())
                 .thenReturn(List.of(approvedEvent));
+
+        Mockito.when(eventStoreRepository.findByAggregateId(aggregateId))
+                .thenReturn(Flux.just(SUBMITTED_EVENT));
 
         Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))
                 .thenReturn(Mono.empty());
