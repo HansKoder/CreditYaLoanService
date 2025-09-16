@@ -10,6 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 public class LoanRead {
     private String id;
     private UUID loanId;

@@ -52,11 +52,6 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
 
     @Override
     public Mono<Loan> decisionLoan(DecisionLoanCommand command) {
-
-        // resolutionLoan
-        // getAuthor -> using jwt claims get username - responsible by
-        // check resolution (approved - rejected)
-        // persist and publish events (event storing) Plan A event storing
         // Plan B -> outbox events (Builder)
         // Load -> notifyDecisionLoanEvent (outbox)
         // Load -> countApprovedLoan (outbox)
@@ -68,9 +63,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(this::fromStringToUUID)
                 .flatMap(this::getLoan)
                 .flatMap(loanUseCase::loadUsername)
-                .log()
                 .flatMap(loan -> checkDecisionLoan(loan, command))
-                .log()
                 .flatMap(this::persistAndPublishEvents)
                 .doOnError(e -> System.out.printf("[domain.use_case] (decision lona) payload[ error:%s ] \n", e.getMessage()));
     }
@@ -127,13 +120,13 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private Mono<Loan> persistAndPublishEvents (Loan loan) {
         List<LoanEvent> events = loan.getUncommittedEvents();
 
-        if (events.isEmpty()) return Mono.just(loan);
+        if (events.isEmpty())
+            return Mono.just(loan);
 
         return eventRepository.saveAll(events)
                 .doOnSuccess(v -> events.forEach(eventBus::publish))
                 .thenReturn(loan)
                 .doOnSuccess(Loan::clearUncommittedEvents);
     }
-
 
 }

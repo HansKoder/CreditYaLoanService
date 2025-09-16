@@ -1,0 +1,23 @@
+meta {
+  name: APPROVED-RAVEN
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYXZlbkBjcmVkaXQuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IkNVU1RPTUVSIn1dLCJpYXQiOjE3NTgwMDY1NzksImV4cCI6MTc1ODAxMDE3OX0.ffNE-uVZ_Grtn0xoUQFSdB3UyuQD38B0NZTRYkXxC3w
+}
+
+body:json {
+  {
+    "loanId": "",
+    "decision": "",
+    "reason": ""
+  }
+}

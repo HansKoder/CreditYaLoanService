@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.repository.EventReactiveRepository;
@@ -35,7 +37,9 @@ public class EventRepositoryAdapter implements EventStoreRepository {
 
     @Override
     public Flux<LoanEvent> findByAggregateId(UUID aggregateId) {
-        return null;
+        log.info("[infra.r2dbc.event] (findByAggregateId) payload=[ aggregateId:{} ]", aggregateId.toString());
+        return repository.findByAggregateId(aggregateId)
+                .map(this::deserialize);
     }
 
 
@@ -56,7 +60,7 @@ public class EventRepositoryAdapter implements EventStoreRepository {
     }
 
 
-    public Mono<Void> saveEvent(LoanEvent event) {
+    private Mono<Void> saveEvent(LoanEvent event) {
         log.info("[infra.r2dbc] (event) save event  payload: {}", event);
         return Mono.fromCallable(() -> this.mapToPersist(event))
                 .flatMap(e -> {
@@ -92,6 +96,29 @@ public class EventRepositoryAdapter implements EventStoreRepository {
         } catch (Exception e) {
             throw new RuntimeException("Error serializing event", e);
         }
+    }
+
+    private LoanEvent deserialize(EventEntity entity) {
+        log.info("[infra.r2dbc] (object-mapper) deserialize eventType={}, aggregateId={}",
+                entity.getEventType(), entity.getAggregateId());
+
+        try {
+            Class<? extends LoanEvent> clazz = resolveEventClass(entity.getEventType());
+            LoanEvent event = objectMapper.readValue(entity.getPayload().asString(), clazz);
+            log.info("[infra.r2dbc] (object-mapper) deserialized payload: {}", event);
+            return event;
+        } catch (Exception e) {
+            throw new RuntimeException("Error deserializing eventType=" + entity.getEventType(), e);
+        }
+    }
+
+    private Class<? extends LoanEvent> resolveEventClass(String eventType) {
+        return switch (eventType) {
+            case "LoanApplicationSubmittedEvent" -> LoanApplicationSubmittedEvent.class;
+            case "LoanResolutionApprovedEvent" -> LoanResolutionApprovedEvent.class;
+            case "LoanResolutionRejectedEvent" -> LoanResolutionRejectedEvent.class;
+            default -> throw new IllegalArgumentException("Unknown eventType: " + eventType);
+        };
     }
 
 }

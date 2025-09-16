@@ -8,19 +8,23 @@ import java.util.UUID;
 
 @Getter
 public class LoanApplicationSubmittedEvent extends LoanEvent{
-    private final String document;
-    private final String name;
-    private final String email;
-    private final BigDecimal baseSalary;
-    private final BigDecimal amount;
-    private final BigDecimal totalMonthlyDebt;
+    private String document;
+    private String name;
+    private String email;
+    private BigDecimal baseSalary;
+    private BigDecimal amount;
+    private BigDecimal totalMonthlyDebt;
 
-    private final Long typeLoan;
-    private final String typeLoanDescription;
-    private final Double interestRate;
+    private Long typeLoan;
+    private String typeLoanDescription;
+    private Double interestRate;
 
-    private final String status;
-    private final int period;
+    private String status;
+    private int period;
+
+    public LoanApplicationSubmittedEvent(UUID aggregateId, int version, Instant timestamp, String eventType, String aggregateType) {
+        super(aggregateId, version, timestamp, eventType, aggregateType);
+    }
 
     private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
         super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);

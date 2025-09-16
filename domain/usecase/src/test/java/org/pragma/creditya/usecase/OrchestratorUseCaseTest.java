@@ -73,27 +73,6 @@ public class OrchestratorUseCaseTest {
             .document("103")
             .build();
 
-    private final Loan LOAN_STATUS_APPROVED = Loan.LoanBuilder.aLoan()
-            .loanStatus(LoanStatus.APPROVED)
-            .amount(BigDecimal.valueOf(4_000_000))
-            .loanTypeCode(1L)
-            .period(1,0)
-            .document("103")
-            .build();
-
-    private final CustomerRead CUSTOMER_LOAD = CustomerRead.builder()
-            .name("doe")
-            .email("doe@gmail.com")
-            .baseSalary(BigDecimal.valueOf(1_000_000))
-            .document("103")
-            .build();
-
-    private final LoanType LOAN_TYPE_LOAD = LoanType.LoanTypeBuilder.aLoanType()
-            .id(1L)
-            .interestRate(2.0)
-            .description("PERSONAL")
-            .build();
-
     // Dummy event mock unknowing event
     static class UnknownLoanEvent extends LoanEvent {
         public UnknownLoanEvent() {
