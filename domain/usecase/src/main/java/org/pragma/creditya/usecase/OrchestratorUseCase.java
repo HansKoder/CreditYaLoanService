@@ -3,18 +3,28 @@ package org.pragma.creditya.usecase;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
+import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
+import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
+import org.pragma.creditya.model.loan.gateways.OutboxRepository;
+import org.pragma.creditya.model.loan.valueobject.LoanId;
+import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
+import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
 import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public class OrchestratorUseCase implements IOrchestratorUseCase{
@@ -24,6 +34,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final EventStoreRepository eventRepository;
     private final ILoanReadUseCase loanReadUseCase;
     private final EventBus eventBus;
+    private final OutboxRepository outboxRepository;
 
     @Override
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
@@ -34,22 +45,83 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(this::persistAndPublishEvents);
     }
 
-    // resolutionLoan
-    // command -> ResolutionLoanCommand ( loanId: string (uuid), type: string enum ['APPROVED', 'REJECTED'], reason string (optional)
-    // check type of resolution (param) -> method private - check type-resolution -> this is null or other loanDomException type resolution is unknown
-    //                             using loanStatus -> must be equals.
-    // check loanId (param) -> null -> exception.
-    // get Loan using eventRepository -> getByAggregateId (rehydrate)
-    // getAuthor -> using jwt claims get username - responsible by
-    // check resolution (approved - rejected)
-    // persist and publish events (event storing)
-    // get customer by document - extract fullName - email
-    // outbox pattern
-
-
     @Override
     public Flux<LoanRead> getLoans(LoanQuery query) {
         return loanReadUseCase.getLoan(query);
+    }
+
+    @Override
+    public Mono<Loan> decisionLoan(DecisionLoanCommand command) {
+
+        // resolutionLoan
+        // getAuthor -> using jwt claims get username - responsible by
+        // check resolution (approved - rejected)
+        // persist and publish events (event storing) Plan A event storing
+        // Plan B -> outbox events (Builder)
+        // Load -> notifyDecisionLoanEvent (outbox)
+        // Load -> countApprovedLoan (outbox)
+        // Load -> sumAmountApprovedLoan (outbox)
+
+        // check
+
+        return checkTypeDecision(command)
+                .flatMap(this::fromStringToUUID)
+                .flatMap(this::getLoan)
+                .flatMap(loanUseCase::loadUsername)
+                .log()
+                .flatMap(loan -> checkDecisionLoan(loan, command))
+                .log()
+                .flatMap(this::persistAndPublishEvents)
+                .doOnError(e -> System.out.printf("[domain.use_case] (decision lona) payload[ error:%s ] \n", e.getMessage()));
+    }
+
+    private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {
+        Map<String, BiFunction<Loan, String, Mono<Loan>>> map = new HashMap<>();
+        map.put(LoanStatus.APPROVED.name(), loanUseCase::approvedLoan);
+        map.put(LoanStatus.REJECTED.name(), loanUseCase::rejectedLoan);
+        return map;
+    }
+
+    private Mono<Loan> checkDecisionLoan (Loan loan, DecisionLoanCommand command) {
+        BiFunction<Loan, String, Mono<Loan>> handler = buildDecisionHandlers().get(command.decision());
+        if (handler == null)
+            return Mono.error(new LoanDomainException("Unknown decision: " + command.decision()));
+
+        return handler.apply(loan, command.reason()).log();
+    }
+
+    private Mono<DecisionLoanCommand> checkTypeDecision (DecisionLoanCommand command) {
+        if (command.decision() == null || command.decision().isBlank())
+            return Mono.error(new LoanDomainException("Decision must be mandatory"));
+
+        Set<String> decisionOptions = new HashSet<>();
+
+        decisionOptions.add(LoanStatus.APPROVED.name());
+        decisionOptions.add(LoanStatus.REJECTED.name());
+
+        if (!decisionOptions.contains(command.decision()))
+            return Mono.error(new LoanDomainException("Unknown decision type"));
+
+        return Mono.just(command);
+    }
+
+    private Mono<UUID> fromStringToUUID (DecisionLoanCommand command) {
+        if (command.loanId() == null || command.loanId().isBlank())
+            return Mono.error(new LoanDomainException("Loan Id must be provided"));
+
+        try {
+            UUID aggregateId = UUID.fromString(command.loanId());
+            return Mono.just(aggregateId).log();
+        } catch (IllegalArgumentException ex) {
+            return Mono.error(new LoanDomainException("Invalid loanId format"));
+        }
+    }
+
+    private Mono<Loan> getLoan (UUID aggregateId) {
+        return eventRepository.findByAggregateId(aggregateId)
+                .collectList()
+                .flatMap(loanUseCase::rehydrate)
+                .log();
     }
 
     private Mono<Loan> persistAndPublishEvents (Loan loan) {

@@ -4,7 +4,8 @@ public record NotifyDecisionEvent (
         String loanId,
         String applicantEmail,
         String applicantName,
-        String decision
+        String decision,
+        String reason
 ) implements LoanDetailEvent{
     @Override
     public String eventType() {

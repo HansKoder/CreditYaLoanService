@@ -35,6 +35,7 @@ public class Loan extends AggregateRoot<LoanId> {
     private LoanType loanType;
 
     private String responsible;
+    private String reason;
 
     // calculate data
     private Amount totalMonthlyDebt;

@@ -2,12 +2,15 @@ package org.pragma.creditya.usecase.loan;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
 import org.pragma.creditya.model.loan.exception.UsernameNotFoundDomainException;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.model.loan.gateways.UserInfoRepository;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class LoanUseCase implements ILoanUseCase {
@@ -38,6 +41,35 @@ public class LoanUseCase implements ILoanUseCase {
         });
     }
 
+    @Override
+    public Mono<Loan> rehydrate(List<LoanEvent> events) {
+        return Mono.just(Loan.rehydrate(events));
+    }
+
+    @Override
+    public Mono<Loan> loadUsername(Loan loan) {
+        return userInfoRepository.getUsername()
+                .map(username -> {
+                    loan.loadAuthorResolutionLoan(username);
+                    return loan;
+                });
+    }
+
+    @Override
+    public Mono<Loan> approvedLoan(Loan loan, String reason) {
+        return Mono.fromCallable(() -> {
+           loan.checkApprovedLoan(reason);
+           return loan;
+        });
+    }
+
+    @Override
+    public Mono<Loan> rejectedLoan(Loan loan, String reason) {
+        return Mono.fromCallable(() -> {
+            loan.checkRejectedLoan(reason);
+            return loan;
+        });
+    }
 
     private Loan checkApplicationLoan (CreateRequestLoanCommand cmd) {
         Loan domain = Loan.LoanBuilder.aLoan()

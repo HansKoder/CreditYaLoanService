@@ -34,6 +34,12 @@ public class EventRepositoryAdapter implements EventStoreRepository {
     }
 
     @Override
+    public Flux<LoanEvent> findByAggregateId(UUID aggregateId) {
+        return null;
+    }
+
+
+    @Override
     public Mono<Void> saveEvent(LoanApplicationSubmittedEvent event) {
         log.info("[infra.r2dbc] (event) save event payload: {}", event);
         return Mono.fromCallable(() -> this.mapToPersist(event))
