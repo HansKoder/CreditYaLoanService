@@ -1,5 +1,6 @@
 package org.pragma.creditya.mongo;
 
+import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
@@ -62,8 +63,15 @@ implements LoanReadRepository
     @Override
     public Mono<LoanRead> getLoanByAggregateId(UUID aggregateId) {
         logger.info("[infra.mongodb] (getLoanByAggregateId) (step 01) payload: [ aggregateId:{} ]", aggregateId.toString());
-        return repository.findById(aggregateId.toString())
+
+        LoanReadCollection example = LoanReadCollection.builder()
+                .loanId(aggregateId)
+                .build();
+
+        return repository.findOne(Example.of(example))
                 .map(this::toEntity)
-                .doOnError(er -> logger.error("[infra.mongodb] (getLoanByAggregateId) unexpected error, Error=[ message:{}]", er.getMessage()));
+                .doOnError(er -> logger.error("[infra.mongodb] (getLoanByAggregateId) unexpected error, Error=[ message:{}]", er.getMessage()))
+                .doOnSuccess(response -> logger.info("[infra.mongodb] (getLoanByAggregateId) success get loan read from mongo replication, payload [ aggregateId={}, response={}]", aggregateId, response));
     }
 }
+

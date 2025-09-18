@@ -31,11 +31,6 @@ public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanAp
                 .months(event.getPeriod())
                 .typeLoan(event.getTypeLoan())
                 .totalMonthlyDebt(event.getTotalMonthlyDebt())
-                .interestRate(event.getInterestRate())
-                .name(event.getName())
-                .email(event.getEmail())
-                .baseSalary(event.getBaseSalary())
-                .typeLoanDescription(event.getTypeLoanDescription())
                 .timestamp(event.getTimestamp())
                 .build();
 

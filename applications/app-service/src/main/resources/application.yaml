@@ -24,19 +24,11 @@ logging:
   level:
     # Hibernate SQL
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    # WebClient / Spring WebFlux
-    org.springframework.web.reactive.function.client: TRACE
-    # Reactor Netty / Netty (DNS resolver + cliente HTTP)
-    reactor.netty: DEBUG
-    reactor.netty.http.client: DEBUG
-    io.netty.resolver.dns: DEBUG
-
 adapter:
   restconsumer:
     timeout: 5000
     # url: "http://localhost:9081/api/v1/users/verify-ownership-customer"
-    url: "${CUSTOMER_URL:http://localhost:9081/api/v1/users/verify-ownership-customer}"
+    url: "${CUSTOMER_URL:http://localhost:9081}"
 management:
   health:
     circuitbreakers:

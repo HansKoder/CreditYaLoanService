@@ -1,16 +1,20 @@
 package org.pragma.creditya.model.loan.event;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Setter
 @Getter
 public class LoanResolutionRejectedEvent extends LoanEvent{
-    private final String status;
-    private final String reason;
-    private final String rejectedBy;
+    private String status;
+    private String reason;
+    private String rejectedBy;
 
+    public LoanResolutionRejectedEvent() {
+    }
 
     public LoanResolutionRejectedEvent(LoanBuilder loanBuilder) {
         super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);

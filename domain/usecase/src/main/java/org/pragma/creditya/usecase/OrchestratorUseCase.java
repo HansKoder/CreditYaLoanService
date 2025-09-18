@@ -40,7 +40,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
         return loanUseCase.checkApplication(command)
                 .flatMap(loanUseCase::verifyOwnershipCustomer)
-                .flatMap(loanTypeUseCase::checkLoanTypeAndLoad)
+                .flatMap(loanTypeUseCase::checkLoanTypeExists)
                 .flatMap(loanUseCase::markAsPending)
                 .flatMap(this::persistAndPublishEvents);
     }
@@ -65,7 +65,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(loanUseCase::loadUsername)
                 .flatMap(loan -> checkDecisionLoan(loan, command))
                 .flatMap(this::persistAndPublishEvents)
-                .doOnError(e -> System.out.printf("[domain.use_case] (decision lona) payload[ error:%s ] \n", e.getMessage()));
+                .doOnError(e -> System.out.printf("[domain.use_case] (decision loan) payload[ error:%s ] \n", e.getMessage()));
     }
 
     private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {

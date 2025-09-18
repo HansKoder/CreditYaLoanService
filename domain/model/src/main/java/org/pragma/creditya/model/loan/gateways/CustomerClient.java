@@ -5,5 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface CustomerClient {
     Mono<Boolean> exitByDocument(String document);
-    Mono<CustomerRead> verifyOwnershipCustomer (String document, String email);
+    Mono<Boolean> verifyOwnershipCustomer (String document, String email);
+    Mono<CustomerRead> getCustomerByDocument (String document);
 }

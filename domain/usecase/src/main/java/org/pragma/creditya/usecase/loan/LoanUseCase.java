@@ -3,6 +3,7 @@ package org.pragma.creditya.usecase.loan;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.loan.exception.CustomerIsNotAllowedDomainException;
 import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
 import org.pragma.creditya.model.loan.exception.UsernameNotFoundDomainException;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
@@ -27,9 +28,10 @@ public class LoanUseCase implements ILoanUseCase {
     public Mono<Loan> verifyOwnershipCustomer(Loan loan) {
         return  userInfoRepository.getUsername()
                 .flatMap(email -> userClient.verifyOwnershipCustomer(loan.getDocument().value(), email))
-                .map(consumerResponse -> {
-                    loan.loadCustomer(consumerResponse);
-                    return loan;
+                .flatMap(result -> {
+                    if (result) return Mono.just(loan);
+
+                    return Mono.error(new CustomerIsNotAllowedDomainException("Customer is not allowed to submitted this Loan"));
                 });
     }
 

@@ -1,20 +1,18 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
+import org.pragma.creditya.model.loan.factory.LoanEventFactory;
 import org.pragma.creditya.model.loan.valueobject.*;
-import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,15 +27,9 @@ public class Loan extends AggregateRoot<LoanId> {
     private LoanTypeCode loanTypeCode;
     private LoanStatus loanStatus;
 
-    // those snapshot must be removed since, projections should add webclient request using document for getting all customer data (CQRS)
-    // snapshots - for building rich events - projections
-    private CustomerRead customer;
-    private LoanType loanType;
-
     private String responsible;
     private String reason;
 
-    // calculate data
     private Amount totalMonthlyDebt;
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
@@ -69,8 +61,7 @@ public class Loan extends AggregateRoot<LoanId> {
     public void markAsPending () {
         this.loanStatus = LoanStatus.PENDING;
         this.setId(new LoanId(UUID.randomUUID()));
-
-        createEventApplicationLoan();
+        uncommittedEvents.add(LoanEventFactory.submittedEvent(this));
     }
 
     public void loadAuthorResolutionLoan (String username) {
@@ -82,13 +73,7 @@ public class Loan extends AggregateRoot<LoanId> {
 
         this.loanStatus = LoanStatus.APPROVED;
 
-        LoanResolutionApprovedEvent event = LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
-                .approvedBy(responsible)
-                .aggregateId(getId().getValue())
-                .reason(reason)
-                .build();
-
-        uncommittedEvents.add(event);
+        uncommittedEvents.add(LoanEventFactory.approvedEvent(this));
     }
 
     public void checkRejectedLoan(String reason) {
@@ -96,25 +81,16 @@ public class Loan extends AggregateRoot<LoanId> {
 
         this.loanStatus = LoanStatus.REJECTED;
 
-        LoanResolutionRejectedEvent event = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
-                .rejectedBy(responsible)
-                .aggregateId(getId().getValue())
-                .reason(reason)
-                .build();
-
-        uncommittedEvents.add(event);
-    }
-
-    // Load read customer and loanType (snapshots) // next iteration must be removed
-    public void loadCustomer (CustomerRead customer) {
-        this.customer = customer;
-    }
-
-    public void loadLoanType (LoanType loanType) {
-        this.loanType = loanType;
+        uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
     }
 
     // private methods business rules
+    private void checkBeforeBeingResolved (String resolution) {
+        checkIdBeforeBeingResolved(resolution);
+        checkStatusBeforeBeingResolved(resolution);
+        checkResponsible(resolution);
+    }
+
     private void calculateTotalMonthlyDebt () {
         int totalMonths = period.calculateTotalMonths();
 
@@ -127,30 +103,23 @@ public class Loan extends AggregateRoot<LoanId> {
         totalMonthlyDebt = new Amount(debt);
     }
 
-    private void createEventApplicationLoan () {
-        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder.
-                aLoanApplicationSubmitted()
-                .aggregateId(getId().getValue())
-                .aggregateType(AGGREGATE_TYPE)
-                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                .timestamp(Instant.now())
-                .document(this.document.value())
-                .status(loanStatus.name())
-                .amount(this.amount.amount())
-                .typeLoan(this.loanTypeCode.code())
-                .period(this.period.calculateTotalMonths())
-                .baseSalary(this.customer.getBaseSalary())
-                .email(this.customer.getEmail())
-                .name(this.customer.getName())
-                .interestRate(this.loanType.getInterestRate().value())
-                .typeLoanDescription(this.loanType.getDescription().value())
-                .totalMonthlyDebt(this.totalMonthlyDebt.amount())
-                .build();
-
-        this.uncommittedEvents.add(event);
+    private void checkResponsible (String resolution) {
+        if (responsible == null || responsible.isBlank()) {
+            String err = "Who is responsible for this loan, Must have a responsible for being " + resolution;
+            throw new LoanDomainException(err);
+        }
     }
 
-    // Events publisher
+    private void checkStatusBeforeBeingResolved (String  resolution) {
+        if (this.loanStatus != LoanStatus.PENDING)
+            throw new LoanDomainException("Must have status Pending for being " + resolution);
+    }
+
+    private void checkIdBeforeBeingResolved (String  resolution) {
+        if (this.getId() == null || this.getId().getValue() == null)
+            throw new LoanDomainException("Must have ID Loan for being " + resolution);
+    }
+
     public static Loan rehydrate(List<LoanEvent> history) {
         if (history == null || history.isEmpty())
             throw new LoanDomainException("Cannot rehydrate Loan without events");
@@ -201,31 +170,6 @@ public class Loan extends AggregateRoot<LoanId> {
     public void clearUncommittedEvents() {
         this.uncommittedEvents.clear();
     }
-
-    private void checkBeforeBeingResolved (String resolution) {
-        checkIdBeforeBeingResolved(resolution);
-        checkStatusBeforeBeingResolved(resolution);
-        checkResponsible(resolution);
-    }
-
-    private void checkResponsible (String resolution) {
-        if (responsible == null || responsible.isBlank()) {
-            String err = "Who is responsible for this loan, Must have a responsible for being " + resolution;
-            throw new LoanDomainException(err);
-        }
-    }
-
-    private void checkStatusBeforeBeingResolved (String  resolution) {
-        if (this.loanStatus != LoanStatus.PENDING)
-            throw new LoanDomainException("Must have status Pending for being " + resolution);
-    }
-
-    private void checkIdBeforeBeingResolved (String  resolution) {
-        if (this.getId() == null || this.getId().getValue() == null)
-            throw new LoanDomainException("Must have ID Loan for being " + resolution);
-    }
-
-
 
     // Builder custom
     public static final class LoanBuilder {

@@ -22,12 +22,12 @@ public class LoanReadEventBus implements EventBus {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends LoanEvent> Flux<T> subscribe(Class<T> eventType) {
         System.out.println("[infra.bus] (subscribe) is assigned ");
         return sink.asFlux()
                 .filter(event -> eventType.isAssignableFrom(event.getClass()))
-                .map(event -> (T) event);
+                .map(event -> (T) event)
+                .doOnSubscribe(s -> System.out.println("[bus] Subscribed to " + eventType.getSimpleName()));
     }
 
 }

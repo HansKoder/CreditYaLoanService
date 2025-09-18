@@ -1,29 +1,24 @@
 package org.pragma.creditya.model.loan.event;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class LoanApplicationSubmittedEvent extends LoanEvent{
     private String document;
-    private String name;
-    private String email;
-    private BigDecimal baseSalary;
     private BigDecimal amount;
     private BigDecimal totalMonthlyDebt;
 
     private Long typeLoan;
-    private String typeLoanDescription;
-    private Double interestRate;
-
     private String status;
     private int period;
 
-    public LoanApplicationSubmittedEvent(UUID aggregateId, int version, Instant timestamp, String eventType, String aggregateType) {
-        super(aggregateId, version, timestamp, eventType, aggregateType);
+    public LoanApplicationSubmittedEvent() {
     }
 
     private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
@@ -34,23 +29,11 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         this.typeLoan = loanBuilder.typeLoan;
         this.status = loanBuilder.status;
         this.period = loanBuilder.period;
-        this.name = loanBuilder.name;
-        this.email = loanBuilder.email;
-        this.baseSalary = loanBuilder.baseSalary;
-        this.typeLoanDescription = loanBuilder.typeLoanDescription;
-        this.interestRate = loanBuilder.interestRate;
         this.totalMonthlyDebt = loanBuilder.totalMonthlyDebt;
     }
 
     public static final class LoanBuilder {
         private BigDecimal totalMonthlyDebt;
-        private String name;
-        private String email;
-        private BigDecimal baseSalary;
-
-        private String typeLoanDescription;
-        private Double interestRate;
-
         private BigDecimal amount;
         private String document;
         private Long typeLoan;
@@ -113,32 +96,6 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
 
         public LoanBuilder period(int value) {
             this.period = value;
-            return this;
-        }
-
-        public LoanBuilder name(String value) {
-            this.name = value;
-            return this;
-        }
-
-        public LoanBuilder typeLoanDescription(String value) {
-            this.typeLoanDescription = value;
-            return this;
-        }
-
-        public LoanBuilder baseSalary(BigDecimal value) {
-            this.baseSalary = value;
-            return this;
-        }
-
-
-        public LoanBuilder interestRate(Double value) {
-            this.interestRate = value;
-            return this;
-        }
-
-        public LoanBuilder email(String value) {
-            this.email = value;
             return this;
         }
 
