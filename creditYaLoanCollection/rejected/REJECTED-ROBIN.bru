@@ -1,0 +1,23 @@
+meta {
+  name: REJECTED-ROBIN
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU4MTUyNzg3LCJleHAiOjE3NTgxNTYzODd9.59eIYxorDlmSnMPGNv4lB3WRG4xMG3vQi8mRHEGxnPc
+}
+
+body:json {
+  {
+    "loanId": "9af222b2-eb2d-45c6-81d6-6d12acbc4e2e",
+    "decision": "REJECTED",
+    "reason": ""
+  }
+}

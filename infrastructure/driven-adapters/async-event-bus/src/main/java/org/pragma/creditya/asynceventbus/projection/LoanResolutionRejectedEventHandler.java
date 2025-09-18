@@ -1,5 +1,6 @@
 package org.pragma.creditya.asynceventbus.projection;
 
+import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loanread.LoanRead;
@@ -11,8 +12,11 @@ public class LoanResolutionRejectedEventHandler implements EventHandler<LoanReso
 
     private final LoanReadRepository loanReadRepository;
 
-    public LoanResolutionRejectedEventHandler(LoanReadRepository loanReadRepository) {
+    public LoanResolutionRejectedEventHandler(LoanReadRepository loanReadRepository, EventBus eventBus) {
         this.loanReadRepository = loanReadRepository;
+
+        eventBus.subscribe(LoanResolutionRejectedEvent.class)
+                .subscribe(this::onEvent);
     }
 
     @Override
