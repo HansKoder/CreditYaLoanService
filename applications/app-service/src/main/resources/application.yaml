@@ -18,16 +18,13 @@ spring:
         format_sql: true
   data:
     mongodb:
-      # uri: "mongodb://loan_mongo_user:loan_mongo_pass@localhost:27018/credit_loan_mongo?authSource=admin"
       uri: "mongodb://${MONGO_USER:${MONGO_USER:loan_mongo_user}}:${MONGO_PASSWORD:${MONGO_PASSWORD:loan_mongo_pass}}@${MONGO_HOST:${MONGO_HOST:localhost}}:${MONGO_PORT:${MONGO_PORT:27018}}/${MONGO_DB:${MONGO_DB:credit_loan_mongo}}?authSource=admin"
 logging:
   level:
-    # Hibernate SQL
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: "DEBUG"
 adapter:
   restconsumer:
     timeout: 5000
-    # url: "http://localhost:9081/api/v1/users/verify-ownership-customer"
     url: "${CUSTOMER_URL:http://localhost:9081}"
 management:
   health:
@@ -75,3 +72,12 @@ adapters:
 jwt:
   secret: "${SECRET_KEY:uO8lC2VhP3nZ6kF9Q1tWjR7yX5aT2sVb0mGhN8oJzK4cE6rLwBqD3pUyHfMxZaSd}"
   expiration: "${EXPIRATION:3600000}"
+entrypoint:
+  sqs:
+    region: "us-east-1"
+    endpoint: "http://localhost:4566"
+    queueUrl: "http://localhost:4566/000000000000/sample"
+    waitTimeSeconds: 20
+    maxNumberOfMessages: 10
+    visibilityTimeoutSeconds: 10
+    numberOfThreads: 1
