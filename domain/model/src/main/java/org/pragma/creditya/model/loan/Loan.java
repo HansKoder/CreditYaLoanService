@@ -11,7 +11,6 @@ import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ToString
 @Getter

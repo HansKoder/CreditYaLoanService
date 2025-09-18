@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: http://localhost:9082/api/v1/loans?page=0&size=20&status=PENDING
+  url: http://localhost:9082/api/v1/loans?page=0&size=20&status=APPROVED
   body: json
   auth: bearer
 }
@@ -13,9 +13,9 @@ get {
 params:query {
   page: 0
   size: 20
-  status: PENDING
+  status: APPROVED
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU4MTU2MzAzLCJleHAiOjE3NTgxNTk5MDN9.BmhjjuU160f1V7LP3Q7A7pK-JNpqbYvE6n6oDtDJ7gI
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU4MTY0MTk2LCJleHAiOjE3NTgxNjc3OTZ9.vr7MjKMUQqdptFkWjzqvdHkv1GNFfDBJmtXNdV6dtWo
 }

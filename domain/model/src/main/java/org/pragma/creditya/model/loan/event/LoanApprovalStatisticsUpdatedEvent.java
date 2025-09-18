@@ -3,29 +3,25 @@ package org.pragma.creditya.model.loan.event;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.UUID;
 
-@Setter
 @Getter
-public class CustomerNotificationRequestedLoan extends LoanEvent{
-    private String document;
-    private String decision;
-    private String reason;
+@Setter
+public class LoanApprovalStatisticsUpdatedEvent extends LoanEvent {
+    private BigDecimal amount;
 
-    public CustomerNotificationRequestedLoan() {
+    public LoanApprovalStatisticsUpdatedEvent() {
     }
 
-    public CustomerNotificationRequestedLoan(LoanBuilder loanBuilder) {
+    public LoanApprovalStatisticsUpdatedEvent(LoanBuilder loanBuilder) {
         super.setAggregateId(loanBuilder.aggregateId);
         super.setEventType(loanBuilder.eventType);
         super.setVersion(1);
         super.setAggregateType(loanBuilder.aggregateType);
         super.setDestination(EventDestination.SQS);
 
-        this.document = loanBuilder.document;
-        this.reason = loanBuilder.reason;
-        this.decision = loanBuilder.decision;
+        this.amount = loanBuilder.amount;
     }
 
     public static final class LoanBuilder {
@@ -33,14 +29,12 @@ public class CustomerNotificationRequestedLoan extends LoanEvent{
         private String eventType;
         private String aggregateType;
 
-        private String document;
-        private String decision;
-        private String reason;
+        private BigDecimal amount;
 
         private LoanBuilder() {
         }
 
-        public static LoanBuilder aLoanResolutionApproved() {
+        public static LoanBuilder aLoanApprovalBuilder() {
             return new LoanBuilder();
         }
 
@@ -59,23 +53,13 @@ public class CustomerNotificationRequestedLoan extends LoanEvent{
             return this;
         }
 
-        public LoanBuilder document(String value) {
-            this.document = value;
+        public LoanBuilder aggregateType(BigDecimal value) {
+            this.amount = value;
             return this;
         }
 
-        public LoanBuilder decision(String value) {
-            this.decision = value;
-            return this;
-        }
-
-        public LoanBuilder reason(String value) {
-            this.reason = value;
-            return this;
-        }
-
-        public CustomerNotificationRequestedLoan build() {
-            return new CustomerNotificationRequestedLoan(this);
+        public LoanApprovalStatisticsUpdatedEvent build() {
+            return new LoanApprovalStatisticsUpdatedEvent(this);
         }
     }
 }

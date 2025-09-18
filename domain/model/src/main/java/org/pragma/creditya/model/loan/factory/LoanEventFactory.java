@@ -1,7 +1,7 @@
 package org.pragma.creditya.model.loan.factory;
 
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.CustomerNotificationRequestedLoan;
+import org.pragma.creditya.model.loan.event.LoanResolutionCustomerNotifiedEvent;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
@@ -48,8 +48,8 @@ public class LoanEventFactory {
                 .build();
     }
 
-    public static CustomerNotificationRequestedLoan customerNotificationEvent (Loan domain) {
-        return CustomerNotificationRequestedLoan.LoanBuilder
+    public static LoanResolutionCustomerNotifiedEvent customerNotificationEvent (Loan domain) {
+        return LoanResolutionCustomerNotifiedEvent.LoanBuilder
                 .aLoanResolutionApproved()
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(domain.getAGGREGATE_TYPE())
