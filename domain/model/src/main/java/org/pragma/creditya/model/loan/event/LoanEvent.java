@@ -2,6 +2,7 @@ package org.pragma.creditya.model.loan.event;
 
 import lombok.*;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.shared.domain.event.DomainEvent;
 
 import java.time.Instant;
@@ -18,4 +19,5 @@ public abstract class LoanEvent implements DomainEvent<Loan> {
     private Instant timestamp;
     private String eventType;
     private String aggregateType;
+    private EventDestination destination;
 }

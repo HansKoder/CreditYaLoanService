@@ -1,7 +1,6 @@
 package org.pragma.creditya.usecase;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,16 +9,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.model.loan.outbox.OutboxEventModel;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;

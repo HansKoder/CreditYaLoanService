@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EventStoreRepository {
-    Mono<Loan> findByAggregateIdLast (UUID aggregateId);
     Flux<LoanEvent> findByAggregateId (UUID aggregateId);
-    Mono<Void> saveEvent (LoanApplicationSubmittedEvent event);
     Mono<Void> saveAll (List<LoanEvent> events);
 }

@@ -17,7 +17,12 @@ public class LoanResolutionRejectedEvent extends LoanEvent{
     }
 
     public LoanResolutionRejectedEvent(LoanBuilder loanBuilder) {
-        super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
+        // super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
+        super.setAggregateId(loanBuilder.aggregateId);
+        super.setEventType(loanBuilder.eventType);
+        super.setVersion(1);
+        super.setAggregateType(loanBuilder.aggregateType);
+        super.setDestination(EventDestination.INTERNAL);
 
         this.status = loanBuilder.status;
         this.reason = loanBuilder.reason;

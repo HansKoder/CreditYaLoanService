@@ -22,7 +22,12 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
     }
 
     private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
-        super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
+        // super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
+        super.setAggregateId(loanBuilder.aggregateId);
+        super.setEventType(loanBuilder.eventType);
+        super.setVersion(1);
+        super.setAggregateType(loanBuilder.aggregateType);
+        super.setDestination(EventDestination.INTERNAL);
 
         this.document = loanBuilder.document;
         this.amount = loanBuilder.amount;

@@ -3,10 +3,7 @@ package org.pragma.creditya.usecase;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
@@ -52,19 +49,13 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
 
     @Override
     public Mono<Loan> decisionLoan(DecisionLoanCommand command) {
-        // Plan B -> outbox events (Builder)
-        // Load -> notifyDecisionLoanEvent (outbox)
-        // Load -> countApprovedLoan (outbox)
-        // Load -> sumAmountApprovedLoan (outbox)
-
-        // check
-
         return checkTypeDecision(command)
                 .flatMap(this::fromStringToUUID)
                 .flatMap(this::getLoan)
                 .flatMap(loanUseCase::loadUsername)
                 .flatMap(loan -> checkDecisionLoan(loan, command))
                 .flatMap(this::persistAndPublishEvents)
+                .flatMap(this::outboxProcess)
                 .doOnError(e -> System.out.printf("[domain.use_case] (decision loan) payload[ error:%s ] \n", e.getMessage()));
     }
 
@@ -118,7 +109,8 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     }
 
     private Mono<Loan> persistAndPublishEvents (Loan loan) {
-        List<LoanEvent> events = loan.getUncommittedEvents();
+        Set<EventDestination> destinations = Set.of(EventDestination.INTERNAL);
+        List<LoanEvent> events = loan.getUncommittedEvents(destinations);
 
         if (events.isEmpty())
             return Mono.just(loan);
@@ -126,7 +118,19 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
         return eventRepository.saveAll(events)
                 .doOnSuccess(v -> events.forEach(eventBus::publish))
                 .thenReturn(loan)
-                .doOnSuccess(Loan::clearUncommittedEvents);
+                .doOnSuccess(response -> response.clearUncommittedEvents(destinations));
+    }
+
+    private Mono<Loan> outboxProcess (Loan loan) {
+        Set<EventDestination> destinations = Set.of(EventDestination.SQS);
+        List<LoanEvent> events = loan.getUncommittedEvents(destinations);
+
+        if (events.isEmpty())
+            return Mono.just(loan);
+
+        return outboxRepository.saveAll(events)
+                .thenReturn(loan)
+                .doOnSuccess(response -> response.clearUncommittedEvents(destinations));
     }
 
 }

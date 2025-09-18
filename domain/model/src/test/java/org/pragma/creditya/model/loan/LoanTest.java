@@ -1,5 +1,6 @@
 package org.pragma.creditya.model.loan;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
@@ -8,6 +9,7 @@ import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.LoanType;
 
 import java.math.BigDecimal;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -127,38 +129,6 @@ public class LoanTest {
     }
 
 
-    @Test void shouldBeSuccess_whenLoadCustomerAndLoanType () {
-        Loan domain = Loan.LoanBuilder
-                .aLoan()
-                .document("123")
-                .amount(BigDecimal.valueOf(100000))
-                .period(1, 6)
-                .loanTypeCode(1L)
-                .build();
-
-        domain.checkApplicationLoan();
-
-        assertEquals(0, domain.getUncommittedEvents().size());
-
-        CustomerRead customerRead =CustomerRead.builder()
-                .email("example@gmail.com")
-                .name("example")
-                .document("123")
-                .baseSalary(BigDecimal.valueOf(20))
-                .build();
-
-        domain.loadCustomer(customerRead);
-        assertEquals(0, domain.getUncommittedEvents().size());
-
-        LoanType loanType = LoanType.LoanTypeBuilder.aLoanType()
-                .description("Example")
-                .id(1L)
-                .interestRate(1.0D)
-                .build();
-
-        domain.loadLoanType(loanType);
-        assertEquals(0, domain.getUncommittedEvents().size());
-    }
 
     @Test void shouldHavePendingStatus_whenMarkAsPending_afterCheckAndLoading () {
         Loan domain = Loan.LoanBuilder
@@ -173,29 +143,12 @@ public class LoanTest {
 
         assertEquals(0, domain.getUncommittedEvents().size());
 
-        CustomerRead customerRead =CustomerRead.builder()
-                .email("example@gmail.com")
-                .name("example")
-                .document("123")
-                .baseSalary(BigDecimal.valueOf(20))
-                .build();
-
-        domain.loadCustomer(customerRead);
-        assertEquals(0, domain.getUncommittedEvents().size());
-
-        LoanType loanType = LoanType.LoanTypeBuilder.aLoanType()
-                .description("Example")
-                .id(1L)
-                .interestRate(1.0D)
-                .build();
-
-        domain.loadLoanType(loanType);
         assertEquals(0, domain.getUncommittedEvents().size());
 
         domain.markAsPending();
         assertEquals(1, domain.getUncommittedEvents().size());
 
-        domain.clearUncommittedEvents();
+        domain.clearUncommittedEvents(Set.of());
         assertEquals(0, domain.getUncommittedEvents().size());
     }
 

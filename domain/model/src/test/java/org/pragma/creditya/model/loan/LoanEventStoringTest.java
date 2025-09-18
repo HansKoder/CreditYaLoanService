@@ -23,11 +23,6 @@ public class LoanEventStoringTest {
     // Dummy event mock unknowing event
     static class UnknownLoanEvent extends LoanEvent {
         public UnknownLoanEvent() {
-            super(UUID.randomUUID(),
-                    1,
-                    Instant.now(),
-                    "EVENT",
-                    "LOAN");
         }
     }
 
@@ -71,11 +66,6 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("5000"))
                         .typeLoan(1L)
                         .period(12)
-                        .baseSalary(new BigDecimal("2000"))
-                        .email("customer@test.com")
-                        .name("John Doe")
-                        .interestRate(0.5)
-                        .typeLoanDescription("Personal Loan")
                         .totalMonthlyDebt(new BigDecimal("416.67"))
                         .build();
 
@@ -103,11 +93,6 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
-                        .baseSalary(new BigDecimal("3000"))
-                        .email("jane@test.com")
-                        .name("Jane Doe")
-                        .interestRate(0.10)
-                        .typeLoanDescription("Mortgage")
                         .totalMonthlyDebt(new BigDecimal("416.67"))
                         .build();
 
@@ -140,11 +125,6 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
-                        .baseSalary(new BigDecimal("3000"))
-                        .email("jane@test.com")
-                        .name("Jane Doe")
-                        .interestRate(0.10)
-                        .typeLoanDescription("Mortgage")
                         .totalMonthlyDebt(new BigDecimal("416.67"))
                         .build();
 

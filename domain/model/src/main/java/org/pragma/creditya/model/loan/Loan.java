@@ -1,10 +1,7 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.factory.LoanEventFactory;
@@ -13,10 +10,8 @@ import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ToString
 @Getter
@@ -72,16 +67,20 @@ public class Loan extends AggregateRoot<LoanId> {
         checkBeforeBeingResolved(APPROVED);
 
         this.loanStatus = LoanStatus.APPROVED;
+        this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.approvedEvent(this));
+        uncommittedEvents.add(LoanEventFactory.customerNotificationEvent(this));
     }
 
     public void checkRejectedLoan(String reason) {
         checkBeforeBeingResolved(REJECTED);
 
         this.loanStatus = LoanStatus.REJECTED;
+        this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
+        uncommittedEvents.add(LoanEventFactory.customerNotificationEvent(this));
     }
 
     // private methods business rules
@@ -129,7 +128,7 @@ public class Loan extends AggregateRoot<LoanId> {
         for (LoanEvent event : history)
             loan.apply(event);
 
-        loan.clearUncommittedEvents(); // clear
+        loan.clearUncommittedEvents(Set.of()); // clear
         return loan;
     }
 
@@ -163,12 +162,19 @@ public class Loan extends AggregateRoot<LoanId> {
         this.responsible = e.getRejectedBy();
     }
 
-    public List<LoanEvent> getUncommittedEvents() {
-        return Collections.unmodifiableList(uncommittedEvents);
+    public List<LoanEvent> getUncommittedEvents(Set<EventDestination> destinations) {
+        return uncommittedEvents
+                .stream().filter(e -> destinations.contains(e.getDestination()))
+                .toList();
     }
 
-    public void clearUncommittedEvents() {
-        this.uncommittedEvents.clear();
+    public void clearUncommittedEvents(Set<EventDestination> destinations) {
+        if (destinations.isEmpty()) {
+            this.uncommittedEvents.clear();
+            return;
+        }
+
+        this.uncommittedEvents.removeIf(e -> destinations.contains(e.getDestination()));
     }
 
     // Builder custom
