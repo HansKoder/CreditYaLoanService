@@ -53,7 +53,7 @@ public class LoanEventFactory {
                 .aLoanResolutionApproved()
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(domain.getAGGREGATE_TYPE())
-                .eventType(LoanResolutionApprovedEvent.class.getSimpleName())
+                .eventType(LoanResolutionCustomerNotifiedEvent.class.getSimpleName())
                 .document(domain.getDocument().value())
                 .reason(domain.getReason())
                 .decision(domain.getLoanStatus().name())

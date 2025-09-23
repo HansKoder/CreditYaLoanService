@@ -26,6 +26,10 @@ adapter:
   restconsumer:
     timeout: 5000
     url: "${CUSTOMER_URL:http://localhost:9081}"
+  sqs:
+    region: "${SQS_REGION:us-east-1}"
+    queueUrl: "${SQS_QUEUE_URL:http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/sample}"
+    endpoint: "${SQS_ENDPOINT:http://localhost:4566}"
 management:
   health:
     circuitbreakers:

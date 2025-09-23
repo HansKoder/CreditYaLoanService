@@ -4,14 +4,13 @@ import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.r2dbc.persistence.eventstoring.adapter.EventRepositoryAdapter;
-import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
 import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelper;
 import org.pragma.creditya.r2dbc.persistence.outbox.repository.OutboxReactiveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,9 +28,14 @@ public class OutboxAdapter implements OutboxRepository {
 
     @Override
     public Flux<LoanEvent> findByPending() {
+        log.info("[infra.r2dbc.outbox] (findByPending) ");
+        OutboxEntity probe = OutboxEntity.builder()
+                .status(OutboxStatus.STARTED)
+                .build();
 
-
-        return null;
+        return repository.findAll(Example.of(probe))
+                .map(outboxSerializerHelper::deserialize)
+                .log();
     }
 
     @Override

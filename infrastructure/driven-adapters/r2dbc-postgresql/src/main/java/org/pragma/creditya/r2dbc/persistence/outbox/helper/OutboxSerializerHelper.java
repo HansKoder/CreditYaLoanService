@@ -3,7 +3,7 @@ package org.pragma.creditya.r2dbc.persistence.outbox.helper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.event.*;
-import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
+import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,12 +26,12 @@ public class OutboxSerializerHelper {
         }
     }
 
-    public LoanEvent deserialize(EventEntity entity) {
+    public LoanEvent deserialize(OutboxEntity entity) {
         log.info("[infra.r2dbc.outbox] (deserialize) eventType={}, aggregateId={}",
                 entity.getEventType(), entity.getAggregateId());
 
         try {
-            Class<? extends LoanEvent> clazz = resolveEventClass(entity.getEventType());
+            Class<? extends LoanEvent> clazz = resolveOutboxClass(entity.getEventType());
             LoanEvent event = objectMapper.readValue(entity.getPayload().asString(), clazz);
             log.info("[infra.r2dbc] (object-mapper) deserialized payload: {}", event);
             return event;
@@ -40,7 +40,7 @@ public class OutboxSerializerHelper {
         }
     }
 
-    private Class<? extends LoanEvent> resolveEventClass(String eventType) {
+    private Class<? extends LoanEvent> resolveOutboxClass(String eventType) {
         return switch (eventType) {
             case "LoanResolutionCustomerNotifiedEvent" ->  LoanResolutionCustomerNotifiedEvent.class;
             case "LoanApprovalStatisticsUpdatedEvent" ->  LoanApprovalStatisticsUpdatedEvent.class;

@@ -128,8 +128,6 @@ public class LoanTest {
         assertEquals(0, domain.getUncommittedEvents().size());
     }
 
-
-
     @Test void shouldHavePendingStatus_whenMarkAsPending_afterCheckAndLoading () {
         Loan domain = Loan.LoanBuilder
                 .aLoan()
@@ -140,8 +138,6 @@ public class LoanTest {
                 .build();
 
         domain.checkApplicationLoan();
-
-        assertEquals(0, domain.getUncommittedEvents().size());
 
         assertEquals(0, domain.getUncommittedEvents().size());
 

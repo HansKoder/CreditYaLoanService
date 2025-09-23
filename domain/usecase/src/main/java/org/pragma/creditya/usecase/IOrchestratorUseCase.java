@@ -12,6 +12,5 @@ public interface IOrchestratorUseCase {
 
     Mono<Loan> applicationLoan (CreateRequestLoanCommand command);
     Flux<LoanRead> getLoans (LoanQuery query);
-
     Mono<Loan> decisionLoan(DecisionLoanCommand command);
 }

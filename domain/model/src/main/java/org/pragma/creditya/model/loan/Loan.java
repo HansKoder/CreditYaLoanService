@@ -127,7 +127,7 @@ public class Loan extends AggregateRoot<LoanId> {
         for (LoanEvent event : history)
             loan.apply(event);
 
-        loan.clearUncommittedEvents(Set.of()); // clear
+        loan.clearUncommittedEvents(Set.of());
         return loan;
     }
 

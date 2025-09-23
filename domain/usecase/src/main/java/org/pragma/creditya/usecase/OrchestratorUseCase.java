@@ -123,7 +123,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
 
     private Mono<Loan> outboxProcess (Loan loan) {
         Set<EventDestination> destinations = Set.of(EventDestination.SQS);
-        List<LoanEvent> events = loan.getUncommittedEvents(destinations);
+        List<LoanEvent> events = loan.getUncommittedEvents(Set.of(EventDestination.SQS));
 
         if (events.isEmpty())
             return Mono.just(loan);

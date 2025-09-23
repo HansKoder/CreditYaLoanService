@@ -2,14 +2,15 @@ package org.pragma.creditya.model.loan;
 
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.LoanType;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -84,8 +85,10 @@ public class LoanResolutionTest {
         loan.checkApprovedLoan(REASON_APPROVED);
 
         assertEquals(LoanStatus.APPROVED, loan.getLoanStatus());
-        assertEquals(1, loan.getUncommittedEvents().size());
+        assertEquals(2, loan.getUncommittedEvents().size());
+
         assertInstanceOf(LoanResolutionApprovedEvent.class, loan.getUncommittedEvents().getFirst());
+        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, loan.getUncommittedEvents().get(1));
     }
 
     @Test
@@ -126,8 +129,33 @@ public class LoanResolutionTest {
         loan.checkRejectedLoan(REASON_REJECTED);
 
         assertEquals(LoanStatus.REJECTED, loan.getLoanStatus());
-        assertEquals(1, loan.getUncommittedEvents().size());
+        assertEquals(2, loan.getUncommittedEvents().size());
+
         assertInstanceOf(LoanResolutionRejectedEvent.class, loan.getUncommittedEvents().getFirst());
+        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, loan.getUncommittedEvents().get(1));
+    }
+
+    @Test
+    void shouldGetEvents_usingFilters () {
+        Loan loan = Loan.LoanBuilder
+                .aLoan()
+                .id(LOAN_ID_EXAMPLE)
+                .document("123")
+                .amount(BigDecimal.valueOf(1000))
+                .loanStatus(LoanStatus.PENDING)
+                .build();
+
+        loan.loadAuthorResolutionLoan(AUTHOR);
+
+        loan.checkApprovedLoan(REASON_APPROVED);
+
+        List<LoanEvent> eventSourcingEvents = loan.getUncommittedEvents(Set.of(EventDestination.INTERNAL));
+        assertEquals(1, eventSourcingEvents.size());
+        assertInstanceOf(LoanResolutionApprovedEvent.class, eventSourcingEvents.getFirst());
+
+        List<LoanEvent> sqsEvents = loan.getUncommittedEvents(Set.of(EventDestination.SQS));
+        assertEquals(1, sqsEvents.size());
+        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, sqsEvents.getFirst());
     }
 
 }
