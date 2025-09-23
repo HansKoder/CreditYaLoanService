@@ -16,8 +16,8 @@ public class OutboxUseCase implements IOutboxUseCase {
     private final INotificationUseCase notificationUseCase;
 
     @Override
-    public Mono<Void> execute(Flux<LoanEvent> events) {
-        return events
+    public Mono<Void> execute(LoanEvent event) {
+        return Mono.just(event)
                 .flatMap(this::handleEvent)
                 .then();
     }

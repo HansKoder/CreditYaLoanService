@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface OutboxRepository {
     Flux<LoanEvent> findByPending ();
-    Mono<Void> markAsSent (UUID aggregateId);
+    Mono<Void> markAsCompleted (UUID outboxId);
+    Mono<Void> markAFailed (UUID outboxId);
     Mono<Void> saveAll (List<LoanEvent> events);
 }

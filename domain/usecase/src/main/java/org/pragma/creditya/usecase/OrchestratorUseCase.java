@@ -17,6 +17,7 @@ import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
 import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
+import org.pragma.creditya.usecase.outbox.OutboxUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final ILoanReadUseCase loanReadUseCase;
     private final EventBus eventBus;
     private final OutboxRepository outboxRepository;
+    private final OutboxUseCase outboxUseCase;
 
     @Override
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
@@ -57,6 +59,11 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .flatMap(this::persistAndPublishEvents)
                 .flatMap(this::outboxProcess)
                 .doOnError(e -> System.out.printf("[domain.use_case] (decision loan) payload[ error:%s ] \n", e.getMessage()));
+    }
+
+    @Override
+    public Mono<Void> outboxProcess(LoanEvent event) {
+        return outboxUseCase.execute(event);
     }
 
     private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {

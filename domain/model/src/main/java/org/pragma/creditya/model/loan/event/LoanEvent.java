@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public abstract class LoanEvent implements DomainEvent<Loan> {
+    private UUID id;
     private UUID aggregateId;
     private int version;
     private Instant timestamp;

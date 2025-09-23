@@ -1,6 +1,7 @@
 package org.pragma.creditya.usecase;
 
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
@@ -13,4 +14,5 @@ public interface IOrchestratorUseCase {
     Mono<Loan> applicationLoan (CreateRequestLoanCommand command);
     Flux<LoanRead> getLoans (LoanQuery query);
     Mono<Loan> decisionLoan(DecisionLoanCommand command);
+    Mono<Void> outboxProcess (LoanEvent event);
 }
