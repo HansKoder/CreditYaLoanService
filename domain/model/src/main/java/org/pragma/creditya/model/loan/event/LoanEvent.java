@@ -20,5 +20,4 @@ public abstract class LoanEvent implements DomainEvent<Loan> {
     private Instant timestamp;
     private String eventType;
     private String aggregateType;
-    private EventDestination destination;
 }

@@ -69,7 +69,6 @@ public class Loan extends AggregateRoot<LoanId> {
         this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.approvedEvent(this));
-        uncommittedEvents.add(LoanEventFactory.customerNotificationEvent(this));
     }
 
     public void checkRejectedLoan(String reason) {
@@ -79,7 +78,6 @@ public class Loan extends AggregateRoot<LoanId> {
         this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
-        uncommittedEvents.add(LoanEventFactory.customerNotificationEvent(this));
     }
 
     // private methods business rules
@@ -127,7 +125,7 @@ public class Loan extends AggregateRoot<LoanId> {
         for (LoanEvent event : history)
             loan.apply(event);
 
-        loan.clearUncommittedEvents(Set.of());
+        loan.clearUncommittedEvents();
         return loan;
     }
 
@@ -161,19 +159,12 @@ public class Loan extends AggregateRoot<LoanId> {
         this.responsible = e.getRejectedBy();
     }
 
-    public List<LoanEvent> getUncommittedEvents(Set<EventDestination> destinations) {
-        return uncommittedEvents
-                .stream().filter(e -> destinations.contains(e.getDestination()))
-                .toList();
+    public List<LoanEvent> getUncommittedEvents() {
+        return Collections.unmodifiableList(uncommittedEvents);
     }
 
-    public void clearUncommittedEvents(Set<EventDestination> destinations) {
-        if (destinations.isEmpty()) {
-            this.uncommittedEvents.clear();
-            return;
-        }
-
-        this.uncommittedEvents.removeIf(e -> destinations.contains(e.getDestination()));
+    public void clearUncommittedEvents() {
+        this.uncommittedEvents.clear();
     }
 
     // Builder custom

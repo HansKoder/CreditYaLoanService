@@ -6,18 +6,15 @@ import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
-import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.model.loan.valueobject.LoanId;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
-import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
+import org.pragma.creditya.outbox.processor.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
 import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
-import org.pragma.creditya.usecase.outbox.OutboxUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,8 +29,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final EventStoreRepository eventRepository;
     private final ILoanReadUseCase loanReadUseCase;
     private final EventBus eventBus;
-    private final OutboxRepository outboxRepository;
-    private final OutboxUseCase outboxUseCase;
+    private final IOutboxHandler outboxProcess;
 
     @Override
     public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
@@ -62,9 +58,12 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     }
 
     @Override
-    public Mono<Void> outboxProcess(LoanEvent event) {
-        return outboxUseCase.execute(event);
+    public Mono<Loan> outboxProcess(Loan domain) {
+        System.out.println("[domain.use_case] (outboxProcess) payload=domain:" + domain);
+        return outboxProcess.execute(domain)
+                .then(Mono.just(domain));
     }
+
 
     private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {
         Map<String, BiFunction<Loan, String, Mono<Loan>>> map = new HashMap<>();
@@ -116,28 +115,14 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     }
 
     private Mono<Loan> persistAndPublishEvents (Loan loan) {
-        Set<EventDestination> destinations = Set.of(EventDestination.INTERNAL);
-        List<LoanEvent> events = loan.getUncommittedEvents(destinations);
+        List<LoanEvent> events = loan.getUncommittedEvents();
 
         if (events.isEmpty())
             return Mono.just(loan);
 
         return eventRepository.saveAll(events)
                 .doOnSuccess(v -> events.forEach(eventBus::publish))
-                .thenReturn(loan)
-                .doOnSuccess(response -> response.clearUncommittedEvents(destinations));
-    }
-
-    private Mono<Loan> outboxProcess (Loan loan) {
-        Set<EventDestination> destinations = Set.of(EventDestination.SQS);
-        List<LoanEvent> events = loan.getUncommittedEvents(Set.of(EventDestination.SQS));
-
-        if (events.isEmpty())
-            return Mono.just(loan);
-
-        return outboxRepository.saveAll(events)
-                .thenReturn(loan)
-                .doOnSuccess(response -> response.clearUncommittedEvents(destinations));
+                .thenReturn(loan);
     }
 
 }

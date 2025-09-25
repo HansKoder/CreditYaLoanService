@@ -43,15 +43,18 @@ public class RestConsumer implements CustomerClient{
     }
 
     public Mono<GetCustomerByDocumentResponse> getCustomer(String document, String token) {
+        log.info("[infra.rest-consumer] (getConsumer) (step-0) payload=[ doc:{} token:{} ]", document, token);
         return userWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/v1/users/customer")
+                        .path("/api/v1/users/document")
                         .queryParam("document", document)
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleErrors)
-                .bodyToMono(GetCustomerByDocumentResponse.class);
+                .bodyToMono(GetCustomerByDocumentResponse.class)
+                .doOnSuccess(e -> log.info("[infra.rest-consumer] (getCustomer) (step-1) success, get customer: response=[ customer:{} ]", e))
+                .doOnError(e -> log.info("[infra.rest-consumer] (getCustomer) (step-1) error, get customer: response=[ error:{} ]", e.getMessage()));
     }
 
     private Mono<? extends Throwable> handleErrors(ClientResponse response) {
@@ -72,12 +75,13 @@ public class RestConsumer implements CustomerClient{
     }
 
     private Mono<String> extractToken () {
+        log.info("[infra.rest-consumer] (extractToken)");
         return Mono.deferContextual(ctx -> {
             String token = Optional.of(ctx.get("token"))
                     .map(Object::toString)
                     .orElse("");
 
-            log.info("[infra.rest-consumer] (extract-token) token: {}", token);
+            log.info("[infra.rest-consumer] (extract-token) token was extracted: {}", token);
 
             return Mono.just(token)
                     .switchIfEmpty(Mono.error(new TokenIsMissingException("Token is missing")));
@@ -97,6 +101,7 @@ public class RestConsumer implements CustomerClient{
 
     @Override
     public Mono<CustomerRead> getCustomerByDocument(String document) {
+        log.info("[infra.rest-consumer] (getCustomerByDocument) payload=[ document:{} ]", document);
         return extractToken()
                 .flatMap(token -> getCustomer(document, token))
                 .map(RestConsumerMapper::toCustomerRead);

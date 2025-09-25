@@ -4,11 +4,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionCustomerNotifiedEvent;
-import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.r2dbc.persistence.outbox.repository.OutboxReactiveRepository;
+import org.pragma.creditya.model.outbox.LoanOutboxMessage;
+import org.pragma.creditya.model.outbox.OutboxStatus;
+import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -18,7 +17,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,18 +52,26 @@ public class OutboxRepositoryIntegrationTest {
     @Autowired
     private OutboxRepository outboxRepository;
 
+    private String LOAN_ID = "8045a685-104d-4093-99b4-ba83bcb0ee2c";
+
     @Test
     void shouldBePersistedWithSuccessful_eventCustomerNotification() {
 
-        LoanResolutionCustomerNotifiedEvent event = LoanResolutionCustomerNotifiedEvent.LoanBuilder
-                .aLoanResolutionApproved()
-                .aggregateType("LOAN")
-                .eventType(LoanResolutionCustomerNotifiedEvent.class.getSimpleName())
-                .aggregateId(UUID.randomUUID())
-                .decision("APPROVED")
+        NotificationOutboxPayload payload = NotificationOutboxPayload.builder()
+                .subject("Loan Notification")
+                .destination("doe@gmail.com")
+                .message("Hello Mr Doe")
+                .type("EMAIL")
                 .build();
 
-        StepVerifier.create(outboxRepository.saveAll(List.of(event)))
+        LoanOutboxMessage outboxMessage = LoanOutboxMessage.builder()
+                .type(payload.getType())
+                .aggregateId(UUID.fromString(LOAN_ID))
+                .status(OutboxStatus.COMPLETED)
+                .aggregateName("LOAN")
+                .build();
+
+        StepVerifier.create(outboxRepository.saveOutboxMessage(outboxMessage, payload))
                 .verifyComplete();
     }
 

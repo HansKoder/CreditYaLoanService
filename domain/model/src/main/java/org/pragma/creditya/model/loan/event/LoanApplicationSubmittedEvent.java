@@ -27,7 +27,6 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         super.setEventType(loanBuilder.eventType);
         super.setVersion(1);
         super.setAggregateType(loanBuilder.aggregateType);
-        super.setDestination(EventDestination.INTERNAL);
 
         this.document = loanBuilder.document;
         this.amount = loanBuilder.amount;

@@ -17,12 +17,10 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
     }
 
     public LoanResolutionApprovedEvent(LoanBuilder loanBuilder) {
-        // super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
         super.setAggregateId(loanBuilder.aggregateId);
         super.setEventType(loanBuilder.eventType);
         super.setVersion(1);
         super.setAggregateType(loanBuilder.aggregateType);
-        super.setDestination(EventDestination.INTERNAL);
 
         this.status = loanBuilder.status;
         this.reason = loanBuilder.reason;

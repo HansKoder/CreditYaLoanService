@@ -1,7 +1,7 @@
 package org.pragma.creditya.r2dbc.persistence.outbox.mapper;
 
 import io.r2dbc.postgresql.codec.Json;
-import org.pragma.creditya.model.loan.event.LoanEvent;
+import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
 import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelper;
@@ -12,34 +12,49 @@ public class OutboxMapper {
 
     private final static Logger log = LoggerFactory.getLogger(OutboxMapper.class);
 
-    public static OutboxEntity fromEventToEntity (LoanEvent event, OutboxSerializerHelper serializerHelper, OutboxStatus status) {
-        log.info("[infra.r2dbc.outbox.mapper] (fromEventToEntity) map to persist: {}", event);
+    public static OutboxEntity fromOutboxMessageToEntity (LoanOutboxMessage outboxMessage) {
+        log.info("[infra.r2dbc.outbox.mapper] (fromOutboxMessageToEntity) Payload=[ outboxMessage:{} ]", outboxMessage);
 
         OutboxEntity entity = OutboxEntity.builder()
-                .aggregateId(event.getAggregateId().toString())
-                .aggregateName(event.getAggregateType())
-                .eventType(event.getEventType())
-                .status(status)
-                .payload(Json.of(serializerHelper.serialize(event)))
+                .aggregateId(outboxMessage.getAggregateId().toString())
+                .aggregateName(outboxMessage.getAggregateName())
+                .eventType(outboxMessage.getType())
+                .status(OutboxStatus.valueOf(outboxMessage.getStatus().name()))
+                // .payload(Json.of(serializerHelper.serializePayload(outboxMessage.getPayload())))
                 .build();
 
         // For handling update
-        if (event.getId() != null) entity.setId(event.getId());
+        if (outboxMessage.getId() != null) entity.setId(outboxMessage.getId());
 
-        log.info("[infra.r2dbc.outbox.mapper] (fromEventToEntity) from event to entity, payload: {}", entity);
+        log.info("[infra.r2dbc.outbox.mapper] (fromOutboxMessageToEntity) from outboxMessage to entity, payload: {}", entity);
 
         return entity;
     }
 
-    public static LoanEvent fromEntityToEvent ( OutboxEntity outboxEntity, OutboxSerializerHelper serializerHelper) {
-        log.info("[infra.r2dbc.outbox.mapper] (fromEntityToEvent) payload=[ outboxEntity:{} ]", outboxEntity);
+    public static LoanOutboxMessage fromOutboxEntityToOutboxMessage (OutboxEntity outboxEntity) {
+        log.info("[infra.r2dbc.outbox.mapper] (fromOutboxEntityToOutboxMessage) Payload=[ outboxEntity:{} ]", outboxEntity);
 
-        LoanEvent loanEvent = serializerHelper.deserialize(outboxEntity);
-        loanEvent.setId(outboxEntity.getId());
+        LoanOutboxMessage outboxMessage = LoanOutboxMessage.builder()
+                .id(outboxEntity.getId())
+                .type(outboxEntity.getEventType())
+                // .payload(outboxEntity.getPayload().asString())
+                .build();
 
-        log.info("[infra.r2dbc.outbox.mapper] (fromEntityToEvent) payload=[ event:{} ]", loanEvent);
+        log.info("[infra.r2dbc.outbox.mapper] (fromOutboxEntityToOutboxMessage) payload: {}", outboxMessage);
 
-        return loanEvent;
+        return outboxMessage;
     }
+
+    /**
+    private static Class<?> resolvePayloadClass(String eventType) {
+        return switch (eventType) {
+            case "LoanResolutionApprovedEvent" -> NotificationOutboxPayload.class;
+            case "LoanResolutionRejectedEvent" -> NotificationOutboxPayload.class;
+            case "LoanReportGeneratedEvent" -> NotificationOutboxPayload.class;
+            default -> throw new IllegalArgumentException("Unknown eventType: " + eventType);
+        };
+    }
+     */
+
 
 }

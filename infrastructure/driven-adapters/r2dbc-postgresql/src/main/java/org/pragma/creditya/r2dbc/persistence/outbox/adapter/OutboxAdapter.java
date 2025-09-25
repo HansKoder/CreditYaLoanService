@@ -2,8 +2,8 @@ package org.pragma.creditya.r2dbc.persistence.outbox.adapter;
 
 import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
+import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
 import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelper;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -27,81 +26,89 @@ public class OutboxAdapter implements OutboxRepository {
     private final OutboxSerializerHelper outboxSerializerHelper;
     private final Logger log = LoggerFactory.getLogger(OutboxAdapter.class);
 
+
     @Override
-    public Flux<LoanEvent> findByPending() {
+    public <T> Mono<Void> saveOutboxMessage(LoanOutboxMessage outboxMessage, T payload) {
+        log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-1) save event  payload=[ outboxMessage:{} ] ", outboxMessage);
+
+        if (payload == null) {
+            log.error("[infra.r2dbc.outbox] [ERROR] (saveOutboxMessage) (step-2) payload is null, payload must be mandatory");
+            return Mono.empty();
+        }
+
+        log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-2) payload after being checked  payload=[ payload:{} ] ", payload);
+
+        log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-100) payload after 33 being checked  payload=[ payload:{} ] ", payload);
+
+        // return markAsCompleted(UUID.randomUUID());
+        return Mono.just(outboxMessage)
+                .map(this::mapToOutboxEntity)
+                // set payload
+                .map(entity -> {
+                    log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-3) before being serialized payload payload=[ payload:{} ] ", entity.getPayload());
+                    entity.setPayload(Json.of(outboxSerializerHelper.serializePayload(payload)));
+                    log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-4) after being serialized payload payload=[ payload:{} ] ", entity.getPayload());
+                    return entity;
+                })
+                .doOnSuccess(entity -> log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-3) mapped from outboxMessage to OutboxEntity, response=[ entity:{} ]", entity))
+                .doOnError(err -> log.info("[infra.r2dbc.outbox] [ERROR] (saveOutboxMessage) (step-3) failed mapped, response=[ errorDetail:{} ]", err.getMessage()))
+                .flatMap(e -> {
+                    log.info("[infra.r2dbc.outbox] (save) this entity will be persisted {}", e);
+                    return repository.save(e);
+                })
+                .doOnError(e -> log.info("[infra.r2dbc.outbox] [ERROR] (save) error when save event, payload: {}, detail: {}", e.getMessage(), e.getStackTrace()))
+                .then();
+    }
+
+
+    private OutboxEntity mapToOutboxEntity (LoanOutboxMessage outboxMessage) {
+        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-1) payload=[ outboxMessage:{} ] ", outboxMessage);
+
+        OutboxEntity entity = OutboxMapper.fromOutboxMessageToEntity(outboxMessage);
+        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-2) mapped to outboxEntity response=[ outboxEntity:{} ] ", entity);
+
+        return entity;
+    }
+
+    @Override
+    public Flux<LoanOutboxMessage> findByPending() {
         log.info("[infra.r2dbc.outbox] (findByPending) ");
-        OutboxEntity probe = OutboxEntity.builder()
+
+        OutboxEntity entity = OutboxEntity.builder()
                 .status(OutboxStatus.STARTED)
                 .build();
 
-        return repository.findAll(Example.of(probe))
-                .map(outboxEntity -> OutboxMapper.fromEntityToEvent(outboxEntity, outboxSerializerHelper))
-                .log();
+        return repository.findAll(Example.of(entity))
+                .map(OutboxMapper::fromOutboxEntityToOutboxMessage);
+        // pending set payload.
     }
 
     @Override
     public Mono<Void> markAsCompleted(UUID outboxId) {
-        log.info("[infra.r2dbc.outbox] (markAsCompleted) payload=[outboxId:{}]", outboxId);
-
-        if (outboxId == null) {
-            log.warn("[infra.r2dbc.outbox] (markAsCompleted) OutboxId is null, should be checked");
-            return Mono.empty();
-        }
+        log.info("[infra.r2dbc.outbox] (markAsCompleted) (step-1) Payload=[ outboxId:{} ]", outboxId);
 
         return repository.findById(outboxId)
-                .map(data -> {
-                    data.setStatus(OutboxStatus.COMPLETED);
-                    return data;
+                .log()
+                .doOnSuccess(res -> log.info("[infra.r2dbc.outbox] (markAsCompleted) (step-2) get find by id, response=[ outboxEntity:{} ]", res))
+                .map(ent -> {
+                    ent.setStatus(OutboxStatus.COMPLETED);
+                    return ent;
                 })
                 .flatMap(repository::save)
-                // .map(outboxEntity -> OutboxMapper.fromEntityToEvent(outboxEntity, outboxSerializerHelper))
-                // .flatMap(e -> saveEvent(e, OutboxStatus.COMPLETED))
-                .doOnSuccess(outboxEntity -> log.info("[infra.r2dbc.outbox] (markAsCompleted) was marked completed with successful, payload=[entity:{}]", outboxEntity))
-                .doOnError(err -> log.error("[infra.r2dbc.outbox] (markAsCompleted) had failed, detail error={}", err.getMessage()))
+                .doOnSuccess(res -> log.info("[infra.r2dbc.outbox] (markAsCompleted) (step-3) entity was persisted with successful response=[ outboxEntity:{} ]", res))
                 .then();
     }
 
     @Override
     public Mono<Void> markAFailed(UUID outboxId) {
-        log.info("[infra.r2dbc.outbox] (markAFailed) payload=[outboxId:{}]", outboxId);
-
-        if (outboxId == null) {
-            log.warn("[infra.r2dbc.outbox] (markAFailed) OutboxId is null, should be checked");
-            return Mono.empty();
-        }
+        log.info("[infra.r2dbc.outbox] (markAFailed) Payload=[ outboxId:{} ]", outboxId);
 
         return repository.findById(outboxId)
-                .map(data -> {
-                    data.setStatus(OutboxStatus.FAILED);
-                    return data;
+                .map(ent -> {
+                    ent.setStatus(OutboxStatus.FAILED);
+                    return ent;
                 })
                 .flatMap(repository::save)
-                // .map(outboxEntity -> OutboxMapper.fromEntityToEvent(outboxEntity, outboxSerializerHelper))
-                // .flatMap(e -> saveEvent(e, OutboxStatus.FAILED))
-
-                .doOnSuccess(outboxEntity -> log.info("[infra.r2dbc.outbox] (markAFailed) was marked failed with successful, payload=[entity:{}]", outboxEntity))
-                .doOnError(err -> log.error("[infra.r2dbc.outbox] (markAFailed) had failed, detail error={}", err.getMessage()))
                 .then();
     }
-
-    @Override
-    public Mono<Void> saveAll(List<LoanEvent> events) {
-        log.info("[infra.r2dbc.outbox] (saveAll) payload [ size:{}, events:{} ]", events.size(), events);
-        return Flux.fromIterable(events)
-                .flatMap(e -> saveEvent(e, OutboxStatus.STARTED))
-                .doOnError(e -> log.info("[infra.r2dbc.outbox] (save-all) error when persisting all events, payload: {}", e.getMessage()))
-                .then();
-    }
-
-    private Mono<Void> saveEvent(LoanEvent event, OutboxStatus status) {
-        log.info("[infra.r2dbc.outbox] (event) save event  payload: {}", event);
-        return Mono.fromCallable(() -> OutboxMapper.fromEventToEntity(event, outboxSerializerHelper, status))
-                .flatMap(e -> {
-                    log.info("[infra.r2dbc.outbox] (save) this entity will be persisted {}", e);
-                    return repository.save(e);
-                })
-                .doOnError(e -> log.info("[infra.r2dbc.outbox] (save) error when save event, payload: {}, detail: {}", e.getMessage(), e.getStackTrace()))
-                .then();
-    }
-
 }

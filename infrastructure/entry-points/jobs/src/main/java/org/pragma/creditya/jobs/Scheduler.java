@@ -1,14 +1,12 @@
 package org.pragma.creditya.jobs;
 
-import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.usecase.IOrchestratorUseCase;
+import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -17,15 +15,12 @@ import java.util.UUID;
 public class Scheduler {
 
     private final OutboxRepository outboxRepository;
-    private final IOrchestratorUseCase useCase;
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
-    public Scheduler(OutboxRepository outboxRepository, IOrchestratorUseCase useCase) {
+    public Scheduler(OutboxRepository outboxRepository) {
         this.outboxRepository = outboxRepository;
-        this.useCase = useCase;
         startJob();
     }
-
 
     private void startJob() {
         int TIME_PROCESS_OUTBOX = 30;
@@ -43,11 +38,18 @@ public class Scheduler {
                 );
     }
 
-    private Mono<Void> processOutbox (LoanEvent outbox) {
+    private Mono<Void> processOutbox (LoanOutboxMessage outbox) {
         logger.info("[infra.entrypoint.scheduler] process outbox payload=[ outbox:{} ]", outbox);
 
         UUID outboxId = outbox.getId();
+        logger.info("[infra.entrypoint.scheduler] payload=[ outboxId:{} ]", outboxId);
 
+        return outboxRepository.markAsCompleted(outboxId)
+                .doOnSuccess(v -> logger.info("[infra.entrypoint.scheduler] was persisted as completed, payload=[ outboxId:{} ]", outboxId))
+                .doOnError(err -> logger.info("[infra.entrypoint.scheduler] it was not possible to be persisted as completed payload=[ outboxId:{}, error:{} ]", outboxId, err.getMessage()))
+                .then();
+
+        /*
         return useCase.outboxProcess(outbox)
                 .retryWhen(Retry.backoff(1, Duration.ofSeconds(5))
                         .doBeforeRetry(rs -> logger.warn("[infra.entrypoint.scheduler] Retrying outboxId={} attempt={} cause={}",
@@ -58,7 +60,7 @@ public class Scheduler {
                     return outboxRepository.markAFailed(outboxId)
                             .doOnError(e -> logger.error("[infra.entrypoint.scheduler] markAFailed also failed for id={}, err={}", outboxId, e.getMessage(), e))
                             .then();
-                });
+                })*/
     }
 
 }
