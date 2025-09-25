@@ -38,9 +38,6 @@ public class OutboxAdapter implements OutboxRepository {
 
         log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-2) payload after being checked  payload=[ payload:{} ] ", payload);
 
-        log.info("[infra.r2dbc.outbox] (saveOutboxMessage) (step-100) payload after 33 being checked  payload=[ payload:{} ] ", payload);
-
-        // return markAsCompleted(UUID.randomUUID());
         return Mono.just(outboxMessage)
                 .map(this::mapToOutboxEntity)
                 // set payload
@@ -60,16 +57,6 @@ public class OutboxAdapter implements OutboxRepository {
                 .then();
     }
 
-
-    private OutboxEntity mapToOutboxEntity (LoanOutboxMessage outboxMessage) {
-        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-1) payload=[ outboxMessage:{} ] ", outboxMessage);
-
-        OutboxEntity entity = OutboxMapper.fromOutboxMessageToEntity(outboxMessage);
-        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-2) mapped to outboxEntity response=[ outboxEntity:{} ] ", entity);
-
-        return entity;
-    }
-
     @Override
     public Flux<LoanOutboxMessage> findByPending() {
         log.info("[infra.r2dbc.outbox] (findByPending) ");
@@ -80,7 +67,6 @@ public class OutboxAdapter implements OutboxRepository {
 
         return repository.findAll(Example.of(entity))
                 .map(OutboxMapper::fromOutboxEntityToOutboxMessage);
-        // pending set payload.
     }
 
     @Override
@@ -110,5 +96,15 @@ public class OutboxAdapter implements OutboxRepository {
                 })
                 .flatMap(repository::save)
                 .then();
+    }
+
+
+    private OutboxEntity mapToOutboxEntity (LoanOutboxMessage outboxMessage) {
+        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-1) payload=[ outboxMessage:{} ] ", outboxMessage);
+
+        OutboxEntity entity = OutboxMapper.fromOutboxMessageToEntity(outboxMessage);
+        log.info("[infra.r2dbc.outbox] (mapToOutboxEntity) (step-2) mapped to outboxEntity response=[ outboxEntity:{} ] ", entity);
+
+        return entity;
     }
 }

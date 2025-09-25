@@ -8,6 +8,8 @@ import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelpe
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 public class OutboxMapper {
 
     private final static Logger log = LoggerFactory.getLogger(OutboxMapper.class);
@@ -20,7 +22,6 @@ public class OutboxMapper {
                 .aggregateName(outboxMessage.getAggregateName())
                 .eventType(outboxMessage.getType())
                 .status(OutboxStatus.valueOf(outboxMessage.getStatus().name()))
-                // .payload(Json.of(serializerHelper.serializePayload(outboxMessage.getPayload())))
                 .build();
 
         // For handling update
@@ -36,8 +37,10 @@ public class OutboxMapper {
 
         LoanOutboxMessage outboxMessage = LoanOutboxMessage.builder()
                 .id(outboxEntity.getId())
+                .aggregateId(UUID.fromString(outboxEntity.getAggregateId()))
+                .aggregateName(outboxEntity.getAggregateName())
                 .type(outboxEntity.getEventType())
-                // .payload(outboxEntity.getPayload().asString())
+                .payload(outboxEntity.getPayload().asString())
                 .build();
 
         log.info("[infra.r2dbc.outbox.mapper] (fromOutboxEntityToOutboxMessage) payload: {}", outboxMessage);
