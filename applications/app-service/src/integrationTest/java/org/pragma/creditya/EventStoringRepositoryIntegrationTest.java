@@ -4,8 +4,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.pragma.creditya.model.loan.event.AggregateType;
+import org.pragma.creditya.model.loan.event.EventType;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
+import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -26,7 +29,6 @@ public class EventStoringRepositoryIntegrationTest {
     @Container
     private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
             .withInitScript("db/init/schema.sql");
-
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -53,14 +55,14 @@ public class EventStoringRepositoryIntegrationTest {
     @Test
     void shouldBePersistedWithSuccessful_eventApplicationLoan() {
 
-        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.LoanBuilder
-                .aLoanApplicationSubmitted()
-                .aggregateType("LOAN")
-                .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
+        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.SubmittedBuilder
+                .aSubmittedEvent()
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_SUBMITTED)
                 .document("123")
                 .typeLoan(1L)
                 .amount(BigDecimal.valueOf(1))
-                .status("PENDING")
+                .status(LoanStatus.PENDING)
                 .build();
 
         StepVerifier.create(eventStoreRepository.saveAll(List.of(event)))

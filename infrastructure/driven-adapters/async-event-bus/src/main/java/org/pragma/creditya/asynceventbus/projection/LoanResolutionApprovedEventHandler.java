@@ -2,7 +2,6 @@ package org.pragma.creditya.asynceventbus.projection;
 
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
@@ -35,7 +34,7 @@ public class LoanResolutionApprovedEventHandler implements EventHandler<LoanReso
 
     private Mono<LoanRead> mapToUpdateRead (LoanRead loanRead, LoanResolutionApprovedEvent event) {
         System.out.println("[infra.event.mapping] map to update status ");
-        loanRead.setStatus(event.getStatus());
+        loanRead.setStatus(event.getStatus().name());
         System.out.println("[infra.event.mapping] event was updated payload=" + event);
         return Mono.just(loanRead);
     }

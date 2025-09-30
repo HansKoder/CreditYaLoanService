@@ -32,7 +32,7 @@ public class LoanResolutionRejectedEventHandler implements EventHandler<LoanReso
     }
 
     private LoanRead mapToUpdateRead (LoanRead loanRead, LoanResolutionRejectedEvent event) {
-        loanRead.setStatus(event.getStatus());
+        loanRead.setStatus(event.getStatus().name());
         return loanRead;
     }
 }

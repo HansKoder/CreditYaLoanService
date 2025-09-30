@@ -13,8 +13,6 @@ import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.outbox.LoanOutboxMessage;
-import org.pragma.creditya.model.outbox.OutboxStatus;
-import org.pragma.creditya.outbox.OutboxHelper;
 import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
 import org.pragma.creditya.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
@@ -23,7 +21,6 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;

@@ -338,4 +338,4 @@ build-cache
 
 # Envs variables
 .env
-**.env
+.env**

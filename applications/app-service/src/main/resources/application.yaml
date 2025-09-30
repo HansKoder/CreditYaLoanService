@@ -23,9 +23,9 @@ adapter:
     timeout: ${RESTCONSUMER_TIMEOUT}
     url: ${RESTCONSUMER_URL}
   sqs:
-    region: ${SQS_REGION}
-    queueUrl: ${SQS_QUEUE_URL}
-    endpoint: ${SQS_ENDPOINT}
+    region: ${ADAPTER_SQS_NOTIFICATION_REGION}
+    queueUrl: ${ADAPTER_SQS_NOTIFICATION_QUEUE_URL}
+    endpoint: ${ADAPTER_SQS_NOTIFICATION_ENDPOINT}
 management:
   health:
     circuitbreakers:
@@ -70,8 +70,8 @@ adapters:
     username: ${POSTGRES_USER:loan_user}
     password: ${POSTGRES_PASSWORD}
 jwt:
-  secret: ${SECRET_KEY}
-  expiration: ${EXPIRATION}
+  secret: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
 
 entrypoint:
   sqs:

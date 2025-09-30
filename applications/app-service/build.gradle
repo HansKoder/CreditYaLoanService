@@ -35,6 +35,10 @@ dependencies {
     testImplementation "org.testcontainers:mockserver:1.20.3"
     testImplementation "org.mock-server:mockserver-client-java:5.15.0"
 
+    // Env vars
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    testImplementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
 }
 
 tasks.register('explodedJar', Copy) {
@@ -72,6 +76,8 @@ tasks.register('integrationTest', Test) {
 
     // BlockHound JDK 13+
     jvmArgs += ["-XX:+AllowRedefinitionToAddDeleteMethods"]
+
+    systemProperty "dotenv.filename", ".env.test"
 }
 
 configurations {

@@ -1,13 +1,8 @@
 package org.pragma.creditya.r2dbc.persistence.eventstoring.adapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.helper.EventSerializerHelper;
@@ -63,8 +58,8 @@ public class EventRepositoryAdapter implements EventStoreRepository {
 
         EventEntity entity = EventEntity.builder()
                 .aggregateId(aggregateId)
-                .aggregateType(event.getAggregateType())
-                .eventType(event.getEventType())
+                .aggregateType(event.getAggregateType().name())
+                .eventType(event.getEventType().name())
                 .payload(Json.of(eventSerializerHelper.serialize(event)))
                 .build();
 

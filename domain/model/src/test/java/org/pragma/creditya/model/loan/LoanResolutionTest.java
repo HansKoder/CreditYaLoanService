@@ -85,7 +85,7 @@ public class LoanResolutionTest {
         loan.checkApprovedLoan(REASON_APPROVED);
 
         assertEquals(LoanStatus.APPROVED, loan.getLoanStatus());
-        assertEquals(2, loan.getUncommittedEvents().size());
+        assertEquals(1, loan.getUncommittedEvents().size());
 
         assertInstanceOf(LoanResolutionApprovedEvent.class, loan.getUncommittedEvents().getFirst());
     }
@@ -128,7 +128,7 @@ public class LoanResolutionTest {
         loan.checkRejectedLoan(REASON_REJECTED);
 
         assertEquals(LoanStatus.REJECTED, loan.getLoanStatus());
-        assertEquals(2, loan.getUncommittedEvents().size());
+        assertEquals(1, loan.getUncommittedEvents().size());
 
         assertInstanceOf(LoanResolutionRejectedEvent.class, loan.getUncommittedEvents().getFirst());
     }
