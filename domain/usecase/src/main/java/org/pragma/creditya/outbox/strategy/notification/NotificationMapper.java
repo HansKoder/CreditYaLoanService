@@ -30,7 +30,7 @@ public class NotificationMapper {
             message.append("Congratulations! Your loan with the code ")
                     .append(event.getAggregateId().toString())
                     .append(" was approved successfully.");
-        } else if ("REJECTED".equalsIgnoreCase(domain.getReason())) {
+        } else if (domain.getLoanStatus().equals(LoanStatus.REJECTED)) {
             message.append("Sorry, your loan with the code ")
                     .append(event.getAggregateId().toString())
                     .append(" was rejected.");

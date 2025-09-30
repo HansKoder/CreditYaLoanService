@@ -15,7 +15,6 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(domain.getAGGREGATE_TYPE())
                 .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                .timestamp(Instant.now())
                 .status(domain.getLoanStatus().name())
                 .amount(domain.getAmount().amount())
                 .typeLoan(domain.getLoanTypeCode().code())

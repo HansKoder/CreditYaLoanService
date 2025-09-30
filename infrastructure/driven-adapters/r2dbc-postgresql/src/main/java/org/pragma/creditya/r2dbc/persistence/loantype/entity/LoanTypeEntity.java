@@ -23,4 +23,7 @@ public class LoanTypeEntity {
     @Column(value = "interest_rate")
     private Double interestRate;
 
+    @Column(value = "auto_decision")
+    private Boolean auto;
+
 }

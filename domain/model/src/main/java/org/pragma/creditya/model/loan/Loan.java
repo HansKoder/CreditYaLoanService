@@ -6,6 +6,7 @@ import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainExcep
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.factory.LoanEventFactory;
 import org.pragma.creditya.model.loan.valueobject.*;
+import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 
 import java.math.BigDecimal;
@@ -28,9 +29,6 @@ public class Loan extends AggregateRoot<LoanId> {
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
     private final String  AGGREGATE_TYPE =  "LOAN";
-
-    private final String APPROVED = "approved";
-    private final String REJECTED = "rejected";
 
     private Loan(LoanBuilder builder) {
         this.document = builder.document;
@@ -55,7 +53,12 @@ public class Loan extends AggregateRoot<LoanId> {
     public void markAsPending () {
         this.loanStatus = LoanStatus.PENDING;
         this.setId(new LoanId(UUID.randomUUID()));
+
         uncommittedEvents.add(LoanEventFactory.submittedEvent(this));
+    }
+
+    public void verifyAutoDecision (LoanType loanType) {
+        // this.isAutoDecision = loanType.getAuto().value();
     }
 
     public void loadAuthorResolutionLoan (String username) {
@@ -63,7 +66,7 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     public void checkApprovedLoan(String reason) {
-        checkBeforeBeingResolved(APPROVED);
+        checkBeforeBeingResolved(LoanStatus.APPROVED);
 
         this.loanStatus = LoanStatus.APPROVED;
         this.reason = reason;
@@ -72,7 +75,7 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     public void checkRejectedLoan(String reason) {
-        checkBeforeBeingResolved(REJECTED);
+        checkBeforeBeingResolved(LoanStatus.REJECTED);
 
         this.loanStatus = LoanStatus.REJECTED;
         this.reason = reason;
@@ -80,11 +83,10 @@ public class Loan extends AggregateRoot<LoanId> {
         uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
     }
 
-    // private methods business rules
-    private void checkBeforeBeingResolved (String resolution) {
-        checkIdBeforeBeingResolved(resolution);
-        checkStatusBeforeBeingResolved(resolution);
-        checkResponsible(resolution);
+    private void checkBeforeBeingResolved (LoanStatus status) {
+        checkIdBeforeBeingResolved(status);
+        checkStatusBeforeBeingResolved(status);
+        checkResponsible(status);
     }
 
     private void calculateTotalMonthlyDebt () {
@@ -99,21 +101,21 @@ public class Loan extends AggregateRoot<LoanId> {
         totalMonthlyDebt = new Amount(debt);
     }
 
-    private void checkResponsible (String resolution) {
+    private void checkResponsible (LoanStatus status) {
         if (responsible == null || responsible.isBlank()) {
-            String err = "Who is responsible for this loan, Must have a responsible for being " + resolution;
+            String err = "Who is responsible for this loan, Must have a responsible for being " + status.name().toLowerCase();
             throw new LoanDomainException(err);
         }
     }
 
-    private void checkStatusBeforeBeingResolved (String  resolution) {
+    private void checkStatusBeforeBeingResolved (LoanStatus status) {
         if (this.loanStatus != LoanStatus.PENDING)
-            throw new LoanDomainException("Must have status Pending for being " + resolution);
+            throw new LoanDomainException("Must have status Pending for being " + status.name().toLowerCase());
     }
 
-    private void checkIdBeforeBeingResolved (String  resolution) {
+    private void checkIdBeforeBeingResolved (LoanStatus status) {
         if (this.getId() == null || this.getId().getValue() == null)
-            throw new LoanDomainException("Must have ID Loan for being " + resolution);
+            throw new LoanDomainException("Must have ID Loan for being " + status.name().toLowerCase());
     }
 
     public static Loan rehydrate(List<LoanEvent> history) {

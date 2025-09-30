@@ -73,5 +73,24 @@ implements LoanReadRepository
                 .doOnError(er -> logger.error("[infra.mongodb] (getLoanByAggregateId) unexpected error, Error=[ message:{}]", er.getMessage()))
                 .doOnSuccess(response -> logger.info("[infra.mongodb] (getLoanByAggregateId) success get loan read from mongo replication, payload [ aggregateId={}, response={}]", aggregateId, response));
     }
+
+    @Override
+    public Flux<LoanRead> getActiveDebts(String document) {
+        logger.info("[infra.mongodb] (getActiveDebts) (step 01) payload: [ document:{} ]", document);
+
+        LoanReadCollection probe = LoanReadCollection.builder()
+                .document(document)
+                .status("APPROVED")
+                .build();
+
+        ExampleMatcher matcher = ExampleMatcher.matchingAll()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Example<LoanReadCollection> example = Example.of(probe, matcher);
+
+        return repository.findAll(example)
+                .map(this::toEntity);
+    }
 }
 

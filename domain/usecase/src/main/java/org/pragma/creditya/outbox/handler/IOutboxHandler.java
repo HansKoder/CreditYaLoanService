@@ -1,4 +1,4 @@
-package org.pragma.creditya.outbox.processor;
+package org.pragma.creditya.outbox.handler;
 
 import org.pragma.creditya.model.loan.Loan;
 import reactor.core.publisher.Mono;

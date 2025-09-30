@@ -9,7 +9,7 @@ import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
-import org.pragma.creditya.outbox.processor.IOutboxHandler;
+import org.pragma.creditya.outbox.handler.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
@@ -63,7 +63,6 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
         return outboxProcess.execute(domain)
                 .then(Mono.just(domain));
     }
-
 
     private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {
         Map<String, BiFunction<Loan, String, Mono<Loan>>> map = new HashMap<>();

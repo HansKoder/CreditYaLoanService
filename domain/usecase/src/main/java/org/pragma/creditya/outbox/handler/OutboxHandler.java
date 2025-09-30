@@ -1,4 +1,4 @@
-package org.pragma.creditya.outbox.processor;
+package org.pragma.creditya.outbox.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
@@ -41,18 +41,5 @@ public class OutboxHandler implements IOutboxHandler {
                 .thenReturn(outboxMessage);
     }
 
-    private Flux<LoanOutboxMessage> processOutbox2(Loan domain, LoanEvent event) {
-        System.out.println("[domain.outbox] (processOutbox) payload=[ domain:{" + domain + "}, event:{" + event+ "} ]");
-        return Flux.fromStream(
-                        strategies.stream()
-                                .filter(strategy -> strategy.apply(event))
-                )
-                .flatMap(strategy -> strategy.handler(domain, event))
-                .flatMap(payload -> {
-                    LoanOutboxMessage outboxMessage = OutboxHelper.toOutboxMessage(event);
-                    outboxRepository.saveOutboxMessage(outboxMessage, payload);
-                    return Mono.just(outboxMessage);
-                });
-    }
 
 }

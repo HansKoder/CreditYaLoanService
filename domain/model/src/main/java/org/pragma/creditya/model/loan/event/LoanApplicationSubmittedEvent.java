@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -17,93 +16,91 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
     private Long typeLoan;
     private String status;
     private int period;
+    private ApplicationSubmittedType typeSubmitted;
 
     public LoanApplicationSubmittedEvent() {
     }
 
-    private LoanApplicationSubmittedEvent(LoanBuilder loanBuilder) {
-        // super(loanBuilder.aggregateId, loanBuilder.version, loanBuilder.timestamp, loanBuilder.eventType, loanBuilder.aggregateType);
-        super.setAggregateId(loanBuilder.aggregateId);
-        super.setEventType(loanBuilder.eventType);
-        super.setVersion(1);
-        super.setAggregateType(loanBuilder.aggregateType);
+    private LoanApplicationSubmittedEvent(SubmittedBuilder builder) {
+        super.setId(builder.eventId);
+        super.setAggregateId(builder.aggregateId);
+        super.setEventType(builder.eventType);
+        super.setAggregateType(builder.aggregateType);
 
-        this.document = loanBuilder.document;
-        this.amount = loanBuilder.amount;
-        this.typeLoan = loanBuilder.typeLoan;
-        this.status = loanBuilder.status;
-        this.period = loanBuilder.period;
-        this.totalMonthlyDebt = loanBuilder.totalMonthlyDebt;
+        this.document = builder.document;
+        this.amount = builder.amount;
+        this.typeLoan = builder.typeLoan;
+        this.status = builder.status;
+        this.period = builder.period;
+        this.totalMonthlyDebt = builder.totalMonthlyDebt;
     }
 
-    public static final class LoanBuilder {
-        private BigDecimal totalMonthlyDebt;
-        private BigDecimal amount;
-        private String document;
-        private Long typeLoan;
-        private String status;
+    public static final class SubmittedBuilder {
+
+        // Loan Event
+        private UUID eventId;
         private UUID aggregateId;
-        private int version;
-        private Instant timestamp;
         private String eventType;
         private String aggregateType;
+        private String status;
+
+        // Submitted Event
+        private String document;
+        private BigDecimal amount;
+        private BigDecimal totalMonthlyDebt;
         private int period;
+        private Long typeLoan;
 
-        public static LoanBuilder aLoanApplicationSubmitted() {
-            return new LoanBuilder();
+        public static SubmittedBuilder aSubmittedEvent() {
+            return new SubmittedBuilder();
         }
 
-        public LoanBuilder amount(BigDecimal amount) {
-            this.amount = amount;
+        public SubmittedBuilder eventId(UUID value) {
+            this.eventId = value;
             return this;
         }
 
-        public LoanBuilder document(String document) {
-            this.document = document;
-            return this;
-        }
-
-        public LoanBuilder typeLoan(Long typeLoan) {
-            this.typeLoan = typeLoan;
-            return this;
-        }
-
-        public LoanBuilder status(String status) {
-            this.status = status;
-            return this;
-        }
-
-        public LoanBuilder aggregateId(UUID aggregateId) {
+        public SubmittedBuilder aggregateId(UUID aggregateId) {
             this.aggregateId = aggregateId;
             return this;
         }
 
-        public LoanBuilder version(int version) {
-            this.version = version;
-            return this;
-        }
-
-        public LoanBuilder timestamp(Instant timestamp) {
-            this.timestamp = timestamp;
-            return this;
-        }
-
-        public LoanBuilder eventType(String eventType) {
+        public SubmittedBuilder eventType(String eventType) {
             this.eventType = eventType;
             return this;
         }
 
-        public LoanBuilder aggregateType(String value) {
+        public SubmittedBuilder aggregateType(String value) {
             this.aggregateType = value;
             return this;
         }
 
-        public LoanBuilder period(int value) {
+        public SubmittedBuilder document(String document) {
+            this.document = document;
+            return this;
+        }
+
+        public SubmittedBuilder amount(BigDecimal amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public SubmittedBuilder typeLoan(Long typeLoan) {
+            this.typeLoan = typeLoan;
+            return this;
+        }
+
+        public SubmittedBuilder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public SubmittedBuilder period(int value) {
             this.period = value;
             return this;
         }
 
-        public LoanBuilder totalMonthlyDebt(BigDecimal value) {
+        public SubmittedBuilder totalMonthlyDebt(BigDecimal value) {
             this.totalMonthlyDebt = value;
             return this;
         }

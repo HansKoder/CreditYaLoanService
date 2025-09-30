@@ -12,5 +12,6 @@ public interface LoanReadRepository {
     Mono<LoanRead> saveLoanRead (LoanRead read);
     Flux<LoanRead> getLoan (LoanQuery query);
     Mono<LoanRead> getLoanByAggregateId (UUID aggregateId);
+    Flux<LoanRead> getActiveDebts (String document);
 
 }

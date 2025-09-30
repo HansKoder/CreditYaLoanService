@@ -20,8 +20,8 @@ public class SQSSenderConfig {
                 .endpointOverride(resolveEndpoint(properties))
                 .region(Region.of(properties.region()))
                 .overrideConfiguration(o -> o.addMetricPublisher(publisher))
-                // .credentialsProvider(getProviderChain()) // [Prod]
-                .credentialsProvider(getLocalstackProvider()) // [Local using localstack]
+                .credentialsProvider(getProviderChain()) // [Prod]
+                // .credentialsProvider(getLocalstackProvider()) // [Local using localstack]
                 .build();
     }
 

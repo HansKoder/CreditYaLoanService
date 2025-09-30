@@ -1,12 +1,10 @@
 package org.pragma.creditya.model.loantype;
 import lombok.Getter;
+import org.pragma.creditya.model.loantype.valueobject.Auto;
 import org.pragma.creditya.model.loantype.valueobject.Description;
 import org.pragma.creditya.model.loantype.valueobject.InterestRate;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
-import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 import org.pragma.creditya.model.shared.domain.model.entity.BaseEntity;
-
-import java.util.UUID;
 
 @Getter
 public class LoanType extends BaseEntity<LoanTypeId> {
@@ -23,6 +21,7 @@ public class LoanType extends BaseEntity<LoanTypeId> {
         private String description;
         private Double interestRate;
         private Long id;
+        private Boolean auto;
 
         private LoanTypeBuilder() {
         }
@@ -38,6 +37,11 @@ public class LoanType extends BaseEntity<LoanTypeId> {
 
         public LoanTypeBuilder interestRate(Double value) {
             this.interestRate = value;
+            return this;
+        }
+
+        public LoanTypeBuilder auto(Boolean value) {
+            this.auto = value;
             return this;
         }
 

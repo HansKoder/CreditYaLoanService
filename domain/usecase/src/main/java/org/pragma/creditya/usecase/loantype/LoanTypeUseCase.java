@@ -12,6 +12,21 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
     private final LoanTypeRepository loanTypeRepository;
 
+    public Mono<Loan> ch3eckLoanTypeExists(Loan loan) {
+        Long id = loan.getLoanTypeCode().code();
+        return loanTypeRepository.findById(id)
+                .flatMap(loanType -> {
+                    loan.verifyAutoDecision(loanType);
+                    return Mono.just(loan);
+                })
+                .switchIfEmpty(
+                        Mono.error(
+                                new LoanTypeNotFoundDomainException("Type Loan code " + id + " does not exist, you need to check")
+                        )
+                );
+    }
+
+
     @Override
     public Mono<Loan> checkLoanTypeExists(Loan loan) {
         Long id = loan.getLoanTypeCode().code();

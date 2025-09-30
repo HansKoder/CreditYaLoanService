@@ -16,6 +16,7 @@ import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.outbox.handler.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 import org.pragma.creditya.usecase.loan.ILoanUseCase;
@@ -51,7 +52,7 @@ public class OrchestratorUseCaseTest {
     private ILoanReadUseCase loanReadUseCase;
 
     @Mock
-    private OutboxRepository outboxRepository;
+    private IOutboxHandler outboxHandler;
 
     @Mock
     private EventBus eventBus;
@@ -72,11 +73,11 @@ public class OrchestratorUseCaseTest {
     // Dummy event mock unknowing event
     static class UnknownLoanEvent extends LoanEvent {
         public UnknownLoanEvent() {
-            super(UUID.randomUUID(),
-                    1,
-                    Instant.now(),
-                    "EVENT",
-                    "LOAN");
+            super();
+            super.setAggregateId(UUID.randomUUID());
+            super.setId(UUID.randomUUID());
+            super.setEventType("ANY TYPE");
+            super.setVersion(1);
         }
     }
 
@@ -85,17 +86,11 @@ public class OrchestratorUseCaseTest {
                     .aggregateId(UUID.fromString(LOAN_ID_EXAMPLE))
                     .aggregateType("LOAN")
                     .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                    .timestamp(Instant.now())
                     .document("123456789")
                     .status(LoanStatus.PENDING.name())
                     .amount(new BigDecimal("5000"))
                     .typeLoan(1L)
                     .period(12)
-                    .baseSalary(new BigDecimal("2000"))
-                    .email("customer@test.com")
-                    .name("John Doe")
-                    .interestRate(0.5)
-                    .typeLoanDescription("Personal Loan")
                     .totalMonthlyDebt(new BigDecimal("416.67"))
                     .build();
 
@@ -106,9 +101,16 @@ public class OrchestratorUseCaseTest {
         eventStoreRepository = Mockito.mock(EventStoreRepository.class);
         loanReadUseCase = Mockito.mock(LoanReadUseCase.class);
         eventBus = Mockito.mock(EventBus.class);
-        outboxRepository = Mockito.mock(OutboxRepository.class);
+        outboxHandler = Mockito.mock(IOutboxHandler.class);
 
-        orchestratorUseCase = new OrchestratorUseCase(loanTypeUseCase, loanUseCase, eventStoreRepository, loanReadUseCase, eventBus, outboxRepository);
+        orchestratorUseCase = new OrchestratorUseCase(
+                loanTypeUseCase,
+                loanUseCase,
+                eventStoreRepository,
+                loanReadUseCase,
+                eventBus,
+                outboxHandler
+        );
     }
 
 
@@ -131,9 +133,6 @@ public class OrchestratorUseCaseTest {
                         .thenReturn(Mono.just(loanMock));
 
         Mockito.when(loanUseCase.markAsPending(loanMock))
-                .thenReturn(Mono.just(loanMock));
-
-        Mockito.when(loanTypeUseCase.checkLoanTypeAndLoad(loanMock))
                 .thenReturn(Mono.just(loanMock));
 
         Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))

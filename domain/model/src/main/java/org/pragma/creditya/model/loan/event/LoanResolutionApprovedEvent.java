@@ -28,14 +28,18 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
     }
 
     public static final class LoanBuilder {
-        private String approvedBy;
-        private String status;
-        private String reason;
         private UUID aggregateId;
         private int version;
         private Instant timestamp;
         private String eventType;
         private String aggregateType;
+
+
+        private String approvedBy;
+        private String status;
+        private String reason;
+
+
 
         private LoanBuilder() {
         }
