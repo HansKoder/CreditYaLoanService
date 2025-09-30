@@ -141,7 +141,7 @@ public class Loan extends AggregateRoot<LoanId> {
 
     private void applyLoanApplicationSubmitted(LoanApplicationSubmittedEvent e) {
         this.setId(new LoanId(e.getAggregateId()));
-        this.loanStatus = LoanStatus.valueOf(e.getStatus());
+        this.loanStatus = e.getStatus();
         this.document = new Document(e.getDocument());
         this.amount = new Amount(e.getAmount());
         this.period = new Period(0, e.getPeriod());

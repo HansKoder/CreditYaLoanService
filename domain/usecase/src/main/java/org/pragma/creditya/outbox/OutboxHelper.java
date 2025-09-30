@@ -10,7 +10,7 @@ public class OutboxHelper {
         System.out.println("[domain.outbox.helper] (toOutboxMessage) payload=[ event:{" + event+ "} ]");
         return LoanOutboxMessage.builder()
                 .aggregateId(event.getAggregateId())
-                .aggregateName(event.getAggregateType())
+                .aggregateName(event.getAggregateType().name())
                 .type(event.getClass().getSimpleName())
                 .status(OutboxStatus.STARTED)
                 .build();

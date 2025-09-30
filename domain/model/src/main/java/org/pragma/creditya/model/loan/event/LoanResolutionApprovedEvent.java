@@ -2,6 +2,7 @@ package org.pragma.creditya.model.loan.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -9,7 +10,7 @@ import java.util.UUID;
 @Setter
 @Getter
 public class LoanResolutionApprovedEvent extends LoanEvent{
-    private String status;
+    private LoanStatus status;
     private String reason;
     private String approvedBy;
 
@@ -19,6 +20,7 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
         super.setAggregateId(builder.aggregateId);
         super.setEventType(builder.eventType);
         super.setAggregateType(builder.aggregateType);
+        super.setId(builder.eventId);
 
         this.status = builder.status;
         this.reason = builder.reason;
@@ -26,12 +28,13 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
     }
 
     public static final class ApprovedBuilder {
+        private UUID eventId;
         private UUID aggregateId;
         private EventType eventType;
         private AggregateType aggregateType;
 
         private String approvedBy;
-        private String status;
+        private LoanStatus status;
         private String reason;
 
         private ApprovedBuilder() {
@@ -41,23 +44,14 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
             return new ApprovedBuilder();
         }
 
-        public ApprovedBuilder approvedBy(String approvedBy) {
-            this.approvedBy = approvedBy;
+        // Event sourcing fields
+        public ApprovedBuilder eventId(UUID value) {
+            this.eventId = value;
             return this;
         }
 
-        public ApprovedBuilder status(String status) {
-            this.status = status;
-            return this;
-        }
-
-        public ApprovedBuilder reason(String reason) {
-            this.reason = reason;
-            return this;
-        }
-
-        public ApprovedBuilder aggregateId(UUID aggregateId) {
-            this.aggregateId = aggregateId;
+        public ApprovedBuilder aggregateId(UUID value) {
+            this.aggregateId = value;
             return this;
         }
 
@@ -68,6 +62,22 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
 
         public ApprovedBuilder aggregateType(AggregateType value) {
             this.aggregateType = value;
+            return this;
+        }
+
+        // Approved Event
+        public ApprovedBuilder approvedBy(String approvedBy) {
+            this.approvedBy = approvedBy;
+            return this;
+        }
+
+        public ApprovedBuilder status(LoanStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public ApprovedBuilder reason(String reason) {
+            this.reason = reason;
             return this;
         }
 

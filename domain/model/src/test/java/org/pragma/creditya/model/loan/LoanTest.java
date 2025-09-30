@@ -144,7 +144,7 @@ public class LoanTest {
         domain.markAsPending();
         assertEquals(1, domain.getUncommittedEvents().size());
 
-        domain.clearUncommittedEvents(Set.of());
+        domain.clearUncommittedEvents();
         assertEquals(0, domain.getUncommittedEvents().size());
     }
 

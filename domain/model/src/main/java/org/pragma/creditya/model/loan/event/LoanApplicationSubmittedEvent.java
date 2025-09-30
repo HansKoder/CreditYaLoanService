@@ -2,6 +2,7 @@ package org.pragma.creditya.model.loan.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,7 +15,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
     private BigDecimal totalMonthlyDebt;
 
     private Long typeLoan;
-    private String status;
+    private LoanStatus status;
     private int period;
     private ApplicationSubmittedType typeSubmitted;
 
@@ -42,7 +43,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         private UUID aggregateId;
         private EventType eventType;
         private AggregateType aggregateType;
-        private String status;
+        private LoanStatus status;
 
         // Submitted Event
         private String document;
@@ -90,7 +91,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
             return this;
         }
 
-        public SubmittedBuilder status(String status) {
+        public SubmittedBuilder status(LoanStatus status) {
             this.status = status;
             return this;
         }

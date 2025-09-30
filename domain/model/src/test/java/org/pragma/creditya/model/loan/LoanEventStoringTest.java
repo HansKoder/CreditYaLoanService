@@ -1,18 +1,11 @@
 package org.pragma.creditya.model.loan;
 
 import org.junit.jupiter.api.Test;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
-import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.loantype.LoanType;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,13 +49,12 @@ public class LoanEventStoringTest {
         UUID aggregateId = UUID.randomUUID();
 
         LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.LoanBuilder.aLoanApplicationSubmitted()
+                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                         .aggregateId(aggregateId)
-                        .aggregateType("LOAN")
-                        .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                        .timestamp(Instant.now())
+                        .aggregateType(AggregateType.AGGREGATE_LOAN)
+                        .eventType(EventType.LOAN_SUBMITTED)
                         .document("123456789")
-                        .status(LoanStatus.PENDING.name())
+                        .status(LoanStatus.PENDING)
                         .amount(new BigDecimal("5000"))
                         .typeLoan(1L)
                         .period(12)
@@ -83,21 +75,19 @@ public class LoanEventStoringTest {
         UUID aggregateId = UUID.randomUUID();
 
         LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.LoanBuilder.aLoanApplicationSubmitted()
+                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                         .aggregateId(aggregateId)
-                        .aggregateType("LOAN")
-                        .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                        .timestamp(Instant.now())
+                        .aggregateType(AggregateType.AGGREGATE_LOAN)
+                        .eventType(EventType.LOAN_SUBMITTED)
                         .document("987654321")
-                        .status(LoanStatus.PENDING.name())
+                        .status(LoanStatus.PENDING)
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
                         .totalMonthlyDebt(new BigDecimal("416.67"))
                         .build();
 
-        var approvedEvent = LoanResolutionApprovedEvent.LoanBuilder
-                .aLoanResolutionApproved()
+        var approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder.anApprovedEvent()
                 .aggregateId(aggregateId)
                 .approvedBy("manager-user")
                 .reason("All checks passed")
@@ -115,20 +105,19 @@ public class LoanEventStoringTest {
         UUID aggregateId = UUID.randomUUID();
 
         LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.LoanBuilder.aLoanApplicationSubmitted()
+                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                         .aggregateId(aggregateId)
-                        .aggregateType("LOAN")
-                        .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
-                        .timestamp(Instant.now())
+                        .aggregateType(AggregateType.AGGREGATE_LOAN)
+                        .eventType(EventType.LOAN_SUBMITTED)
                         .document("987654321")
-                        .status(LoanStatus.PENDING.name())
+                        .status(LoanStatus.PENDING)
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
                         .totalMonthlyDebt(new BigDecimal("416.67"))
                         .build();
 
-        var rejectedEvent = LoanResolutionRejectedEvent.LoanBuilder.aLoanResolutionRejected()
+        var rejectedEvent = LoanResolutionRejectedEvent.RejectedBuilder.aRejectedEvent()
                 .aggregateId(aggregateId)
                 .rejectedBy("manager-user")
                 .reason("All checks passed")

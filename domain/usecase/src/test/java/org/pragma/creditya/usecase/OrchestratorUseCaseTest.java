@@ -9,9 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
@@ -76,18 +74,17 @@ public class OrchestratorUseCaseTest {
             super();
             super.setAggregateId(UUID.randomUUID());
             super.setId(UUID.randomUUID());
-            super.setEventType("ANY TYPE");
-            super.setVersion(1);
+            super.setEventType(EventType.LOAN_SUBMITTED);
         }
     }
 
     private final LoanApplicationSubmittedEvent SUBMITTED_EVENT =
-            LoanApplicationSubmittedEvent.LoanBuilder.aLoanApplicationSubmitted()
+            LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                     .aggregateId(UUID.fromString(LOAN_ID_EXAMPLE))
-                    .aggregateType("LOAN")
-                    .eventType(LoanApplicationSubmittedEvent.class.getSimpleName())
+                    .aggregateType(AggregateType.AGGREGATE_LOAN)
+                    .eventType(EventType.LOAN_SUBMITTED)
                     .document("123456789")
-                    .status(LoanStatus.PENDING.name())
+                    .status(LoanStatus.PENDING)
                     .amount(new BigDecimal("5000"))
                     .typeLoan(1L)
                     .period(12)
@@ -118,8 +115,8 @@ public class OrchestratorUseCaseTest {
     void shouldBePersisted_becauseApplicationLoanIsValid () {
         Loan loanMock = Mockito.mock(Loan.class);
 
-        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.LoanBuilder
-                .aLoanApplicationSubmitted()
+        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent
+                .SubmittedBuilder.aSubmittedEvent()
                 .aggregateId(UUID.fromString(LOAN_ID_EXAMPLE))
                 .build();
 
@@ -236,7 +233,7 @@ public class OrchestratorUseCaseTest {
         UUID aggregateId = UUID.fromString(LOAN_ID_EXAMPLE);
 
         LoanResolutionApprovedEvent approvedEvent =
-                LoanResolutionApprovedEvent.LoanBuilder.aLoanResolutionApproved()
+                LoanResolutionApprovedEvent.ApprovedBuilder.anApprovedEvent()
                         .approvedBy("Advisor@credit.com")
                         .aggregateId(aggregateId)
                         .reason("OK")

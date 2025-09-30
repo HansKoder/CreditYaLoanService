@@ -88,7 +88,6 @@ public class LoanResolutionTest {
         assertEquals(2, loan.getUncommittedEvents().size());
 
         assertInstanceOf(LoanResolutionApprovedEvent.class, loan.getUncommittedEvents().getFirst());
-        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, loan.getUncommittedEvents().get(1));
     }
 
     @Test
@@ -132,30 +131,7 @@ public class LoanResolutionTest {
         assertEquals(2, loan.getUncommittedEvents().size());
 
         assertInstanceOf(LoanResolutionRejectedEvent.class, loan.getUncommittedEvents().getFirst());
-        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, loan.getUncommittedEvents().get(1));
     }
 
-    @Test
-    void shouldGetEvents_usingFilters () {
-        Loan loan = Loan.LoanBuilder
-                .aLoan()
-                .id(LOAN_ID_EXAMPLE)
-                .document("123")
-                .amount(BigDecimal.valueOf(1000))
-                .loanStatus(LoanStatus.PENDING)
-                .build();
-
-        loan.loadAuthorResolutionLoan(AUTHOR);
-
-        loan.checkApprovedLoan(REASON_APPROVED);
-
-        List<LoanEvent> eventSourcingEvents = loan.getUncommittedEvents(Set.of(EventDestination.INTERNAL));
-        assertEquals(1, eventSourcingEvents.size());
-        assertInstanceOf(LoanResolutionApprovedEvent.class, eventSourcingEvents.getFirst());
-
-        List<LoanEvent> sqsEvents = loan.getUncommittedEvents(Set.of(EventDestination.SQS));
-        assertEquals(1, sqsEvents.size());
-        assertInstanceOf(LoanResolutionCustomerNotifiedEvent.class, sqsEvents.getFirst());
-    }
 
 }
