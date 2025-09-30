@@ -28,7 +28,6 @@ public class Loan extends AggregateRoot<LoanId> {
     private Amount totalMonthlyDebt;
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
-    private final String  AGGREGATE_TYPE =  "LOAN";
 
     private Loan(LoanBuilder builder) {
         this.document = builder.document;

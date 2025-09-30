@@ -4,7 +4,6 @@ import lombok.*;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.shared.domain.event.DomainEvent;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @ToString
@@ -14,6 +13,6 @@ import java.util.UUID;
 public abstract class LoanEvent implements DomainEvent<Loan> {
     private UUID id;
     private UUID aggregateId;
-    private String eventType;
-    private String aggregateType;
+    private EventType eventType;
+    private AggregateType aggregateType;
 }

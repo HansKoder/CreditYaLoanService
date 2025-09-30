@@ -40,8 +40,8 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         // Loan Event
         private UUID eventId;
         private UUID aggregateId;
-        private String eventType;
-        private String aggregateType;
+        private EventType eventType;
+        private AggregateType aggregateType;
         private String status;
 
         // Submitted Event
@@ -65,12 +65,12 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
             return this;
         }
 
-        public SubmittedBuilder eventType(String eventType) {
+        public SubmittedBuilder eventType(EventType eventType) {
             this.eventType = eventType;
             return this;
         }
 
-        public SubmittedBuilder aggregateType(String value) {
+        public SubmittedBuilder aggregateType(AggregateType value) {
             this.aggregateType = value;
             return this;
         }

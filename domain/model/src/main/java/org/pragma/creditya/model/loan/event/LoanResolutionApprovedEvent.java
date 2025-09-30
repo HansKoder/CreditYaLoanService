@@ -13,77 +13,60 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
     private String reason;
     private String approvedBy;
 
-    public LoanResolutionApprovedEvent() {
+    public LoanResolutionApprovedEvent() {}
+
+    public LoanResolutionApprovedEvent(ApprovedBuilder builder) {
+        super.setAggregateId(builder.aggregateId);
+        super.setEventType(builder.eventType);
+        super.setAggregateType(builder.aggregateType);
+
+        this.status = builder.status;
+        this.reason = builder.reason;
+        this.approvedBy = builder.approvedBy;
     }
 
-    public LoanResolutionApprovedEvent(LoanBuilder loanBuilder) {
-        super.setAggregateId(loanBuilder.aggregateId);
-        super.setEventType(loanBuilder.eventType);
-        super.setVersion(1);
-        super.setAggregateType(loanBuilder.aggregateType);
-
-        this.status = loanBuilder.status;
-        this.reason = loanBuilder.reason;
-        this.approvedBy = loanBuilder.approvedBy;
-    }
-
-    public static final class LoanBuilder {
+    public static final class ApprovedBuilder {
         private UUID aggregateId;
-        private int version;
-        private Instant timestamp;
-        private String eventType;
-        private String aggregateType;
-
+        private EventType eventType;
+        private AggregateType aggregateType;
 
         private String approvedBy;
         private String status;
         private String reason;
 
-
-
-        private LoanBuilder() {
+        private ApprovedBuilder() {
         }
 
-        public static LoanBuilder aLoanResolutionApproved() {
-            return new LoanBuilder();
+        public static ApprovedBuilder anApprovedEvent() {
+            return new ApprovedBuilder();
         }
 
-        public LoanBuilder approvedBy(String approvedBy) {
+        public ApprovedBuilder approvedBy(String approvedBy) {
             this.approvedBy = approvedBy;
             return this;
         }
 
-        public LoanBuilder status(String status) {
+        public ApprovedBuilder status(String status) {
             this.status = status;
             return this;
         }
 
-        public LoanBuilder reason(String reason) {
+        public ApprovedBuilder reason(String reason) {
             this.reason = reason;
             return this;
         }
 
-        public LoanBuilder aggregateId(UUID aggregateId) {
+        public ApprovedBuilder aggregateId(UUID aggregateId) {
             this.aggregateId = aggregateId;
             return this;
         }
 
-        public LoanBuilder version(int version) {
-            this.version = version;
+        public ApprovedBuilder eventType(EventType value) {
+            this.eventType = value;
             return this;
         }
 
-        public LoanBuilder timestamp(Instant timestamp) {
-            this.timestamp = timestamp;
-            return this;
-        }
-
-        public LoanBuilder eventType(String eventType) {
-            this.eventType = eventType;
-            return this;
-        }
-
-        public LoanBuilder aggregateType(String value) {
+        public ApprovedBuilder aggregateType(AggregateType value) {
             this.aggregateType = value;
             return this;
         }
