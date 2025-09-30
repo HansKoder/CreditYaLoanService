@@ -1,4 +1,4 @@
-package org.pragma.creditya.outbox.strategy.decision;
+package org.pragma.creditya.outbox.strategy.selfdecision;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
@@ -11,7 +11,7 @@ import org.pragma.creditya.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class DecisionHandler implements OutboxStrategy {
+public class SelfDecisionHandler implements OutboxStrategy {
 
     private final CustomerClient customerClient;
     private final LoanReadRepository loanReadRepository;
