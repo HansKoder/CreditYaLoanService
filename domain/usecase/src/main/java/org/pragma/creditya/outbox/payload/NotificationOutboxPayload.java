@@ -9,12 +9,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @Builder
-public class NotificationOutboxPayload {
+public class NotificationOutboxPayload implements OutboxPayload {
 
     private String type;
     private String subject;
     private String message;
     private String destination;
-
 
 }

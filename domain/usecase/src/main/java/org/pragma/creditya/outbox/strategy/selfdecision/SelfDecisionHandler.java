@@ -7,6 +7,7 @@ import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
+import org.pragma.creditya.outbox.payload.OutboxPayload;
 import org.pragma.creditya.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +31,7 @@ public class SelfDecisionHandler implements OutboxStrategy {
     }
 
     @Override
-    public Mono<?> handler(Loan domain, LoanEvent event) {
+    public Mono<OutboxPayload> handler(Loan domain, LoanEvent event) {
         System.out.println("[use_case.outbox.strategy] (handler) payload=[ event:{" + event + "}]");
 
         return Mono.empty();

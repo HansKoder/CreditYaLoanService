@@ -7,6 +7,7 @@ import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
+import org.pragma.creditya.outbox.payload.OutboxPayload;
 import org.pragma.creditya.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +23,7 @@ public class NotificationHandler implements OutboxStrategy {
     }
 
     @Override
-    public Mono<NotificationOutboxPayload> handler(Loan domain, LoanEvent event) {
+    public Mono<OutboxPayload> handler(Loan domain, LoanEvent event) {
         System.out.println("[use_case.outbox.strategy] (handler) payload=[ event:{" + event + "}]");
         return customerClient.getCustomerByDocument(domain.getDocument().value())
                 .map(customer -> NotificationMapper.toPayload(domain, event, customer));
