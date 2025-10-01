@@ -23,7 +23,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Builder
-public class DecisionLoanOutboxPayload {
+public class DecisionLoanOutboxPayload implements OutboxPayload{
 
     private BigDecimal customerSalary;
     private String currentLoanId;

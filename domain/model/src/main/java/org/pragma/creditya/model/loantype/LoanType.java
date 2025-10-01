@@ -21,7 +21,6 @@ public class LoanType extends BaseEntity<LoanTypeId> {
         private String description;
         private Double interestRate;
         private Long id;
-        private Boolean auto;
 
         private LoanTypeBuilder() {
         }
@@ -37,11 +36,6 @@ public class LoanType extends BaseEntity<LoanTypeId> {
 
         public LoanTypeBuilder interestRate(Double value) {
             this.interestRate = value;
-            return this;
-        }
-
-        public LoanTypeBuilder auto(Boolean value) {
-            this.auto = value;
             return this;
         }
 

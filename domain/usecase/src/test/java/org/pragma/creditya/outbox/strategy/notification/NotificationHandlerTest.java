@@ -14,9 +14,11 @@ import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.gateways.CustomerClient;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -96,7 +98,18 @@ public class NotificationHandlerTest {
         var payload = notificationHandler.handler(domain, approvedEvent);
 
         StepVerifier.create(payload)
-                .expectComplete();
+                .assertNext(outboxPayload -> {
+                    assertInstanceOf(NotificationOutboxPayload.class, outboxPayload);
+
+                    NotificationOutboxPayload notificationPayload = (NotificationOutboxPayload) outboxPayload;
+
+                    assertEquals("EMAIL", notificationPayload.getType());
+                    assertEquals("Loan Decision", notificationPayload.getSubject());
+                    assertEquals(customer.getEmail(), notificationPayload.getDestination());
+                    assertTrue(notificationPayload.getMessage()
+                            .contains("Congratulations! Your loan with the code c4fc5172-1cd3-4dfa-aa71-456b50bc9089 was approved successfully."));
+                })
+                .verifyComplete();
     }
 
 }

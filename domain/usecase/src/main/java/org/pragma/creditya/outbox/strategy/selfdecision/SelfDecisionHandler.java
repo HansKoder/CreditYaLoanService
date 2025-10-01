@@ -11,6 +11,8 @@ import org.pragma.creditya.outbox.payload.OutboxPayload;
 import org.pragma.creditya.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class SelfDecisionHandler implements OutboxStrategy {
 
@@ -33,12 +35,8 @@ public class SelfDecisionHandler implements OutboxStrategy {
     @Override
     public Mono<OutboxPayload> handler(Loan domain, LoanEvent event) {
         System.out.println("[use_case.outbox.strategy] (handler) payload=[ event:{" + event + "}]");
-
-        return Mono.empty();
-        /*
         return customerClient.getCustomerByDocument(domain.getDocument().value())
-                .flatMap(customer -> loanReadRepository.getActiveDebts(customer.getDocument()))
-
-         */
+                .zipWith(loanReadRepository.getActiveDebts(domain.getDocument().value()).collectList())
+                .map(tuple -> SelfDecisionMapper.toPayload(domain, tuple.getT2(), tuple.getT1()) );
     }
 }

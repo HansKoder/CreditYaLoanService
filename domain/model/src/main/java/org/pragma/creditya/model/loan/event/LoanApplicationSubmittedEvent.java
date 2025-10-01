@@ -34,6 +34,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         this.status = builder.status;
         this.period = builder.period;
         this.totalMonthlyDebt = builder.totalMonthlyDebt;
+        this.typeSubmitted = builder.typeSubmitted;
     }
 
     public static final class SubmittedBuilder {
@@ -51,6 +52,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         private BigDecimal totalMonthlyDebt;
         private int period;
         private Long typeLoan;
+        private ApplicationSubmittedType typeSubmitted;
 
         public static SubmittedBuilder aSubmittedEvent() {
             return new SubmittedBuilder();
@@ -103,6 +105,11 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
 
         public SubmittedBuilder totalMonthlyDebt(BigDecimal value) {
             this.totalMonthlyDebt = value;
+            return this;
+        }
+
+        public SubmittedBuilder typeSubmitted(ApplicationSubmittedType value) {
+            this.typeSubmitted = value;
             return this;
         }
 
