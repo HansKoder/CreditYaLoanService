@@ -59,7 +59,7 @@ public class EventRepositoryAdapter implements EventStoreRepository {
         EventEntity entity = EventEntity.builder()
                 .aggregateId(aggregateId)
                 .aggregateType(event.getAggregateType().name())
-                .eventType(event.getEventType().name())
+                .eventType(event.getEventType().getEventClass().getSimpleName())
                 .payload(Json.of(eventSerializerHelper.serialize(event)))
                 .build();
 
