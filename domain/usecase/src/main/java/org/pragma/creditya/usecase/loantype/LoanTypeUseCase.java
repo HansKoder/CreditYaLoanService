@@ -12,7 +12,7 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
     private final LoanTypeRepository loanTypeRepository;
 
-    public Mono<Loan> ch3eckLoanTypeExists(Loan loan) {
+    public Mono<Loan> checkLoanTypeExists(Loan loan) {
         Long id = loan.getLoanTypeCode().code();
         return loanTypeRepository.findById(id)
                 .flatMap(loanType -> {
@@ -28,7 +28,7 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
 
     @Override
-    public Mono<Loan> checkLoanTypeExists(Loan loan) {
+    public Mono<Loan> checkLoanTypeExistsOld(Loan loan) {
         Long id = loan.getLoanTypeCode().code();
         return loanTypeRepository.existLoanType(new LoanTypeId(id))
                 .flatMap(exist -> {
