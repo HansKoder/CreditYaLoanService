@@ -5,6 +5,7 @@ import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loan.valueobject.Resolution;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
@@ -35,8 +36,9 @@ public class LoanUseCase implements ILoanUseCase {
     }
 
     @Override
-    public Mono<Loan> resolutionApplicationLoan(Loan domain) {
-        return null;
+    public Mono<Loan> resolutionApplicationLoan(Loan domain, Resolution resolution) {
+        domain.resolutionApplicationLoan(resolution);
+        return Mono.just(domain);
     }
 
     @Override

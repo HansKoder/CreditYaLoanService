@@ -50,6 +50,7 @@ public class LoanHelper {
 
         return eventRepository.saveAll(events)
                 .doOnSuccess(v -> events.forEach(eventBus::publish))
+                .doOnSuccess(v -> outboxProcess.execute(loan))
                 .thenReturn(loan);
     }
 
