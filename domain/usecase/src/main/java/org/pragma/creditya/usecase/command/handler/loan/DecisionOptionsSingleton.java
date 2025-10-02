@@ -2,8 +2,6 @@ package org.pragma.creditya.usecase.command.handler.loan;
 
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public final class DecisionOptionsSingleton {

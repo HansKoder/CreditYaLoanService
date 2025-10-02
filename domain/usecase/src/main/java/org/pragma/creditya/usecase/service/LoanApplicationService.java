@@ -35,13 +35,6 @@ public class LoanApplicationService implements ILoanApplicationService {
     @Override
     public Mono<Loan> resolutionApplicationLoan(ResolveApplicationLoanCommand command) {
 
-        /**
-        String loanId,
-        String decision,
-        String resolutionType,
-        String reason
-        **/
-
         // 1) getLoanById() -> loanUseCase -> helper check UUID, rehydrate, get current Loan (LOAN) AR
         // 2) Method private -> checkDecisionApplicationLoan ->
         // 2.1) checkDecisionApplicationLoan() -> loanUseCase -> helper checkDecisionType LoanStatus (VO)
@@ -55,9 +48,9 @@ public class LoanApplicationService implements ILoanApplicationService {
 
         // loanUseCase -> getLoan(LoanId), checkDecisionType(String decision), resolutionApplicationLoan (vo), persist(Loan)
 
-
-        return null;
+        return loanUseCase.getLoan(command.loanId());
     }
+
 
 
 }
