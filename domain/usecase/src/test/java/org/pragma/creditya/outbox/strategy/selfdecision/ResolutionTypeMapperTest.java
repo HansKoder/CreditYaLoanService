@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SelfDecisionMapperTest {
+public class ResolutionTypeMapperTest {
 
     private final String AGGREGATE_ID = "c4fc5172-1cd3-4dfa-aa71-456b50bc9089";
 

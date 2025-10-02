@@ -24,7 +24,7 @@ public class NotificationHandler implements OutboxStrategy {
     @Override
     public Mono<OutboxPayload> handler(Loan domain, LoanEvent event) {
         System.out.println("[use_case.outbox.strategy] (handler) payload=[ event:{" + event + "}]");
-        return customerClient.getCustomerByDocument(domain.getDocument().value())
+        return customerClient.getCustomerByDocument(domain.getDocument())
                 .map(customer -> NotificationMapper.toPayload(domain, event, customer));
 
     }

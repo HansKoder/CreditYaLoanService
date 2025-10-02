@@ -1,10 +1,17 @@
 package org.pragma.creditya.model.customer.valueobject;
 
-import org.pragma.creditya.model.loan.exception.LoanDomainException;
+import org.pragma.creditya.model.customer.exception.CustomerDomainException;
+import org.pragma.creditya.model.shared.domain.model.valueobject.BaseId;
 
-public record Document(String value) {
-    public Document {
-        if (value == null || value.isBlank())
-            throw new LoanDomainException("Document must be mandatory");
+public class Document extends BaseId<String> {
+    public Document(String value) {
+        super(value);
+
+        checkDocument();
+    }
+
+    private void checkDocument() {
+        if (this.getValue() == null || this.getValue().isBlank())
+            throw new CustomerDomainException("Document must be mandatory");
     }
 }

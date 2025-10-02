@@ -12,10 +12,10 @@ public class LoanEventFactory {
                 .eventType(EventType.LOAN_SUBMITTED)
                 .status(domain.getLoanStatus())
                 .amount(domain.getAmount().amount())
-                .typeLoan(domain.getLoanTypeCode().code())
+                .typeLoan(domain.getLoanTypeId().getValue())
                 .period(domain.getPeriod().calculateTotalMonths())
                 .totalMonthlyDebt(domain.getTotalMonthlyDebt().amount())
-                .document(domain.getDocument().value())
+                .document(domain.getDocument().getValue())
                 .build();
     }
 

@@ -2,6 +2,7 @@ package org.pragma.creditya.usecase.command.handler.loantype;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
@@ -12,6 +13,13 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
 
     private final LoanTypeRepository loanTypeRepository;
 
+    @Override
+    public Mono<LoanType> getLoanTypeById(LoanTypeId id) {
+        return loanTypeRepository.findById(id)
+                .switchIfEmpty(Mono.error(new LoanTypeNotFoundDomainException("Loan Type with the ID " + id + " is not found")));
+    }
+
+    /*
     public Mono<Loan> checkLoanTypeExists(Loan loan) {
         Long id = loan.getLoanTypeCode().code();
         return loanTypeRepository.findById(id)
@@ -39,6 +47,6 @@ public class LoanTypeUseCase implements ILoanTypeUseCase {
                     return Mono.error(new LoanTypeNotFoundDomainException(err));
                 });
     }
-
+    */
 
 }

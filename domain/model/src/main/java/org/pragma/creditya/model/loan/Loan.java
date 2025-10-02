@@ -2,6 +2,7 @@ package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
 import org.pragma.creditya.model.customer.valueobject.CustomerId;
+import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
@@ -20,7 +21,7 @@ import java.util.*;
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
 
-    private CustomerId customerId;
+    private Document document;
     private LoanTypeId loanTypeId;
 
     private Amount amount;
@@ -41,6 +42,8 @@ public class Loan extends AggregateRoot<LoanId> {
         this.amount = builder.amount;
         this.period = builder.period;
         this.loanStatus = builder.loanStatus;
+        this.document = builder.document;
+        this.loanTypeId = builder.loanTypeId;
     }
 
     // Business Rules
@@ -180,6 +183,9 @@ public class Loan extends AggregateRoot<LoanId> {
         private Period period;
         private LoanStatus loanStatus;
 
+        private Document document;
+        private LoanTypeId loanTypeId;
+
         private LoanBuilder() {
         }
 
@@ -199,6 +205,16 @@ public class Loan extends AggregateRoot<LoanId> {
 
         public LoanBuilder loanStatus(LoanStatus loanStatus) {
             this.loanStatus = loanStatus;
+            return this;
+        }
+
+        public LoanBuilder document(String value) {
+            this.document = new Document(value);
+            return this;
+        }
+
+        public LoanBuilder loanTypeId(Long value) {
+            this.loanTypeId = new LoanTypeId(value);
             return this;
         }
 

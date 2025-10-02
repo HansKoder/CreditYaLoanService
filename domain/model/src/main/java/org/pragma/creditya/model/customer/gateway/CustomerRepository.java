@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 public interface CustomerRepository {
     Mono<Boolean> verifyCustomerByDocument(Document document);
     Mono<Customer> getCustomerByDocument (Document document);
-    Mono<Boolean> verifyCustomerByDocumentAndEmail (String document, String email);
+    Mono<Boolean> verifyCustomerByDocumentAndEmail (Document document, String email);
 
 }

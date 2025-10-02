@@ -25,12 +25,18 @@ public class LoanTypeRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<Boolean> existLoanType(LoanTypeId loanTypeId) {
+    public Mono<Boolean> existLoanType(LoanTypeId id) {
         LoanTypeEntity data = LoanTypeEntity.builder()
-                .id(loanTypeId.getValue())
+                .id(id.getValue())
                 .build();
 
         return repository.exists(Example.of(data));
+    }
+
+    @Override
+    public Mono<LoanType> findById(LoanTypeId id) {
+        return repository.findById(id.getValue())
+                .map(this::toEntity);
     }
 
 

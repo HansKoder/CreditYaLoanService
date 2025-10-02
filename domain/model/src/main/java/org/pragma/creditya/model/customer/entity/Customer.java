@@ -9,15 +9,13 @@ import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;
 
 @Getter
 @Setter
-public class Customer extends AggregateRoot<CustomerId> {
+public class Customer extends AggregateRoot<Document> {
     private String email;
     private String name;
-    private Document document;
     private Amount baseSalary;
 
     private Customer(CustomerBuilder builder) {
         super.setId(builder.id);
-        document = builder.document;
         email = builder.email;
         name = builder.name;
         baseSalary = builder.baseSalary;
@@ -27,8 +25,7 @@ public class Customer extends AggregateRoot<CustomerId> {
         private Amount baseSalary;
         private String email;
         private String name;
-        private Document document;
-        private CustomerId id;
+        private Document id;
 
         private CustomerBuilder() {
         }
@@ -52,13 +49,8 @@ public class Customer extends AggregateRoot<CustomerId> {
             return this;
         }
 
-        public CustomerBuilder document(Document document) {
-            this.document = document;
-            return this;
-        }
-
-        public CustomerBuilder id(CustomerId id) {
-            this.id = id;
+        public CustomerBuilder id(Document document) {
+            this.id = document;
             return this;
         }
 
