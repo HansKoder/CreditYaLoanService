@@ -1,14 +1,12 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
-import org.pragma.creditya.model.customer.valueobject.CustomerId;
 import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.factory.LoanEventFactory;
 import org.pragma.creditya.model.loan.valueobject.*;
-import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
@@ -64,44 +62,26 @@ public class Loan extends AggregateRoot<LoanId> {
         uncommittedEvents.add(LoanEventFactory.submittedEvent(this, resolutionType));
     }
 
-    // Should Be adjusted
-    public void markAsPending () {
-        this.loanStatus = LoanStatus.PENDING;
-        this.setId(new LoanId(UUID.randomUUID()));
+    public void resolutionApplicationLoan (Resolution resolution) {
+        this.resolution = resolution;
+         checkBeforeBeingResolved();
 
-        uncommittedEvents.add(LoanEventFactory.submittedEvent(this, ResolutionType.MANUAL_DECISION));
+        this.loanStatus = resolution.decision();
+        this.uncommittedEvents.add(getLoanResolvedEvent());
     }
 
-    public void verifyAutoDecision (LoanType loanType) {
-        // this.isAutoDecision = loanType.getAuto().value();
+    private LoanEvent getLoanResolvedEvent() {
+        return switch (resolution.decision()) {
+            case LoanStatus.APPROVED -> LoanEventFactory.approvedEvent(this);
+            case LoanStatus.REJECTED -> LoanEventFactory.rejectedEvent(this);
+            default -> throw new LoanDomainException("Unexcepted Decision, should be checked");
+        };
     }
 
-    public void loadAuthorResolutionLoan (String decidedBy) {
-        // this.responsible = username;
-    }
-
-    public void checkApprovedLoan(String reason) {
-        checkBeforeBeingResolved(LoanStatus.APPROVED);
-
-        this.loanStatus = LoanStatus.APPROVED;
-        // this.reason = reason;
-
-        uncommittedEvents.add(LoanEventFactory.approvedEvent(this));
-    }
-
-    public void checkRejectedLoan(String reason) {
-        checkBeforeBeingResolved(LoanStatus.REJECTED);
-
-        this.loanStatus = LoanStatus.REJECTED;
-        // this.reason = reason;
-
-        uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
-    }
-
-    private void checkBeforeBeingResolved (LoanStatus status) {
-        checkIdBeforeBeingResolved(status);
-        checkStatusBeforeBeingResolved(status);
-        checkResponsible(status);
+    private void checkBeforeBeingResolved () {
+        checkIdBeforeBeingResolved();
+        checkStatusBeforeBeingResolved();
+        checkDecidedBy();
     }
 
     private void calculateTotalMonthlyDebt () {
@@ -116,22 +96,21 @@ public class Loan extends AggregateRoot<LoanId> {
         monthlyDebt = new Amount(debt);
     }
 
-    private void checkResponsible (LoanStatus status) {
-        /**
-        if (responsible == null || responsible.isBlank()) {
-            String err = "Who is responsible for this loan, Must have a responsible for being " + status.name().toLowerCase();
+    private void checkDecidedBy () {
+        if (resolution.by() == null || resolution.by().isBlank()) {
+            String err = "In order to resolve the loan application, it must be responsible for giving the resolution.";
             throw new LoanDomainException(err);
-        }*/
+        }
     }
 
-    private void checkStatusBeforeBeingResolved (LoanStatus status) {
+    private void checkStatusBeforeBeingResolved () {
         if (this.loanStatus != LoanStatus.PENDING)
-            throw new LoanDomainException("Must have status Pending for being " + status.name().toLowerCase());
+            throw new LoanDomainException("In order to resolve loan application, it must be with status PENDING");
     }
 
-    private void checkIdBeforeBeingResolved (LoanStatus status) {
+    private void checkIdBeforeBeingResolved () {
         if (this.getId() == null || this.getId().getValue() == null)
-            throw new LoanDomainException("Must have ID Loan for being " + status.name().toLowerCase());
+            throw new LoanDomainException("In order to resolve Loan Application, it must be persisted Loan, Loan without ID cannot continue with the resolution process");
     }
 
     public static Loan rehydrate(List<LoanEvent> history) {

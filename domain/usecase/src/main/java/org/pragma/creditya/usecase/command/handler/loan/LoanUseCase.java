@@ -3,44 +3,46 @@ package org.pragma.creditya.usecase.command.handler.loan;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
+import org.pragma.creditya.model.loan.exception.LoanDomainException;
+import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
+import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
 import reactor.core.publisher.Mono;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class LoanUseCase implements ILoanUseCase {
 
-    private final EventBus eventBus;
-    private final IOutboxHandler outboxProcess;
+    private final LoanHelper loanHelper;
 
     @Override
     public Mono<Loan> checkApplication(CreateApplicationLoanCommand cmd) {
         return Mono.fromCallable(() -> checkApplicationLoan(cmd));
     }
 
-    /*
     @Override
-    public Mono<Loan> rehydrate(List<LoanEvent> events) {
-        return Mono.just(Loan.rehydrate(events));
+    public Mono<Loan> getLoan(String loanId) {
+        return loanHelper.fromStringToUUID(loanId)
+                .flatMap(loanHelper::getLoanById);
     }
 
     @Override
-    public Mono<Loan> approvedLoan(Loan loan, String reason) {
-        return Mono.fromCallable(() -> {
-           loan.checkApprovedLoan(reason);
-           return loan;
-        });
+    public Mono<LoanStatus> checkDecisionType(String decision) {
+        return loanHelper.checkDecisionType(decision);
     }
 
     @Override
-    public Mono<Loan> rejectedLoan(Loan loan, String reason) {
-        return Mono.fromCallable(() -> {
-            loan.checkRejectedLoan(reason);
-            return loan;
-        });
+    public Mono<Loan> resolutionApplicationLoan(Loan domain) {
+        return null;
     }
-    */
 
+    @Override
+    public Mono<Loan> persist(Loan domain) {
+        return loanHelper.persistAndPublishEvents(domain);
+    }
 
     private Loan checkApplicationLoan (CreateApplicationLoanCommand cmd) {
         Loan domain = Loan.LoanBuilder.aLoan()

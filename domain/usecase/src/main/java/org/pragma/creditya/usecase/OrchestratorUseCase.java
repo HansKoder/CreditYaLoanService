@@ -11,7 +11,7 @@ import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
-import org.pragma.creditya.usecase.command.DecisionLoanCommand;
+import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
 import org.pragma.creditya.usecase.command.handler.loantype.ILoanTypeUseCase;
@@ -46,7 +46,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     }
 
     @Override
-    public Mono<Loan> decisionLoan(DecisionLoanCommand command) {
+    public Mono<Loan> decisionLoan(ResolveApplicationLoanCommand command) {
         return checkTypeDecision(command)
                 .flatMap(this::fromStringToUUID)
                 .flatMap(this::getLoan)
@@ -71,7 +71,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
         return map;
     }
 
-    private Mono<Loan> checkDecisionLoan (Loan loan, DecisionLoanCommand command) {
+    private Mono<Loan> checkDecisionLoan (Loan loan, ResolveApplicationLoanCommand command) {
         BiFunction<Loan, String, Mono<Loan>> handler = buildDecisionHandlers().get(command.decision());
         if (handler == null)
             return Mono.error(new LoanDomainException("Unknown decision: " + command.decision()));
@@ -79,7 +79,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
         return handler.apply(loan, command.reason()).log();
     }
 
-    private Mono<DecisionLoanCommand> checkTypeDecision (DecisionLoanCommand command) {
+    private Mono<ResolveApplicationLoanCommand> checkTypeDecision (ResolveApplicationLoanCommand command) {
         if (command.decision() == null || command.decision().isBlank())
             return Mono.error(new LoanDomainException("Decision must be mandatory"));
 
@@ -94,17 +94,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
         return Mono.just(command);
     }
 
-    private Mono<UUID> fromStringToUUID (DecisionLoanCommand command) {
-        if (command.loanId() == null || command.loanId().isBlank())
-            return Mono.error(new LoanDomainException("Loan Id must be provided"));
 
-        try {
-            UUID aggregateId = UUID.fromString(command.loanId());
-            return Mono.just(aggregateId).log();
-        } catch (IllegalArgumentException ex) {
-            return Mono.error(new LoanDomainException("Invalid loanId format"));
-        }
-    }
 
     private Mono<Loan> getLoan (UUID aggregateId) {
         return eventRepository.findByAggregateId(aggregateId)

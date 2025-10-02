@@ -5,7 +5,7 @@ import org.pragma.creditya.api.dto.request.ResolutionApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
-import org.pragma.creditya.usecase.command.DecisionLoanCommand;
+import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 
 public class LoanRestMapper {
 
@@ -32,7 +32,7 @@ public class LoanRestMapper {
         );
     }
 
-    public static DecisionLoanCommand toCommand (ResolutionApplicationLoanRequest request) {
-        return new DecisionLoanCommand(request.loanId(), request.decision(), request.reason());
+    public static ResolveApplicationLoanCommand toCommand (ResolutionApplicationLoanRequest request) {
+        return new ResolveApplicationLoanCommand(request.loanId(), request.decision(), request.reason());
     }
 }

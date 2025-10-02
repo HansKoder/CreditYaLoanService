@@ -1,8 +1,8 @@
 package org.pragma.creditya.usecase.command;
 
-public record DecisionLoanCommand(
+public record ResolveApplicationLoanCommand(
         String loanId,
         String decision,
         String reason,
-        Boolean isSelfDecision
+        String resolutionType
 ) { }

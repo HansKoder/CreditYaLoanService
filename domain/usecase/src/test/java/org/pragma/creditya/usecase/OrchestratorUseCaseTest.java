@@ -15,7 +15,7 @@ import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
-import org.pragma.creditya.usecase.command.DecisionLoanCommand;
+import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.command.handler.loan.LoanUseCase;
 import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
@@ -151,7 +151,7 @@ public class OrchestratorUseCaseTest {
 
     @Test
     void shouldThrowException_decisionIsNull () {
-        DecisionLoanCommand command = new DecisionLoanCommand(
+        ResolveApplicationLoanCommand command = new ResolveApplicationLoanCommand(
                 LOAN_ID_EXAMPLE,
                 null,
                 ""
@@ -168,7 +168,7 @@ public class OrchestratorUseCaseTest {
 
     @Test
     void shouldThrowException_decisionIsUnknown () {
-        DecisionLoanCommand command = new DecisionLoanCommand(
+        ResolveApplicationLoanCommand command = new ResolveApplicationLoanCommand(
                 LOAN_ID_EXAMPLE,
                 "UNKNOWN",
                 ""
@@ -185,7 +185,7 @@ public class OrchestratorUseCaseTest {
 
     @Test
     void shouldThrowException_LoanIdIsNull () {
-        DecisionLoanCommand command = new DecisionLoanCommand(
+        ResolveApplicationLoanCommand command = new ResolveApplicationLoanCommand(
                 null,
                 "REJECTED",
                 ""
@@ -209,7 +209,7 @@ public class OrchestratorUseCaseTest {
         Mockito.when(loanUseCase.rehydrate(Mockito.anyList()))
                 .thenReturn(Mono.error(new LoanDomainException("Unknown event type")));
 
-        DecisionLoanCommand command = new DecisionLoanCommand(
+        ResolveApplicationLoanCommand command = new ResolveApplicationLoanCommand(
                 LOAN_ID_EXAMPLE,
                 "APPROVED",
                 ""
@@ -258,7 +258,7 @@ public class OrchestratorUseCaseTest {
         Mockito.when(eventStoreRepository.saveAll(Mockito.anyList()))
                 .thenReturn(Mono.empty());
 
-        DecisionLoanCommand command = new DecisionLoanCommand(
+        ResolveApplicationLoanCommand command = new ResolveApplicationLoanCommand(
                 LOAN_ID_EXAMPLE,
                 "APPROVED",
                 "OK"
