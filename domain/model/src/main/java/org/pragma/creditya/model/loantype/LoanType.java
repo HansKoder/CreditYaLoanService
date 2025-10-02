@@ -51,8 +51,8 @@ public class LoanType extends BaseEntity<LoanTypeId> {
             return this;
         }
 
-        public LoanTypeBuilder selfDecision(Boolean value) {
-            this.resolutionType = new ResolutionType(value);
+        public LoanTypeBuilder resolutionType(ResolutionType value) {
+            this.resolutionType = value;
             return this;
         }
 

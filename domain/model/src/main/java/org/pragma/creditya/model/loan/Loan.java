@@ -10,6 +10,7 @@ import org.pragma.creditya.model.loan.factory.LoanEventFactory;
 import org.pragma.creditya.model.loan.valueobject.*;
 import org.pragma.creditya.model.loantype.LoanType;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
+import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
 import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;
 
@@ -21,8 +22,8 @@ import java.util.*;
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
 
-    private Document document;
-    private LoanTypeId loanTypeId;
+    private final Document document;
+    private final LoanTypeId loanTypeId;
 
     private Amount amount;
     private Period period;
@@ -33,7 +34,7 @@ public class Loan extends AggregateRoot<LoanId> {
 
     // expand to possibility to support contractOffered, contractSigned, etc.
 
-    private Amount totalMonthlyDebt;
+    private Amount monthlyDebt;
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
 
@@ -57,11 +58,18 @@ public class Loan extends AggregateRoot<LoanId> {
         calculateTotalMonthlyDebt();
     }
 
+    public void markAsSubmitted (ResolutionType resolutionType) {
+        this.loanStatus = LoanStatus.PENDING;
+        this.setId(new LoanId(UUID.randomUUID()));
+        uncommittedEvents.add(LoanEventFactory.submittedEvent(this, resolutionType));
+    }
+
+    // Should Be adjusted
     public void markAsPending () {
         this.loanStatus = LoanStatus.PENDING;
         this.setId(new LoanId(UUID.randomUUID()));
 
-        uncommittedEvents.add(LoanEventFactory.submittedEvent(this));
+        uncommittedEvents.add(LoanEventFactory.submittedEvent(this, ResolutionType.MANUAL_DECISION));
     }
 
     public void verifyAutoDecision (LoanType loanType) {
@@ -105,7 +113,7 @@ public class Loan extends AggregateRoot<LoanId> {
         BigDecimal debt = amount.amount()
                 .divide(BigDecimal.valueOf(totalMonths), 2, RoundingMode.HALF_UP);
 
-        totalMonthlyDebt = new Amount(debt);
+        monthlyDebt = new Amount(debt);
     }
 
     private void checkResponsible (LoanStatus status) {
@@ -154,7 +162,7 @@ public class Loan extends AggregateRoot<LoanId> {
         this.amount = new Amount(e.getAmount());
         this.period = new Period(0, e.getPeriod());
 
-        this.totalMonthlyDebt = new Amount(e.getTotalMonthlyDebt());
+        this.monthlyDebt = new Amount(e.getMonthlyDebt());
     }
 
     private void applyLoanApproved(LoanResolutionApprovedEvent e) {

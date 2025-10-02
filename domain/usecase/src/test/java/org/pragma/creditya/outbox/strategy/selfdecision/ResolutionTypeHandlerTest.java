@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.AggregateType;
-import org.pragma.creditya.model.loan.event.ApplicationSubmittedType;
 import org.pragma.creditya.model.loan.event.EventType;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;

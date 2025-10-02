@@ -30,7 +30,7 @@ public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanAp
                 .status(event.getStatus().name())
                 .months(event.getPeriod())
                 .typeLoan(event.getTypeLoan())
-                .totalMonthlyDebt(event.getTotalMonthlyDebt())
+                .totalMonthlyDebt(event.getMonthlyDebt())
                 .build();
 
         System.out.printf("[infra.event.handler] (onEvent) (3) LeanRead=%s", read);

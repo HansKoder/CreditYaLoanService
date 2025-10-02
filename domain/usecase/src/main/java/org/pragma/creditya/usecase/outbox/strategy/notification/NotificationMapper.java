@@ -1,13 +1,13 @@
 package org.pragma.creditya.usecase.outbox.strategy.notification;
 
+import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
 
 public class NotificationMapper {
-    public static NotificationOutboxPayload toPayload (Loan domain, LoanEvent event, CustomerRead customer) {
+    public static NotificationOutboxPayload toPayload (Loan domain, LoanEvent event, Customer customer) {
         System.out.println("[use_case.outbox.notification.mapper] (toPayload) payload=[ domain:{" + domain + "}, event:{"+ event+ "}]");
         NotificationOutboxPayload payload = NotificationOutboxPayload.builder()
                 .type("EMAIL")
@@ -20,7 +20,7 @@ public class NotificationMapper {
         return payload;
     }
 
-    private static void greetingMessage (StringBuilder stringBuilder, CustomerRead customer) {
+    private static void greetingMessage (StringBuilder stringBuilder, Customer customer) {
         stringBuilder.append("Hello, Dear ")
                 .append(customer.getName().isEmpty() ? "Customer" : customer.getName())
                 .append("\n\n");
@@ -37,8 +37,8 @@ public class NotificationMapper {
                 .append(event.getAggregateId().toString())
                 .append(" was rejected. \n\n");
 
-        if (domain.getReason() != null && !domain.getReason().isBlank()) {
-            message.append("Reason: ").append(domain.getReason())
+        if (domain.getResolution().reason() != null && !domain.getResolution().reason().isBlank()) {
+            message.append("Reason: ").append(domain.getResolution().reason())
                     .append(".")
                     .append("\n\n");
         }
@@ -50,7 +50,7 @@ public class NotificationMapper {
 
     }
 
-    private static String extractMessage (CustomerRead customer, Loan domain, LoanEvent event) {
+    private static String extractMessage (Customer customer, Loan domain, LoanEvent event) {
         System.out.println("[use_case.outbox.notification.mapper] (extractMessage) payload=[ domain:{" + domain + "}, event:{"+ event+ "}]");
 
         StringBuilder message = new StringBuilder();

@@ -2,10 +2,11 @@ package org.pragma.creditya.model.loan.factory;
 
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 
 public class LoanEventFactory {
 
-    public static LoanApplicationSubmittedEvent submittedEvent (Loan domain) {
+    public static LoanApplicationSubmittedEvent submittedEvent (Loan domain, ResolutionType resolutionType) {
         return LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
@@ -14,8 +15,8 @@ public class LoanEventFactory {
                 .amount(domain.getAmount().amount())
                 .typeLoan(domain.getLoanTypeId().getValue())
                 .period(domain.getPeriod().calculateTotalMonths())
-                .totalMonthlyDebt(domain.getTotalMonthlyDebt().amount())
                 .document(domain.getDocument().getValue())
+                .resolutionType(resolutionType)
                 .build();
     }
 
@@ -24,9 +25,9 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_APPROVED)
-                .approvedBy(domain.getResponsible())
+                .approvedBy(domain.getResolution().decideBy())
                 .status(domain.getLoanStatus())
-                .reason(domain.getReason())
+                .reason(domain.getResolution().reason())
                 .build();
     }
 
@@ -35,9 +36,9 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_REJECTED)
-                .rejectedBy(domain.getResponsible())
+                .rejectedBy(domain.getResolution().decideBy())
                 .status(domain.getLoanStatus())
-                .reason(domain.getReason())
+                .reason(domain.getResolution().reason())
                 .build();
     }
 

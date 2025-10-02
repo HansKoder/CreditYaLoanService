@@ -1,5 +1,6 @@
 package org.pragma.creditya.model.loanread.gateways;
 
+import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
 import reactor.core.publisher.Flux;
@@ -12,6 +13,6 @@ public interface LoanReadRepository {
     Mono<LoanRead> saveLoanRead (LoanRead read);
     Flux<LoanRead> getLoan (LoanQuery query);
     Mono<LoanRead> getLoanByAggregateId (UUID aggregateId);
-    Flux<LoanRead> getActiveDebts (String document);
+    Flux<LoanRead> getActiveDebts (Document document);
 
 }

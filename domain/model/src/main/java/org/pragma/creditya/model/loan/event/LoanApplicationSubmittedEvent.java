@@ -3,6 +3,7 @@ package org.pragma.creditya.model.loan.event;
 import lombok.Getter;
 import lombok.Setter;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -12,12 +13,12 @@ import java.util.UUID;
 public class LoanApplicationSubmittedEvent extends LoanEvent{
     private String document;
     private BigDecimal amount;
-    private BigDecimal totalMonthlyDebt;
+    private BigDecimal monthlyDebt;
 
     private Long typeLoan;
     private LoanStatus status;
+    private ResolutionType resolutionType;
     private int period;
-    private ApplicationSubmittedType typeSubmitted;
 
     public LoanApplicationSubmittedEvent() {
     }
@@ -33,8 +34,8 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         this.typeLoan = builder.typeLoan;
         this.status = builder.status;
         this.period = builder.period;
-        this.totalMonthlyDebt = builder.totalMonthlyDebt;
-        this.typeSubmitted = builder.typeSubmitted;
+        this.monthlyDebt = builder.monthlyDebt;
+        this.resolutionType = builder.resolutionType;
     }
 
     public static final class SubmittedBuilder {
@@ -49,10 +50,11 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         // Submitted Event
         private String document;
         private BigDecimal amount;
-        private BigDecimal totalMonthlyDebt;
+        private BigDecimal monthlyDebt;
         private int period;
         private Long typeLoan;
-        private ApplicationSubmittedType typeSubmitted;
+
+        private ResolutionType resolutionType;
 
         public static SubmittedBuilder aSubmittedEvent() {
             return new SubmittedBuilder();
@@ -103,13 +105,13 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
             return this;
         }
 
-        public SubmittedBuilder totalMonthlyDebt(BigDecimal value) {
-            this.totalMonthlyDebt = value;
+        public SubmittedBuilder monthlyDebt(BigDecimal value) {
+            this.monthlyDebt = value;
             return this;
         }
 
-        public SubmittedBuilder typeSubmitted(ApplicationSubmittedType value) {
-            this.typeSubmitted = value;
+        public SubmittedBuilder resolutionType(ResolutionType value) {
+            this.resolutionType = value;
             return this;
         }
 

@@ -1,5 +1,6 @@
 package org.pragma.creditya.mongo;
 
+import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
@@ -75,11 +76,11 @@ implements LoanReadRepository
     }
 
     @Override
-    public Flux<LoanRead> getActiveDebts(String document) {
+    public Flux<LoanRead> getActiveDebts(Document document) {
         logger.info("[infra.mongodb] (getActiveDebts) (step 01) payload: [ document:{} ]", document);
 
         LoanReadCollection probe = LoanReadCollection.builder()
-                .document(document)
+                .document(document.getValue())
                 .status("APPROVED")
                 .build();
 
