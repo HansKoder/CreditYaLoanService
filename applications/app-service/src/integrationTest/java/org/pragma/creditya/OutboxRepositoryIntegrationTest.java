@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
 import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.pragma.creditya.model.outbox.OutboxStatus;
-import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
+import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -17,7 +17,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
-import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest

@@ -27,14 +27,14 @@ public class RestConsumerConfig {
 
     public RestConsumerConfig(@Value("${adapter.restconsumer.url}") String url,
                               @Value("${adapter.restconsumer.timeout}") int timeout) {
-        logger.info("[infra.rest-consume] (construct) extract env vars payload=[ url:{}, timeout:{} ]", url, timeout);
+        logger.info("[infra.rest-consumer] (construct) extract env vars payload=[ url:{}, timeout:{} ]", url, timeout);
         this.url = url;
         this.timeout = timeout;
     }
 
     @Bean
     public WebClient getWebClient(WebClient.Builder builder) {
-        logger.info("[infra.rest-consume] (getWebClient) consume user-service to check identify payload [ url:{}, timeout:{} ]", url, timeout);
+        logger.info("[infra.rest-consumer] (getWebClient) consume user-service to check identify payload [ url:{}, timeout:{} ]", url, timeout);
 
         return builder
             .baseUrl(url)
@@ -45,9 +45,6 @@ public class RestConsumerConfig {
 
 
     private ClientHttpConnector getClientHttpConnector() {
-        /*
-        IF YO REQUIRE APPEND SSL CERTIFICATE SELF SIGNED: this should be in the default cacerts trustore
-        */
         return new ReactorClientHttpConnector(HttpClient.create()
                 .compress(true)
                 .keepAlive(true)

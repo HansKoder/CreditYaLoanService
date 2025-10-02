@@ -12,10 +12,11 @@ import org.pragma.creditya.model.loan.event.AggregateType;
 import org.pragma.creditya.model.loan.event.ApplicationSubmittedType;
 import org.pragma.creditya.model.loan.event.EventType;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.gateways.CustomerClient;
+import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
-import org.pragma.creditya.outbox.payload.DecisionLoanOutboxPayload;
+import org.pragma.creditya.usecase.outbox.payload.DecisionLoanOutboxPayload;
+import org.pragma.creditya.usecase.outbox.strategy.selfdecision.SelfDecisionHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -34,7 +35,7 @@ public class SelfDecisionHandlerTest {
     private SelfDecisionHandler handler;
 
     @Mock
-    private CustomerClient customerClient;
+    private CustomerRepository customerClient;
 
     @Mock
     private LoanReadRepository loanReadRepository;

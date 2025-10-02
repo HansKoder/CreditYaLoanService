@@ -12,23 +12,21 @@ import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
-import org.pragma.creditya.model.loan.gateways.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.outbox.handler.IOutboxHandler;
-import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
+import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
-import org.pragma.creditya.usecase.loan.ILoanUseCase;
-import org.pragma.creditya.usecase.loan.LoanUseCase;
-import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
-import org.pragma.creditya.usecase.loanread.LoanReadUseCase;
-import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
-import org.pragma.creditya.usecase.loantype.LoanTypeUseCase;
+import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
+import org.pragma.creditya.usecase.command.handler.loan.LoanUseCase;
+import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
+import org.pragma.creditya.usecase.query.loan.LoanReadUseCase;
+import org.pragma.creditya.usecase.command.handler.loantype.ILoanTypeUseCase;
+import org.pragma.creditya.usecase.command.handler.loantype.LoanTypeUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -138,10 +136,10 @@ public class OrchestratorUseCaseTest {
         Mockito.doNothing()
                 .when(eventBus).publish(Mockito.any());
 
-        CreateRequestLoanCommand createRequestLoanCommand =
-                new CreateRequestLoanCommand("103", BigDecimal.valueOf(4_000_000), 1L, 1,6);
+        CreateApplicationLoanCommand createApplicationLoanCommand =
+                new CreateApplicationLoanCommand("103", BigDecimal.valueOf(4_000_000), 1L, 1,6);
 
-        var response = orchestratorUseCase.applicationLoan(createRequestLoanCommand);
+        var response = orchestratorUseCase.applicationLoan(createApplicationLoanCommand);
 
         StepVerifier.create(response)
                 .expectNext(LOAN_STATUS_PENDING)

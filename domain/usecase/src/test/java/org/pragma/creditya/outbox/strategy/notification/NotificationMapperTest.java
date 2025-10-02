@@ -7,7 +7,8 @@ import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
+import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
+import org.pragma.creditya.usecase.outbox.strategy.notification.NotificationMapper;
 
 import java.util.UUID;
 

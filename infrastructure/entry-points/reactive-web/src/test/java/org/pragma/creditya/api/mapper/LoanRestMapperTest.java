@@ -5,7 +5,7 @@ import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class LoanRestMapperTest {
 
     @Test
     void shouldBeMappedToCommand () {
-        CreateRequestLoanCommand command = LoanRestMapper.toCommand(REQUEST);
+        CreateApplicationLoanCommand command = LoanRestMapper.toCommand(REQUEST);
 
         assertEquals("103", command.document());
         assertEquals(BigDecimal.ONE, command.amount());

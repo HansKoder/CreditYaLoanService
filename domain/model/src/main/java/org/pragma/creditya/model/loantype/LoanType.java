@@ -1,6 +1,5 @@
 package org.pragma.creditya.model.loantype;
 import lombok.Getter;
-import org.pragma.creditya.model.loantype.valueobject.Auto;
 import org.pragma.creditya.model.loantype.valueobject.Description;
 import org.pragma.creditya.model.loantype.valueobject.InterestRate;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;

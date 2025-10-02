@@ -1,6 +1,5 @@
 package org.pragma.creditya.outbox.handler;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,8 +12,9 @@ import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.gateways.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.outbox.LoanOutboxMessage;
-import org.pragma.creditya.outbox.payload.NotificationOutboxPayload;
-import org.pragma.creditya.outbox.strategy.OutboxStrategy;
+import org.pragma.creditya.usecase.outbox.handler.OutboxHandler;
+import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
+import org.pragma.creditya.usecase.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

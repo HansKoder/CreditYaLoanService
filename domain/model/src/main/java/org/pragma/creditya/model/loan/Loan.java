@@ -1,13 +1,16 @@
 package org.pragma.creditya.model.loan;
 import lombok.Getter;
 import lombok.ToString;
+import org.pragma.creditya.model.customer.valueobject.CustomerId;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.exception.AmountLoanIsNotEnoughDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.factory.LoanEventFactory;
 import org.pragma.creditya.model.loan.valueobject.*;
 import org.pragma.creditya.model.loantype.LoanType;
+import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import org.pragma.creditya.model.shared.domain.model.entity.AggregateRoot;
+import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,26 +19,28 @@ import java.util.*;
 @ToString
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
-    private Document document;
+
+    private CustomerId customerId;
+    private LoanTypeId loanTypeId;
+
     private Amount amount;
     private Period period;
-    private LoanTypeCode loanTypeCode;
     private LoanStatus loanStatus;
 
-    private String responsible;
-    private String reason;
+    // must be relocated in a Value Object (maybe)
+    private Resolution resolution;
+
+    // expand to possibility to support contractOffered, contractSigned, etc.
 
     private Amount totalMonthlyDebt;
 
     private final List<LoanEvent> uncommittedEvents = new ArrayList<>();
 
     private Loan(LoanBuilder builder) {
-        this.document = builder.document;
+        this.setId(builder.id);
         this.amount = builder.amount;
         this.period = builder.period;
-        this.loanTypeCode = builder.loanTypeCode;
         this.loanStatus = builder.loanStatus;
-        this.setId(builder.id);
     }
 
     // Business Rules
@@ -60,15 +65,15 @@ public class Loan extends AggregateRoot<LoanId> {
         // this.isAutoDecision = loanType.getAuto().value();
     }
 
-    public void loadAuthorResolutionLoan (String username) {
-        this.responsible = username;
+    public void loadAuthorResolutionLoan (String decidedBy) {
+        // this.responsible = username;
     }
 
     public void checkApprovedLoan(String reason) {
         checkBeforeBeingResolved(LoanStatus.APPROVED);
 
         this.loanStatus = LoanStatus.APPROVED;
-        this.reason = reason;
+        // this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.approvedEvent(this));
     }
@@ -77,7 +82,7 @@ public class Loan extends AggregateRoot<LoanId> {
         checkBeforeBeingResolved(LoanStatus.REJECTED);
 
         this.loanStatus = LoanStatus.REJECTED;
-        this.reason = reason;
+        // this.reason = reason;
 
         uncommittedEvents.add(LoanEventFactory.rejectedEvent(this));
     }
@@ -101,10 +106,11 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     private void checkResponsible (LoanStatus status) {
+        /**
         if (responsible == null || responsible.isBlank()) {
             String err = "Who is responsible for this loan, Must have a responsible for being " + status.name().toLowerCase();
             throw new LoanDomainException(err);
-        }
+        }*/
     }
 
     private void checkStatusBeforeBeingResolved (LoanStatus status) {
@@ -142,22 +148,20 @@ public class Loan extends AggregateRoot<LoanId> {
     private void applyLoanApplicationSubmitted(LoanApplicationSubmittedEvent e) {
         this.setId(new LoanId(e.getAggregateId()));
         this.loanStatus = e.getStatus();
-        this.document = new Document(e.getDocument());
         this.amount = new Amount(e.getAmount());
         this.period = new Period(0, e.getPeriod());
-        this.loanTypeCode = new LoanTypeCode(e.getTypeLoan());
 
         this.totalMonthlyDebt = new Amount(e.getTotalMonthlyDebt());
     }
 
     private void applyLoanApproved(LoanResolutionApprovedEvent e) {
         this.loanStatus = LoanStatus.APPROVED;
-        this.responsible = e.getApprovedBy();
+        // this.responsible = e.getApprovedBy();
     }
 
     private void applyLoanRejected(LoanResolutionRejectedEvent e) {
         this.loanStatus = LoanStatus.REJECTED;
-        this.responsible = e.getRejectedBy();
+        // this.responsible = e.getRejectedBy();
     }
 
     public List<LoanEvent> getUncommittedEvents() {
@@ -170,12 +174,11 @@ public class Loan extends AggregateRoot<LoanId> {
 
     // Builder custom
     public static final class LoanBuilder {
-        private Amount amount;
-        private Document document;
-        private Period period;
-        private LoanTypeCode loanTypeCode;
-        private LoanStatus loanStatus;
+
         private LoanId id;
+        private Amount amount;
+        private Period period;
+        private LoanStatus loanStatus;
 
         private LoanBuilder() {
         }
@@ -189,18 +192,8 @@ public class Loan extends AggregateRoot<LoanId> {
             return this;
         }
 
-        public LoanBuilder document(String document) {
-            this.document = new Document(document);
-            return this;
-        }
-
         public LoanBuilder period(int year, int month) {
             this.period = new Period(year, month);
-            return this;
-        }
-
-        public LoanBuilder loanTypeCode(Long loanType) {
-            this.loanTypeCode = new LoanTypeCode(loanType);
             return this;
         }
 

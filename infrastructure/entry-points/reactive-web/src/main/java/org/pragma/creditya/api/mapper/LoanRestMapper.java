@@ -4,13 +4,13 @@ import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.api.dto.request.ResolutionApplicationLoanRequest;
 import org.pragma.creditya.api.dto.response.LoanApplicationResponse;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
 
 public class LoanRestMapper {
 
-    public static CreateRequestLoanCommand toCommand (CreateApplicationLoanRequest request) {
-        return new CreateRequestLoanCommand(
+    public static CreateApplicationLoanCommand toCommand (CreateApplicationLoanRequest request) {
+        return new CreateApplicationLoanCommand(
                 request.document(),
                 request.amount(),
                 request.loanTypeId(),

@@ -6,8 +6,9 @@ import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.LoanRead;
-import org.pragma.creditya.outbox.payload.DebtPayload;
-import org.pragma.creditya.outbox.payload.DecisionLoanOutboxPayload;
+import org.pragma.creditya.usecase.outbox.payload.DebtPayload;
+import org.pragma.creditya.usecase.outbox.payload.DecisionLoanOutboxPayload;
+import org.pragma.creditya.usecase.outbox.strategy.selfdecision.SelfDecisionMapper;
 
 import java.math.BigDecimal;
 import java.util.List;

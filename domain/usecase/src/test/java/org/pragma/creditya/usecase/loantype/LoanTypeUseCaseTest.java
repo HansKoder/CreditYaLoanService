@@ -12,6 +12,7 @@ import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
 import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
+import org.pragma.creditya.usecase.command.handler.loantype.LoanTypeUseCase;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 

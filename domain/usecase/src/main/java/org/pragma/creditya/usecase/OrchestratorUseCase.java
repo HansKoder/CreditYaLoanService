@@ -9,12 +9,12 @@ import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loanread.LoanRead;
 import org.pragma.creditya.model.loanread.query.LoanQuery;
-import org.pragma.creditya.outbox.handler.IOutboxHandler;
-import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
+import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.DecisionLoanCommand;
-import org.pragma.creditya.usecase.loan.ILoanUseCase;
-import org.pragma.creditya.usecase.loanread.ILoanReadUseCase;
-import org.pragma.creditya.usecase.loantype.ILoanTypeUseCase;
+import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
+import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
+import org.pragma.creditya.usecase.command.handler.loantype.ILoanTypeUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final IOutboxHandler outboxProcess;
 
     @Override
-    public Mono<Loan> applicationLoan(CreateRequestLoanCommand command) {
+    public Mono<Loan> applicationLoan(CreateApplicationLoanCommand command) {
         return loanUseCase.checkApplication(command)
                 .flatMap(loanUseCase::verifyOwnershipCustomer)
                 .flatMap(loanTypeUseCase::checkLoanTypeExists)
