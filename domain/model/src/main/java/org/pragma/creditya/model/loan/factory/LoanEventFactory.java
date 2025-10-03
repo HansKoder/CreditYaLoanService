@@ -6,6 +6,37 @@ import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 
 public class LoanEventFactory {
 
+    public static LoanEvent applicationSubmittedLoan (Loan domain, ResolutionType resolutionType) {
+        var event = LoanEvent.builder()
+                .aggregateId(domain.getId().getValue())
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_SUBMITTED)
+                .payload(submittedEventPayload(domain, resolutionType)) // Test Submitted using Payload
+                .build();
+
+        System.out.println("[domain.loan.factory] (submittedEvent) build a new event, response=[ submittedEvent:{"+ event + "} ]");
+
+        return event;
+    }
+
+    public static LoanEvent applicationApprovedLoan (Loan domain) {
+        return LoanEvent.builder()
+                .aggregateId(domain.getId().getValue())
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_APPROVED)
+                .payload(approvedEventPayload(domain))
+                .build();
+    }
+
+    public static LoanEvent applicationRejectedLoan (Loan domain) {
+        return LoanEvent.builder()
+                .aggregateId(domain.getId().getValue())
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_REJECTED)
+                .payload(rejectedEventPayload(domain))
+                .build();
+    }
+
     private static ApplicationSubmittedEvent submittedEventPayload (Loan domain, ResolutionType resolutionType) {
         return ApplicationSubmittedEvent.builder()
                 .status(domain.getLoanStatus())
@@ -34,47 +65,5 @@ public class LoanEventFactory {
                 .build();
     }
 
-    public static LoanApplicationSubmittedEvent submittedEvent (Loan domain, ResolutionType resolutionType) {
-        var event = LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
-                .aggregateId(domain.getId().getValue())
-                .aggregateType(AggregateType.AGGREGATE_LOAN)
-                .eventType(EventType.LOAN_SUBMITTED)
-                .payload(submittedEventPayload(domain, resolutionType)) // Test Submitted using Payload
-                .status(domain.getLoanStatus())
-                .amount(domain.getAmount().amount())
-                .typeLoan(domain.getLoanTypeId().getValue())
-                .period(domain.getPeriod().calculateTotalMonths())
-                .document(domain.getDocument().getValue())
-                .resolutionType(resolutionType)
-                .build();
-
-        System.out.println("[domain.loan.factory] (submittedEvent) build a new event, response=[ submittedEvent:{"+ event + "} ]");
-
-        return event;
-    }
-
-    public static LoanResolutionApprovedEvent approvedEvent (Loan domain) {
-        return LoanResolutionApprovedEvent.ApprovedBuilder.anApprovedEvent()
-                .aggregateId(domain.getId().getValue())
-                .aggregateType(AggregateType.AGGREGATE_LOAN)
-                .eventType(EventType.LOAN_APPROVED)
-                .payload(approvedEventPayload(domain))
-                .approvedBy(domain.getResolution().by())
-                .status(domain.getLoanStatus())
-                .reason(domain.getResolution().reason())
-                .build();
-    }
-
-    public static LoanResolutionRejectedEvent rejectedEvent (Loan domain) {
-        return LoanResolutionRejectedEvent.RejectedBuilder.aRejectedEvent()
-                .aggregateId(domain.getId().getValue())
-                .aggregateType(AggregateType.AGGREGATE_LOAN)
-                .eventType(EventType.LOAN_REJECTED)
-                .payload(rejectedEventPayload(domain))
-                .rejectedBy(domain.getResolution().by())
-                .status(domain.getLoanStatus())
-                .reason(domain.getResolution().reason())
-                .build();
-    }
 
 }

@@ -59,7 +59,7 @@ public class Loan extends AggregateRoot<LoanId> {
     public void markAsSubmitted (ResolutionType resolutionType) {
         this.loanStatus = LoanStatus.PENDING;
         this.setId(new LoanId(UUID.randomUUID()));
-        uncommittedEvents.add(LoanEventFactory.submittedEvent(this, resolutionType));
+        uncommittedEvents.add(LoanEventFactory.applicationSubmittedLoan(this, resolutionType));
     }
 
     public void resolutionApplicationLoan (Resolution resolution) {
@@ -72,8 +72,8 @@ public class Loan extends AggregateRoot<LoanId> {
 
     private LoanEvent getLoanResolvedEvent() {
         return switch (resolution.decision()) {
-            case LoanStatus.APPROVED -> LoanEventFactory.approvedEvent(this);
-            case LoanStatus.REJECTED -> LoanEventFactory.rejectedEvent(this);
+            case LoanStatus.APPROVED -> LoanEventFactory.applicationApprovedLoan(this);
+            case LoanStatus.REJECTED -> LoanEventFactory.applicationRejectedLoan(this);
             default -> throw new LoanDomainException("Unexcepted Decision, should be checked");
         };
     }
