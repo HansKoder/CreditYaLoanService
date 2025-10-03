@@ -20,6 +20,7 @@ public class RestHelper {
     private final static Logger LOG = LoggerFactory.getLogger(RestHelper.class);
 
     public static Mono<? extends Throwable> handleErrors(ClientResponse response) {
+        LOG.info("[infra.rest-consumer] (handleErrors) payload=[ response:{} ]", response);
         return response.bodyToMono(CustomerErrorResponse.class)
                 .defaultIfEmpty(new CustomerErrorResponse(
                         response.statusCode().value(),

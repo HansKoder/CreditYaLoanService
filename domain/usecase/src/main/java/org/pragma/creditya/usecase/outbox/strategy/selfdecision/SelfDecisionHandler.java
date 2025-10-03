@@ -27,7 +27,7 @@ public class SelfDecisionHandler implements OutboxStrategy {
     private boolean checkIsSelfDecision (LoanApplicationSubmittedEvent submittedEvent) {
         return submittedEvent
                 .getResolutionType()
-                .equals(ResolutionType.MANUAL_DECISION);
+                .equals(ResolutionType.SELF_DECISION);
     }
 
     @Override

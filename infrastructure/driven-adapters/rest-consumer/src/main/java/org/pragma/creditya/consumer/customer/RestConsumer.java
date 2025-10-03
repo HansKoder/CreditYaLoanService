@@ -1,9 +1,11 @@
 package org.pragma.creditya.consumer.customer;
 
 import lombok.RequiredArgsConstructor;
+import org.pragma.creditya.consumer.InfrastructureException;
 import org.pragma.creditya.consumer.cons.RestConstant;
 import org.pragma.creditya.consumer.customer.payload.GetCustomerPayload;
 import org.pragma.creditya.consumer.customer.payload.VerifyCustomerPayload;
+import org.pragma.creditya.consumer.customer.response.VerifyCustomerResponse;
 import org.pragma.creditya.consumer.exception.*;
 import org.pragma.creditya.consumer.customer.response.CustomerResponse;
 import org.slf4j.Logger;
@@ -22,7 +24,12 @@ public class RestConsumer {
 
     private final static Logger log = LoggerFactory.getLogger(RestConsumer.class);
 
-    public Mono<Boolean> verifyOwnership(VerifyCustomerPayload payload) {
+    public Mono<VerifyCustomerResponse> verifyOwnership(VerifyCustomerPayload payload) {
+        log.info("[infra.rest-consumer] (verify-customer) (step-0) payload=[ doc:{} email:{} token:{} ]",
+                payload.document(),
+                payload.token(),
+                payload.token());
+
         return userWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(RestConstant.CUSTOMER_ENDPOINT_VERIFY)
@@ -31,9 +38,11 @@ public class RestConsumer {
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, RestConstant.BEARER + payload.token())
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
-                .toBodilessEntity()
-                .map(response -> response.getStatusCode().is2xxSuccessful());
+                // .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
+                .bodyToMono(VerifyCustomerResponse.class)
+                .doOnSuccess(e -> log.info("[infra.rest-consumer] (verify-customer) (step-1) success, verify: response=[ response:{} ]", e))
+                .doOnError(e -> log.info("[infra.rest-consumer] (verify-customer) (step-1) error, verify: response=[ error:{} ]", e.getMessage()))
+                .onErrorResume(err -> Mono.error(new InfrastructureException(err.getMessage())));
     }
 
     public Mono<CustomerResponse> getCustomer(GetCustomerPayload payload) {
@@ -45,7 +54,7 @@ public class RestConsumer {
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, RestConstant.BEARER + payload.token())
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
+                // .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
                 .bodyToMono(CustomerResponse.class)
                 .doOnSuccess(e -> log.info("[infra.rest-consumer] (getCustomer) (step-1) success, get customer: response=[ customer:{} ]", e))
                 .doOnError(e -> log.info("[infra.rest-consumer] (getCustomer) (step-1) error, get customer: response=[ error:{} ]", e.getMessage()));

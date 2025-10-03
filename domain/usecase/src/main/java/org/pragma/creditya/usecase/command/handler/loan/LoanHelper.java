@@ -8,6 +8,7 @@ import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -49,9 +50,11 @@ public class LoanHelper {
             return Mono.just(loan);
 
         return eventRepository.saveAll(events)
-                .doOnSuccess(v -> events.forEach(eventBus::publish))
-                .doOnSuccess(v -> outboxProcess.execute(loan))
-                .thenReturn(loan);
+                .then(outboxProcess.execute(loan))   // <- Se encadena aquí
+                .thenMany(Flux.fromIterable(events).doOnNext(eventBus::publish))
+                // .doOnSuccess(v -> outboxProcess.execute(loan))
+                // .doOnSuccess(v -> events.forEach(eventBus::publish))
+                .then(Mono.just(loan));
     }
 
     public Mono<Loan> getLoanById (UUID aggregateId) {

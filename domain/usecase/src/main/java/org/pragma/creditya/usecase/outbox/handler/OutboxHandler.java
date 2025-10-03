@@ -21,6 +21,11 @@ public class OutboxHandler implements IOutboxHandler {
     @Override
     public Mono<Void> execute(Loan domain) {
         return Flux.fromIterable(domain.getUncommittedEvents())
+                .log()
+                .map(event -> {
+                    System.out.println("event:: " + event);
+                    return event;
+                })
                 .flatMap(event -> processOutbox(domain, event))
                 .then();
     }

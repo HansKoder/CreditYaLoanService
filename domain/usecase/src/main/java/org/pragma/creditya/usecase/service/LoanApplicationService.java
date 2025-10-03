@@ -36,7 +36,7 @@ public class LoanApplicationService implements ILoanApplicationService {
                             return domain;
                         })
                         .then(Mono.just(domain))
-                );
+                ).flatMap(loanUseCase::persist);
     }
 
     @Override
