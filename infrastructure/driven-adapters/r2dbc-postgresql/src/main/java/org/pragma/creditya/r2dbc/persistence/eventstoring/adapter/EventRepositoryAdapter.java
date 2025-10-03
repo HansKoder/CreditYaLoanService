@@ -6,6 +6,7 @@ import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.helper.EventSerializerHelper;
+import org.pragma.creditya.r2dbc.persistence.eventstoring.mapper.EventSourcingMapper;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.repository.EventReactiveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,8 @@ import java.util.UUID;
 public class EventRepositoryAdapter implements EventStoreRepository {
 
     private final EventReactiveRepository repository;
-    private final EventSerializerHelper eventSerializerHelper;
+    private final EventSourcingMapper mapper;
+    // private final EventSerializerHelper eventSerializerHelper;
 
     private final Logger log = LoggerFactory.getLogger(EventRepositoryAdapter.class);
 
@@ -29,7 +31,8 @@ public class EventRepositoryAdapter implements EventStoreRepository {
     public Flux<LoanEvent> findByAggregateId(UUID aggregateId) {
         log.info("[infra.r2dbc.event] (findByAggregateId) payload=[ aggregateId:{} ]", aggregateId.toString());
         return repository.findByAggregateId(aggregateId)
-                .map(eventSerializerHelper::deserialize);
+                .map(mapper::toEntity);
+                //.map(eventSerializerHelper::deserialize);
     }
 
     @Override
@@ -43,7 +46,8 @@ public class EventRepositoryAdapter implements EventStoreRepository {
 
     private Mono<Void> saveEvent(LoanEvent event) {
         log.info("[infra.r2dbc] (event) save event  payload: {}", event);
-        return Mono.fromCallable(() -> this.mapToPersist(event))
+        // return Mono.fromCallable(() -> this.mapToPersist(event))
+        return Mono.fromCallable(() -> mapper.toData(event))
                 .flatMap(e -> {
                     log.info("[infra.r2dbc] (save) this entity will be persisted {}", e);
                     return repository.save(e);
@@ -52,6 +56,7 @@ public class EventRepositoryAdapter implements EventStoreRepository {
                 .then();
     }
 
+    /**
     private EventEntity mapToPersist (LoanEvent event) {
         log.info("[infra.r2dbc] (mapper) map to persist: {}", event);
         UUID aggregateId = event.getAggregateId() == null ? null : event.getAggregateId();
@@ -67,6 +72,7 @@ public class EventRepositoryAdapter implements EventStoreRepository {
 
         return entity;
     }
+     */
 
 
 }

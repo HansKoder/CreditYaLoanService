@@ -28,25 +28,25 @@ public class EventSerializerHelper {
         }
     }
 
-    public LoanEvent deserialize(EventEntity entity) {
-        log.info("[infra.r2dbc] (object-mapper) deserialize eventType={}, aggregateId={}",
-                entity.getEventType(), entity.getAggregateId());
+    public LoanEventPayload deserialize(EventEntity data) {
+        log.info("[infra.r2dbc.event.sourcing] (deserialize-01) deserialize from jpa to event (entity) payload=[ data:{} ]", data);
 
         try {
-            Class<? extends LoanEvent> clazz = resolveEventClass(entity.getEventType());
-            LoanEvent event = objectMapper.readValue(entity.getPayload().asString(), clazz);
-            log.info("[infra.r2dbc] (object-mapper) deserialized payload: {}", event);
+            Class<? extends LoanEventPayload> clazz = resolveEventClass(data.getEventType());
+            LoanEventPayload event = objectMapper.readValue(data.getPayload().asString(), clazz);
+            log.info("[infra.r2dbc.event.sourcing] (deserialize-02) event deserialized response=[ event:{} ]", event);
             return event;
         } catch (Exception e) {
-            throw new RuntimeException("Error deserializing eventType=" + entity.getEventType(), e);
+            log.info("[infra.r2dbc.event.sourcing] (deserialize-02) unexpected error when is  deserialized, response=[ error:{} ]", e.getMessage());
+            throw new RuntimeException("Error deserializing payload=[ eventType:" + data.getEventType() + ", error:" + e.getMessage() + ", ]", e);
         }
     }
 
-    private Class<? extends LoanEvent> resolveEventClass(String eventType) {
+    public Class<? extends LoanEventPayload> resolveEventClass(String eventType) {
         return switch (eventType) {
-            case "LoanApplicationSubmittedEvent" -> LoanApplicationSubmittedEvent.class;
-            case "LoanResolutionApprovedEvent" -> LoanResolutionApprovedEvent.class;
-            case "LoanResolutionRejectedEvent" -> LoanResolutionRejectedEvent.class;
+            case "ApplicationSubmittedEvent" -> ApplicationSubmittedEvent.class;
+            case "ApplicationApprovedEvent" -> ApplicationApprovedEvent.class;
+            case "ApplicationRejectedEvent" -> ApplicationRejectedEvent.class;
             default -> throw new IllegalArgumentException("Unknown eventType: " + eventType);
         };
     }

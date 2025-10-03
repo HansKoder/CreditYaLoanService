@@ -9,8 +9,9 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Data
-public abstract class LoanEvent implements DomainEvent<Loan> {
+public class LoanEvent implements DomainEvent<Loan> {
     private UUID id;
     private UUID aggregateId;
     private EventType eventType;

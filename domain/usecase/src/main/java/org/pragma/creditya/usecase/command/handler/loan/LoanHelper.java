@@ -50,10 +50,11 @@ public class LoanHelper {
             return Mono.just(loan);
 
         return eventRepository.saveAll(events)
-                .then(outboxProcess.execute(loan))   // <- Se encadena aquí
+                .then(outboxProcess.execute(loan))
                 .thenMany(Flux.fromIterable(events).doOnNext(eventBus::publish))
                 // .doOnSuccess(v -> outboxProcess.execute(loan))
                 // .doOnSuccess(v -> events.forEach(eventBus::publish))
+                .log()
                 .then(Mono.just(loan));
     }
 

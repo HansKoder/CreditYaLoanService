@@ -1,23 +1,21 @@
 package org.pragma.creditya.model.loan.event;
 
-import org.pragma.creditya.model.shared.domain.event.DomainEvent;
-
 public enum EventType {
     LOAN_SUBMITTED(ApplicationSubmittedEvent.class),
-    LOAN_APPROVED(LoanResolutionApprovedEvent.class),
-    LOAN_REJECTED(LoanResolutionRejectedEvent.class);
+    LOAN_APPROVED(ApplicationApprovedEvent.class),
+    LOAN_REJECTED(ApplicationRejectedEvent.class);
 
-    private final Class<? extends DomainEvent<?>> eventClass;
+    private final Class<? extends LoanEventPayload> eventClass;
 
-    EventType(Class<? extends DomainEvent<?>> eventClass) {
+    EventType(Class<? extends LoanEventPayload> eventClass) {
         this.eventClass = eventClass;
     }
 
-    public Class<? extends DomainEvent<?>> getEventClass() {
+    public Class<? extends LoanEventPayload> getEventClass() {
         return eventClass;
     }
 
-    public static EventType fromClass(Class<? extends DomainEvent<?>> clazz) {
+    public static EventType fromClass(Class<? extends LoanEventPayload> clazz) {
         for (EventType type : values()) {
             if (type.eventClass.equals(clazz)) {
                 return type;

@@ -14,11 +14,28 @@ public class LoanEventFactory {
                 .period(domain.getPeriod().calculateTotalMonths())
                 .document(domain.getDocument().getValue())
                 .resolutionType(resolutionType)
+                .monthlyDebt(domain.getMonthlyDebt().amount())
+                .build();
+    }
+
+    private static ApplicationApprovedEvent approvedEventPayload (Loan domain) {
+        return ApplicationApprovedEvent.builder()
+                .approvedBy(domain.getResolution().by())
+                .status(domain.getLoanStatus())
+                .reason(domain.getResolution().reason())
+                .build();
+    }
+
+    private static ApplicationRejectedEvent rejectedEventPayload (Loan domain) {
+        return ApplicationRejectedEvent.builder()
+                .rejectedBy(domain.getResolution().by())
+                .status(domain.getLoanStatus())
+                .reason(domain.getResolution().reason())
                 .build();
     }
 
     public static LoanApplicationSubmittedEvent submittedEvent (Loan domain, ResolutionType resolutionType) {
-        return LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
+        var event = LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_SUBMITTED)
@@ -30,6 +47,10 @@ public class LoanEventFactory {
                 .document(domain.getDocument().getValue())
                 .resolutionType(resolutionType)
                 .build();
+
+        System.out.println("[domain.loan.factory] (submittedEvent) build a new event, response=[ submittedEvent:{"+ event + "} ]");
+
+        return event;
     }
 
     public static LoanResolutionApprovedEvent approvedEvent (Loan domain) {
@@ -37,6 +58,7 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_APPROVED)
+                .payload(approvedEventPayload(domain))
                 .approvedBy(domain.getResolution().by())
                 .status(domain.getLoanStatus())
                 .reason(domain.getResolution().reason())
@@ -48,6 +70,7 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_REJECTED)
+                .payload(rejectedEventPayload(domain))
                 .rejectedBy(domain.getResolution().by())
                 .status(domain.getLoanStatus())
                 .reason(domain.getResolution().reason())

@@ -20,8 +20,8 @@ import java.util.*;
 @Getter
 public class Loan extends AggregateRoot<LoanId> {
 
-    private final Document document;
-    private final LoanTypeId loanTypeId;
+    private Document document;
+    private LoanTypeId loanTypeId;
 
     private Amount amount;
     private Period period;
@@ -127,29 +127,34 @@ public class Loan extends AggregateRoot<LoanId> {
     }
 
     private void apply(LoanEvent event) {
-        switch (event) {
-            case LoanApplicationSubmittedEvent e -> applyLoanApplicationSubmitted(e);
-            case LoanResolutionApprovedEvent e -> applyLoanApproved(e);
-            case LoanResolutionRejectedEvent e -> applyLoanRejected(e);
+        switch (event.getPayload()) {
+            case ApplicationSubmittedEvent e -> applyLoanApplicationSubmitted(event);
+            case ApplicationApprovedEvent e -> applyLoanApproved(e);
+            case ApplicationRejectedEvent e -> applyLoanRejected(e);
             default -> throw new LoanDomainException("Unknown event type: " + event.getClass().getName());
         }
     }
 
-    private void applyLoanApplicationSubmitted(LoanApplicationSubmittedEvent e) {
-        this.setId(new LoanId(e.getAggregateId()));
-        this.loanStatus = e.getStatus();
-        this.amount = new Amount(e.getAmount());
-        this.period = new Period(0, e.getPeriod());
+    private void applyLoanApplicationSubmitted(LoanEvent event) {
+        this.setId(new LoanId(event.getAggregateId()));
 
-        this.monthlyDebt = new Amount(e.getMonthlyDebt());
+        ApplicationSubmittedEvent payload = (ApplicationSubmittedEvent) event.getPayload();
+
+        this.loanStatus = payload.getStatus();
+        this.amount = new Amount(payload.getAmount());
+        this.period = new Period(1, 2); // Pending for be adjusted
+        this.monthlyDebt = new Amount(payload.getMonthlyDebt());
+
+        this.document = new Document(payload.getDocument());
+        this.loanTypeId = new LoanTypeId(payload.getTypeLoan());
     }
 
-    private void applyLoanApproved(LoanResolutionApprovedEvent e) {
+    private void applyLoanApproved(ApplicationApprovedEvent e) {
         this.loanStatus = LoanStatus.APPROVED;
         this.resolution = new Resolution(e.getApprovedBy(), e.getReason(), e.getStatus());
     }
 
-    private void applyLoanRejected(LoanResolutionRejectedEvent e) {
+    private void applyLoanRejected(ApplicationRejectedEvent e) {
         this.loanStatus = LoanStatus.REJECTED;
         this.resolution = new Resolution(e.getRejectedBy(), e.getReason(), e.getStatus());
     }

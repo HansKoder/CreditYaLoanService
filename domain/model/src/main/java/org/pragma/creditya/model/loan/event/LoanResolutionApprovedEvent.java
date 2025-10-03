@@ -21,6 +21,7 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
         super.setEventType(builder.eventType);
         super.setAggregateType(builder.aggregateType);
         super.setId(builder.eventId);
+        super.setPayload(builder.payload);
 
         this.status = builder.status;
         this.reason = builder.reason;
@@ -36,6 +37,8 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
         private String approvedBy;
         private LoanStatus status;
         private String reason;
+
+        private LoanEventPayload payload;
 
         private ApprovedBuilder() {
         }
@@ -78,6 +81,11 @@ public class LoanResolutionApprovedEvent extends LoanEvent{
 
         public ApprovedBuilder reason(String reason) {
             this.reason = reason;
+            return this;
+        }
+
+        public ApprovedBuilder payload(LoanEventPayload value) {
+            this.payload = value;
             return this;
         }
 
