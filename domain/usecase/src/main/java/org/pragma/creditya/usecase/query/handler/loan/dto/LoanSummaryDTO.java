@@ -1,4 +1,4 @@
-package org.pragma.creditya.model.loanread;
+package org.pragma.creditya.usecase.query.handler.loan.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-public class LoanRead {
+public class LoanSummaryDTO {
     private String id;
     private UUID loanId;
     private BigDecimal amount;

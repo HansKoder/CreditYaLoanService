@@ -3,23 +3,17 @@ package org.pragma.creditya.usecase;
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.bus.EventBus;
-import org.pragma.creditya.model.loan.event.*;
-import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
-import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.loanread.LoanRead;
-import org.pragma.creditya.model.loanread.query.LoanQuery;
+import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
+import org.pragma.creditya.usecase.query.handler.loan.GetLoanQuery;
 import org.pragma.creditya.usecase.outbox.handler.IOutboxHandler;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
-import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
+import org.pragma.creditya.usecase.query.handler.loan.ILoanHandler;
 import org.pragma.creditya.usecase.command.handler.loantype.ILoanTypeUseCase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.*;
-import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public class OrchestratorUseCase implements IOrchestratorUseCase{
@@ -27,34 +21,23 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
     private final ILoanTypeUseCase loanTypeUseCase;
     private final ILoanUseCase loanUseCase;
     private final EventStoreRepository eventRepository;
-    private final ILoanReadUseCase loanReadUseCase;
+    private final ILoanHandler loanReadUseCase;
     private final EventBus eventBus;
     private final IOutboxHandler outboxProcess;
 
     @Override
     public Mono<Loan> applicationLoan(CreateApplicationLoanCommand command) {
-        return loanUseCase.checkApplication(command)
-                .flatMap(loanUseCase::verifyOwnershipCustomer)
-                .flatMap(loanTypeUseCase::checkLoanTypeExists)
-                .flatMap(loanUseCase::markAsPending)
-                .flatMap(this::persistAndPublishEvents);
+        return Mono.empty();
     }
 
     @Override
-    public Flux<LoanRead> getLoans(LoanQuery query) {
-        return loanReadUseCase.getLoan(query);
+    public Flux<LoanSummaryDTO> getLoans(GetLoanQuery query) {
+        return Flux.empty();
     }
 
     @Override
     public Mono<Loan> decisionLoan(ResolveApplicationLoanCommand command) {
-        return checkTypeDecision(command)
-                .flatMap(this::fromStringToUUID)
-                .flatMap(this::getLoan)
-                .flatMap(loanUseCase::loadUsername)
-                .flatMap(loan -> checkDecisionLoan(loan, command))
-                .flatMap(this::persistAndPublishEvents)
-                .flatMap(this::outboxProcess)
-                .doOnError(e -> System.out.printf("[domain.use_case] (decision loan) payload[ error:%s ] \n", e.getMessage()));
+        return Mono.empty();
     }
 
     @Override
@@ -64,54 +47,5 @@ public class OrchestratorUseCase implements IOrchestratorUseCase{
                 .then(Mono.just(domain));
     }
 
-    private Map<String, BiFunction<Loan, String, Mono<Loan>>> buildDecisionHandlers() {
-        Map<String, BiFunction<Loan, String, Mono<Loan>>> map = new HashMap<>();
-        map.put(LoanStatus.APPROVED.name(), loanUseCase::approvedLoan);
-        map.put(LoanStatus.REJECTED.name(), loanUseCase::rejectedLoan);
-        return map;
-    }
-
-    private Mono<Loan> checkDecisionLoan (Loan loan, ResolveApplicationLoanCommand command) {
-        BiFunction<Loan, String, Mono<Loan>> handler = buildDecisionHandlers().get(command.decision());
-        if (handler == null)
-            return Mono.error(new LoanDomainException("Unknown decision: " + command.decision()));
-
-        return handler.apply(loan, command.reason()).log();
-    }
-
-    private Mono<ResolveApplicationLoanCommand> checkTypeDecision (ResolveApplicationLoanCommand command) {
-        if (command.decision() == null || command.decision().isBlank())
-            return Mono.error(new LoanDomainException("Decision must be mandatory"));
-
-        Set<String> decisionOptions = new HashSet<>();
-
-        decisionOptions.add(LoanStatus.APPROVED.name());
-        decisionOptions.add(LoanStatus.REJECTED.name());
-
-        if (!decisionOptions.contains(command.decision()))
-            return Mono.error(new LoanDomainException("Unknown decision type"));
-
-        return Mono.just(command);
-    }
-
-
-
-    private Mono<Loan> getLoan (UUID aggregateId) {
-        return eventRepository.findByAggregateId(aggregateId)
-                .collectList()
-                .flatMap(loanUseCase::rehydrate)
-                .log();
-    }
-
-    private Mono<Loan> persistAndPublishEvents (Loan loan) {
-        List<LoanEvent> events = loan.getUncommittedEvents();
-
-        if (events.isEmpty())
-            return Mono.just(loan);
-
-        return eventRepository.saveAll(events)
-                .doOnSuccess(v -> events.forEach(eventBus::publish))
-                .thenReturn(loan);
-    }
 
 }

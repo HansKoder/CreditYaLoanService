@@ -1,10 +1,8 @@
 package org.pragma.creditya.r2dbc.persistence.outbox.mapper;
 
-import io.r2dbc.postgresql.codec.Json;
 import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
-import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

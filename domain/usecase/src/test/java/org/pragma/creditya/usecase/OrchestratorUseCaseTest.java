@@ -18,8 +18,8 @@ import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.ResolveApplicationLoanCommand;
 import org.pragma.creditya.usecase.command.handler.loan.ILoanUseCase;
 import org.pragma.creditya.usecase.command.handler.loan.LoanUseCase;
-import org.pragma.creditya.usecase.query.loan.ILoanReadUseCase;
-import org.pragma.creditya.usecase.query.loan.LoanReadUseCase;
+import org.pragma.creditya.usecase.query.handler.loan.ILoanHandler;
+import org.pragma.creditya.usecase.query.handler.loan.LoanHandler;
 import org.pragma.creditya.usecase.command.handler.loantype.ILoanTypeUseCase;
 import org.pragma.creditya.usecase.command.handler.loantype.LoanTypeUseCase;
 import reactor.core.publisher.Flux;
@@ -45,7 +45,7 @@ public class OrchestratorUseCaseTest {
     private EventStoreRepository eventStoreRepository;
 
     @Mock
-    private ILoanReadUseCase loanReadUseCase;
+    private ILoanHandler loanReadUseCase;
 
     @Mock
     private IOutboxHandler outboxHandler;
@@ -94,7 +94,7 @@ public class OrchestratorUseCaseTest {
         loanUseCase = Mockito.mock(LoanUseCase.class);
         loanTypeUseCase = Mockito.mock(LoanTypeUseCase.class);
         eventStoreRepository = Mockito.mock(EventStoreRepository.class);
-        loanReadUseCase = Mockito.mock(LoanReadUseCase.class);
+        loanReadUseCase = Mockito.mock(LoanHandler.class);
         eventBus = Mockito.mock(EventBus.class);
         outboxHandler = Mockito.mock(IOutboxHandler.class);
 

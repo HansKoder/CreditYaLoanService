@@ -1,6 +1,6 @@
-package org.pragma.creditya.model.loanread.query;
+package org.pragma.creditya.usecase.query;
 
-import org.pragma.creditya.model.loanread.exception.PaginationDomainException;
+import org.pragma.creditya.model.query.exception.PaginationDomainException;
 
 public record Pagination (
         int page,

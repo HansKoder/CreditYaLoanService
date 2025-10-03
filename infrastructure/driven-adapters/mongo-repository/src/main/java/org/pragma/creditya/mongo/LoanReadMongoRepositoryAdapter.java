@@ -1,10 +1,9 @@
 package org.pragma.creditya.mongo;
 
 import org.pragma.creditya.model.customer.valueobject.Document;
-import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loanread.LoanRead;
-import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
-import org.pragma.creditya.model.loanread.query.LoanQuery;
+import org.pragma.creditya.model.query.LoanRead;
+import org.pragma.creditya.model.query.gateways.LoanReadRepository;
+import org.pragma.creditya.model.query.valueobject.LoanQuery;
 import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.pragma.creditya.mongo.helper.AdapterOperations;
 import org.pragma.creditya.mongo.mapper.LoanReadCustomMapper;

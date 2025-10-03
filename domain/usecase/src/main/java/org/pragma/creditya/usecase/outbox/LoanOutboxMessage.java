@@ -1,4 +1,4 @@
-package org.pragma.creditya.model.outbox;
+package org.pragma.creditya.usecase.outbox;
 
 import lombok.*;
 

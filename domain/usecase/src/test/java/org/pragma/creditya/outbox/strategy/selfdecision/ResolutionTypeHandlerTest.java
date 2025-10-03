@@ -13,7 +13,7 @@ import org.pragma.creditya.model.loan.event.EventType;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
+import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.pragma.creditya.usecase.outbox.payload.DecisionLoanOutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.selfdecision.SelfDecisionHandler;
 import reactor.core.publisher.Flux;

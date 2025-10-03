@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.outbox.LoanOutboxMessage;
-import org.pragma.creditya.model.outbox.OutboxStatus;
+import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.OutboxStatus;
 import org.pragma.creditya.usecase.outbox.OutboxHelper;
 
 import java.math.BigDecimal;

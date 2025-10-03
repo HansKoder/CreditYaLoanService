@@ -1,6 +1,6 @@
 package org.pragma.creditya.mongo.mapper;
 
-import org.pragma.creditya.model.loanread.LoanRead;
+import org.pragma.creditya.model.query.LoanRead;
 import org.pragma.creditya.mongo.collection.LoanReadCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

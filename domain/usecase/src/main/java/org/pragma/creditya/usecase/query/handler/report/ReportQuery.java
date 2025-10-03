@@ -1,8 +1,8 @@
-package org.pragma.creditya.usecase.query.report;
+package org.pragma.creditya.usecase.query.handler.report;
 
 import reactor.core.publisher.Mono;
 
-public class ReportUseCase implements IReportUseCase{
+public class ReportQuery implements IReportQuery {
     @Override
     public Mono<Void> updateReport() {
         return null;

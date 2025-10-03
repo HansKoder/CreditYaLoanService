@@ -5,7 +5,7 @@ import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
-import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
+import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.usecase.outbox.payload.OutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.OutboxStrategy;

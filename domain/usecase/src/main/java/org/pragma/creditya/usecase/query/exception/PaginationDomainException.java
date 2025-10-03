@@ -1,4 +1,4 @@
-package org.pragma.creditya.model.loanread.exception;
+package org.pragma.creditya.usecase.query.exception;
 
 import org.pragma.creditya.model.shared.domain.exception.DomainException;
 

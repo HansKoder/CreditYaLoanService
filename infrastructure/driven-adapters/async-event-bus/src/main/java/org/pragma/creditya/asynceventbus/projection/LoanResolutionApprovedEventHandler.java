@@ -3,8 +3,8 @@ package org.pragma.creditya.asynceventbus.projection;
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loanread.LoanRead;
-import org.pragma.creditya.model.loanread.gateways.LoanReadRepository;
+import org.pragma.creditya.model.query.LoanRead;
+import org.pragma.creditya.model.query.gateways.LoanReadRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 

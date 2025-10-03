@@ -1,11 +1,9 @@
-package org.pragma.creditya.model.loan.gateways;
+package org.pragma.creditya.usecase.outbox.gateway;
 
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface OutboxRepository {

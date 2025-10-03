@@ -1,14 +1,13 @@
 package org.pragma.creditya.jobs;
 
-import org.pragma.creditya.model.loan.gateways.OutboxRepository;
+import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
 import org.pragma.creditya.model.loan.gateways.SQSProducer;
-import org.pragma.creditya.model.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class Scheduler {
         Flux.interval(Duration.ofSeconds(TIME_PROCESS_OUTBOX))
                 .flatMap(tick ->
                         outboxRepository.findByPending()
-                                .flatMap(this::processOutbox)
+                                .flatMap(data -> processOutbox(data))
                                 .onErrorContinue((err, obj) -> logger.error("[infra.entrypoint.scheduler] Error processing item {}, err={}", obj, err.getMessage(), err))
                 )
                 .subscribe(

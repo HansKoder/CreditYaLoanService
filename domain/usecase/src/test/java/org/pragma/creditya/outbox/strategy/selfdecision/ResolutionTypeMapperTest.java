@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.model.loanread.LoanRead;
+import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
 import org.pragma.creditya.usecase.outbox.payload.DebtPayload;
 import org.pragma.creditya.usecase.outbox.payload.DecisionLoanOutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.selfdecision.SelfDecisionMapper;
@@ -45,7 +45,7 @@ public class ResolutionTypeMapperTest {
     @DisplayName("Should Be mapped without debts because it does not have previous debts.")
     @Test
     void shouldBeMapped_withPreviousDebts_becauseItHasPreviousDebts () {
-        LoanRead loanRead = LoanRead.builder()
+        LoanSummaryDTO loanSummaryDTO = LoanSummaryDTO.builder()
                 .loanId(UUID.fromString(AGGREGATE_ID))
                 .amount(BigDecimal.valueOf(1200000))
                 .totalMonthlyDebt(BigDecimal.valueOf(100000))
@@ -61,7 +61,7 @@ public class ResolutionTypeMapperTest {
                 .baseSalary(BigDecimal.valueOf(5000000))
                 .build();
 
-        DecisionLoanOutboxPayload payload = SelfDecisionMapper.toPayload(domain, List.of(loanRead), customerRead);
+        DecisionLoanOutboxPayload payload = SelfDecisionMapper.toPayload(domain, List.of(loanSummaryDTO), customerRead);
 
         assertNotNull(payload);
 
