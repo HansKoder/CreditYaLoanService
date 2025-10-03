@@ -6,11 +6,23 @@ import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 
 public class LoanEventFactory {
 
+    private static ApplicationSubmittedEvent submittedEventPayload (Loan domain, ResolutionType resolutionType) {
+        return ApplicationSubmittedEvent.builder()
+                .status(domain.getLoanStatus())
+                .amount(domain.getAmount().amount())
+                .typeLoan(domain.getLoanTypeId().getValue())
+                .period(domain.getPeriod().calculateTotalMonths())
+                .document(domain.getDocument().getValue())
+                .resolutionType(resolutionType)
+                .build();
+    }
+
     public static LoanApplicationSubmittedEvent submittedEvent (Loan domain, ResolutionType resolutionType) {
         return LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_SUBMITTED)
+                .payload(submittedEventPayload(domain, resolutionType)) // Test Submitted using Payload
                 .status(domain.getLoanStatus())
                 .amount(domain.getAmount().amount())
                 .typeLoan(domain.getLoanTypeId().getValue())

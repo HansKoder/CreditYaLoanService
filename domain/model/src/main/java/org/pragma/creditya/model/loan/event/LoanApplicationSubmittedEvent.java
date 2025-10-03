@@ -28,6 +28,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         super.setAggregateId(builder.aggregateId);
         super.setEventType(builder.eventType);
         super.setAggregateType(builder.aggregateType);
+        super.setPayload(builder.payload);
 
         this.document = builder.document;
         this.amount = builder.amount;
@@ -46,6 +47,7 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
         private EventType eventType;
         private AggregateType aggregateType;
         private LoanStatus status;
+        private LoanEventPayload payload;
 
         // Submitted Event
         private String document;
@@ -114,6 +116,12 @@ public class LoanApplicationSubmittedEvent extends LoanEvent{
             this.resolutionType = value;
             return this;
         }
+
+        public SubmittedBuilder payload(ApplicationSubmittedEvent value) {
+            this.payload = value;
+            return this;
+        }
+
 
         public LoanApplicationSubmittedEvent build() {
             return new LoanApplicationSubmittedEvent(this);

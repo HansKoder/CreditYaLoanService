@@ -3,7 +3,7 @@ package org.pragma.creditya.model.loan.event;
 import org.pragma.creditya.model.shared.domain.event.DomainEvent;
 
 public enum EventType {
-    LOAN_SUBMITTED(LoanApplicationSubmittedEvent.class),
+    LOAN_SUBMITTED(ApplicationSubmittedEvent.class),
     LOAN_APPROVED(LoanResolutionApprovedEvent.class),
     LOAN_REJECTED(LoanResolutionRejectedEvent.class);
 

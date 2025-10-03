@@ -2,10 +2,7 @@ package org.pragma.creditya.r2dbc.persistence.eventstoring.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,9 @@ public class EventSerializerHelper {
     public String serialize(LoanEvent event) {
         log.info("[infra.r2dbc] (object-mapper) serialize: {}", event);
         try {
-            String payload = objectMapper.writeValueAsString(event);
+            LoanEventPayload data = event.getPayload();
+            log.info("[infra.r2dbc] (object-mapper) loanEventPayload: {}", data);
+            String payload = objectMapper.writeValueAsString(data);
             log.info("[infra.r2dbc] (object-mapper) serialized this is the payload: {}", payload);
             return payload;
         } catch (Exception e) {
