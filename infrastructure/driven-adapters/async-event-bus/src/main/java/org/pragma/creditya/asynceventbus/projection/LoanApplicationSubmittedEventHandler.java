@@ -3,8 +3,8 @@ package org.pragma.creditya.asynceventbus.projection;
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.query.LoanRead;
-import org.pragma.creditya.model.query.gateways.LoanReadRepository;
+import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
+import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,7 +23,7 @@ public class LoanApplicationSubmittedEventHandler implements EventHandler<LoanAp
     public void onEvent(LoanApplicationSubmittedEvent event) {
         System.out.println("[infra.event.handler] (onEvent) (1) register a new event, payload: " + event);
 
-        LoanRead read = LoanRead.builder()
+        LoanSummaryDTO read = LoanSummaryDTO.builder()
                 .loanId(event.getAggregateId())
                 .amount(event.getAmount())
                 .document(event.getDocument())

@@ -2,8 +2,8 @@ package org.pragma.creditya.outbox.strategy.notification;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
@@ -22,7 +22,7 @@ public class NotificationMapperTest {
     @DisplayName("Should be mapped outbox payload when Loan was approved ")
     @Test
     void shouldBeMappedToPayload_whenIsApproved () {
-        CustomerRead customer = CustomerRead.builder()
+        Customer customer = Customer.CustomerBuilder.aCustomer()
                 .name("Doe")
                 .email("doe@gmail.com")
                 .build();
@@ -54,7 +54,7 @@ public class NotificationMapperTest {
     @DisplayName("Should be mapped outbox payload when Loan was approved ")
     @Test
     void shouldBeMappedToPayload_whenIsRejected () {
-        CustomerRead customer = CustomerRead.builder()
+        Customer customer = Customer.CustomerBuilder.aCustomer()
                 .name("Doe")
                 .email("doe@gmail.com")
                 .build();

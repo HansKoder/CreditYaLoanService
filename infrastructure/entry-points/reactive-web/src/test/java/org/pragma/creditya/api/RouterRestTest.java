@@ -10,8 +10,8 @@ import org.pragma.creditya.model.loan.exception.DocumentNotFoundDomainException;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loantype.exception.LoanTypeNotFoundDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.usecase.IOrchestratorUseCase;
 import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
+import org.pragma.creditya.usecase.service.ILoanApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
@@ -38,7 +38,7 @@ class RouterRestTest {
     private WebTestClient webTestClient;
 
     @MockitoBean
-    IOrchestratorUseCase useCase;
+    ILoanApplicationService command;
 
     private final String URL_POST_APPLICATION_LOAN = "/api/v1/loan";
 
@@ -46,7 +46,7 @@ class RouterRestTest {
 
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .id(LOAN_ID_EXAMPLE)
-            .loanTypeCode(1L)
+            .loanTypeId(1L)
             .loanStatus(LoanStatus.PENDING)
             .document("103")
             .period(1,0)
@@ -63,7 +63,7 @@ class RouterRestTest {
 
     @Test
     void shouldCreateUserWithSuccessful() {
-        when(useCase.applicationLoan(any(CreateApplicationLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.just(LOAN_EXAMPLE));
 
         webTestClient.post()
@@ -81,7 +81,7 @@ class RouterRestTest {
 
     @Test
     void shouldThrowException_whenAmountIsNegative() {
-        when(useCase.applicationLoan(any(CreateApplicationLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.error(new LoanDomainException("Amount must be positive")));
 
         webTestClient.post()
@@ -99,7 +99,7 @@ class RouterRestTest {
 
     @Test
     void shouldThrowException_whenDocumentIsNotFound() {
-        when(useCase.applicationLoan(any(CreateApplicationLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.error(new DocumentNotFoundDomainException("Document not found")));
 
         webTestClient.post()
@@ -117,7 +117,7 @@ class RouterRestTest {
 
     @Test
     void shouldThrowException_whenLoanTypeNotFound() {
-        when(useCase.applicationLoan(any(CreateApplicationLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.error(new LoanTypeNotFoundDomainException("LoanType not found")));
 
         webTestClient.post()
@@ -135,7 +135,7 @@ class RouterRestTest {
 
     @Test
     void shouldThrowException_whenCustomerClientIsDown() {
-        when(useCase.applicationLoan(any(CreateApplicationLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.error(new InfrastructureException("Server is not working")));
 
         webTestClient.post()

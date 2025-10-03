@@ -7,7 +7,7 @@ import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.gateways.UserInfoRepository;
 import org.pragma.creditya.model.loantype.gateways.LoanTypeRepository;
-import org.pragma.creditya.usecase.query.handler.loan.LoanHandler;
+import org.pragma.creditya.usecase.query.handler.loan.LoanQuery;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,8 +61,8 @@ public class UseCasesConfigTest {
         }
 
         @Bean
-        public LoanHandler loanReadUseCase () {
-            return Mockito.mock(LoanHandler.class);
+        public LoanQuery loanReadUseCase () {
+            return Mockito.mock(LoanQuery.class);
         }
 
         @Bean

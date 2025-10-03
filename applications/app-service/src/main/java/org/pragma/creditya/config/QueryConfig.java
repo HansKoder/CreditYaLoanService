@@ -5,10 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 
 @Configuration
-@ComponentScan(basePackages = "org.pragma.creditya.usecase.outbox",
+@ComponentScan(basePackages = "org.pragma.creditya.usecase",
         includeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "^.+Handler$")
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "^.+Query$")
         },
         useDefaultFilters = false)
-public class OutboxHandlerConfig {
+public class QueryConfig {
 }

@@ -6,13 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pragma.creditya.model.customer.entity.Customer;
+import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.AggregateType;
 import org.pragma.creditya.model.loan.event.EventType;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
+import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
+import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;
 import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.pragma.creditya.usecase.outbox.payload.DecisionLoanOutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.selfdecision.SelfDecisionHandler;
@@ -24,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +55,7 @@ public class ResolutionTypeHandlerTest {
         LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
                 .aSubmittedEvent()
                 .aggregateId(UUID.fromString(AGGREGATE_ID))
-                .typeSubmitted(ApplicationSubmittedType.SELF_DECISION)
+                .resolutionType(ResolutionType.SELF_DECISION)
                 .build();
 
         assertTrue(handler.apply(submittedEvent));
@@ -61,7 +65,7 @@ public class ResolutionTypeHandlerTest {
         LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
                 .aSubmittedEvent()
                 .aggregateId(UUID.fromString(AGGREGATE_ID))
-                .typeSubmitted(ApplicationSubmittedType.MANUAL_DECISION)
+                .resolutionType(ResolutionType.MANUAL_DECISION)
                 .build();
 
         assertFalse(handler.apply(submittedEvent));
@@ -69,17 +73,17 @@ public class ResolutionTypeHandlerTest {
 
     @Test
     void should () {
-        CustomerRead customer = CustomerRead.builder()
+        Customer customer = Customer.CustomerBuilder.aCustomer()
                 .email("doe@gmail.com")
                 .name("Doe")
-                .document("123")
-                .baseSalary(BigDecimal.valueOf(2500))
+                .id(new Document("123"))
+                .baseSalary(new Amount(BigDecimal.valueOf(2500)))
                 .build();
 
-        when(customerClient.getCustomerByDocument(anyString()))
+        when(customerClient.getCustomerByDocument(any()))
                 .thenReturn(Mono.just(customer));
 
-        when(loanReadRepository.getActiveDebts("123"))
+        when(loanReadRepository.getActiveDebts(new Document("123")))
                 .thenReturn(Flux.empty());
 
         LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
@@ -88,7 +92,7 @@ public class ResolutionTypeHandlerTest {
                 .typeLoan(1L)
                 .eventType(EventType.LOAN_SUBMITTED)
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
-                .typeSubmitted(ApplicationSubmittedType.SELF_DECISION)
+                .resolutionType(ResolutionType.SELF_DECISION)
                 .status(LoanStatus.PENDING)
                 .document("123")
                 .amount(BigDecimal.valueOf(1500))

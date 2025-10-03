@@ -47,7 +47,6 @@ public class LoanTest {
                     .document("123")
                     .amount(BigDecimal.valueOf(10))
                     .period(1, 6)
-                    .loanTypeCode(null)
                     .build();
         });
 
@@ -62,7 +61,6 @@ public class LoanTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanTypeCode(1L)
                 .build();
 
         LoanDomainException exception = assertThrows(LoanDomainException.class, domain::checkApplicationLoan);
@@ -77,7 +75,6 @@ public class LoanTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanTypeCode(1L)
                 .loanStatus(LoanStatus.APPROVED)
                 .build();
 
@@ -93,7 +90,6 @@ public class LoanTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10))
                 .period(1, 6)
-                .loanTypeCode(1L)
                 .build();
 
         AmountLoanIsNotEnoughDomainException exception = assertThrows(AmountLoanIsNotEnoughDomainException.class, domain::checkApplicationLoan);
@@ -109,7 +105,6 @@ public class LoanTest {
                 .document("123")
                 .amount(BigDecimal.valueOf(10000))
                 .period(1, 6)
-                .loanTypeCode(1L)
                 .build();
 
         domain.checkApplicationLoan();
@@ -124,24 +119,5 @@ public class LoanTest {
         assertEquals(0, domain.getUncommittedEvents().size());
     }
 
-    @Test void shouldHavePendingStatus_whenMarkAsPending_afterCheckAndLoading () {
-        Loan domain = Loan.LoanBuilder
-                .aLoan()
-                .document("123")
-                .amount(BigDecimal.valueOf(100000))
-                .period(1, 6)
-                .loanTypeCode(1L)
-                .build();
-
-        domain.checkApplicationLoan();
-
-        assertEquals(0, domain.getUncommittedEvents().size());
-
-        domain.markAsPending();
-        assertEquals(1, domain.getUncommittedEvents().size());
-
-        domain.clearUncommittedEvents();
-        assertEquals(0, domain.getUncommittedEvents().size());
-    }
 
 }

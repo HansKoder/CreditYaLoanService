@@ -23,9 +23,9 @@ public class LoanRestMapper {
         String loanId = entity.getId().getValue() != null ? entity.getId().getValue().toString() : "";
         return new LoanApplicationResponse(
                 loanId,
-                entity.getDocument().value(),
+                entity.getDocument().getValue(),
                 entity.getAmount().amount(),
-                entity.getLoanTypeCode().code(),
+                entity.getLoanTypeId().getValue(),
                 entity.getPeriod().year(),
                 entity.getPeriod().month(),
                 entity.getLoanStatus().name()
@@ -33,6 +33,11 @@ public class LoanRestMapper {
     }
 
     public static ResolveApplicationLoanCommand toCommand (ResolutionApplicationLoanRequest request) {
-        return new ResolveApplicationLoanCommand(request.loanId(), request.decision(), request.reason());
+        return new ResolveApplicationLoanCommand(
+                request.loanId(),
+                request.decision(),
+                request.reason(),
+                request.resolutionType()
+        );
     }
 }

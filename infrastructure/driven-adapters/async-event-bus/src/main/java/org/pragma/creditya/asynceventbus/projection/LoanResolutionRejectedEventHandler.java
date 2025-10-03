@@ -3,8 +3,8 @@ package org.pragma.creditya.asynceventbus.projection;
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
-import org.pragma.creditya.model.query.LoanRead;
-import org.pragma.creditya.model.query.gateways.LoanReadRepository;
+import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
+import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +31,7 @@ public class LoanResolutionRejectedEventHandler implements EventHandler<LoanReso
                 .subscribe();
     }
 
-    private LoanRead mapToUpdateRead (LoanRead loanRead, LoanResolutionRejectedEvent event) {
+    private LoanSummaryDTO mapToUpdateRead (LoanSummaryDTO loanRead, LoanResolutionRejectedEvent event) {
         loanRead.setStatus(event.getStatus().name());
         return loanRead;
     }

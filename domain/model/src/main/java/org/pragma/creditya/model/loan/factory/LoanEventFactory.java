@@ -25,7 +25,7 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_APPROVED)
-                .approvedBy(domain.getResolution().decideBy())
+                .approvedBy(domain.getResolution().by())
                 .status(domain.getLoanStatus())
                 .reason(domain.getResolution().reason())
                 .build();
@@ -36,7 +36,7 @@ public class LoanEventFactory {
                 .aggregateId(domain.getId().getValue())
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .eventType(EventType.LOAN_REJECTED)
-                .rejectedBy(domain.getResolution().decideBy())
+                .rejectedBy(domain.getResolution().by())
                 .status(domain.getLoanStatus())
                 .reason(domain.getResolution().reason())
                 .build();

@@ -58,16 +58,16 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("5000"))
                         .typeLoan(1L)
                         .period(12)
-                        .totalMonthlyDebt(new BigDecimal("416.67"))
+                        .monthlyDebt(new BigDecimal("416.67"))
                         .build();
 
         Loan loan = Loan.rehydrate(List.of(submittedEvent));
 
         assertEquals(aggregateId, loan.getId().getValue());
         assertEquals(LoanStatus.PENDING, loan.getLoanStatus());
-        assertEquals("123456789", loan.getDocument().value());
+        assertEquals("123456789", loan.getDocument().getValue());
         assertEquals(new BigDecimal("5000"), loan.getAmount().amount());
-        assertEquals(new BigDecimal("416.67"), loan.getTotalMonthlyDebt().amount());
+        assertEquals(new BigDecimal("416.67"), loan.getMonthlyDebt().amount());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
-                        .totalMonthlyDebt(new BigDecimal("416.67"))
+                        .monthlyDebt(new BigDecimal("416.67"))
                         .build();
 
         var approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder.anApprovedEvent()
@@ -97,7 +97,7 @@ public class LoanEventStoringTest {
 
         assertEquals(aggregateId, loan.getId().getValue());
         assertEquals(LoanStatus.APPROVED, loan.getLoanStatus());
-        assertEquals("manager-user", loan.getResponsible());
+        assertEquals("manager-user", loan.getResolution().by());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class LoanEventStoringTest {
                         .amount(new BigDecimal("10000"))
                         .typeLoan(2L)
                         .period(24)
-                        .totalMonthlyDebt(new BigDecimal("416.67"))
+                        .monthlyDebt(new BigDecimal("416.67"))
                         .build();
 
         var rejectedEvent = LoanResolutionRejectedEvent.RejectedBuilder.aRejectedEvent()
@@ -127,7 +127,7 @@ public class LoanEventStoringTest {
 
         assertEquals(aggregateId, loan.getId().getValue());
         assertEquals(LoanStatus.REJECTED, loan.getLoanStatus());
-        assertEquals("manager-user", loan.getResponsible());
+        assertEquals("manager-user", loan.getResolution().by());
     }
 
 }

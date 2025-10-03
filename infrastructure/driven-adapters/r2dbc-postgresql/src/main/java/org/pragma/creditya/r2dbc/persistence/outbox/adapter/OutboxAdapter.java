@@ -2,13 +2,13 @@ package org.pragma.creditya.r2dbc.persistence.outbox.adapter;
 
 import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.model.loan.gateways.OutboxRepository;
-import org.pragma.creditya.model.outbox.LoanOutboxMessage;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
 import org.pragma.creditya.r2dbc.persistence.outbox.helper.OutboxSerializerHelper;
 import org.pragma.creditya.r2dbc.persistence.outbox.mapper.OutboxMapper;
 import org.pragma.creditya.r2dbc.persistence.outbox.repository.OutboxReactiveRepository;
+import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;

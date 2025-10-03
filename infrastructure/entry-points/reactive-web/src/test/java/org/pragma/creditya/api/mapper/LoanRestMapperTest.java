@@ -18,7 +18,7 @@ public class LoanRestMapperTest {
 
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .id(LOAN_ID_EXAMPLE)
-            .loanTypeCode(1L)
+            .loanTypeId(1L)
             .loanStatus(LoanStatus.PENDING)
             .document("103")
             .period(1,0)

@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.entity.CustomerRead;
 import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
@@ -19,8 +19,7 @@ import org.pragma.creditya.usecase.outbox.strategy.notification.NotificationHand
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
@@ -75,13 +74,12 @@ public class NotificationHandlerTest {
 
     @Test
     void shouldBeMappedToOutboxMessage_whenIsApproved () {
-        CustomerRead customer = CustomerRead.builder()
+        Customer customer = Customer.CustomerBuilder.aCustomer()
                 .email("doe@gmail.com")
                 .name("Doe")
-                .document("123")
                 .build();
 
-        when(customerClient.getCustomerByDocument(anyString()))
+        when(customerClient.getCustomerByDocument(any()))
                 .thenReturn(Mono.just(customer));
 
         LoanResolutionApprovedEvent approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder

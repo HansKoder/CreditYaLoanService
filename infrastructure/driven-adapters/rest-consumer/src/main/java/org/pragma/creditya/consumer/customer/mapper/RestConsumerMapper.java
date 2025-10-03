@@ -11,9 +11,8 @@ import java.util.UUID;
 public class RestConsumerMapper {
     public static Customer toEntity (CustomerResponse requestResponse) {
         return Customer.CustomerBuilder.aCustomer()
-                .id(new CustomerId(UUID.fromString(requestResponse.customerId())))
                 .name(requestResponse.name())
-                .document(new Document(requestResponse.document()))
+                .id(new Document(requestResponse.document()))
                 .email(requestResponse.email())
                 .baseSalary(new Amount(requestResponse.baseSalary()))
                 .build();

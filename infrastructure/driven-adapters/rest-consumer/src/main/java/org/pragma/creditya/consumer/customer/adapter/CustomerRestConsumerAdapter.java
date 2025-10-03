@@ -26,7 +26,7 @@ public class CustomerRestConsumerAdapter implements CustomerRepository {
     @Override
     public Mono<Customer> getCustomerByDocument(Document document) {
         return RestHelper.extractToken()
-                .map(token -> new GetCustomerPayload(document.value(), token))
+                .map(token -> new GetCustomerPayload(document.getValue(), token))
                 .flatMap(restConsumer::getCustomer)
                 .map(RestConsumerMapper::toEntity);
     }
@@ -34,7 +34,7 @@ public class CustomerRestConsumerAdapter implements CustomerRepository {
     @Override
     public Mono<Boolean> verifyCustomerByDocumentAndEmail(Document document, String email) {
         return RestHelper.extractToken()
-                .map(token -> new VerifyCustomerPayload(document.value(), email, token))
+                .map(token -> new VerifyCustomerPayload(document.getValue(), email, token))
                 .flatMap(restConsumer::verifyOwnership);
     }
 }

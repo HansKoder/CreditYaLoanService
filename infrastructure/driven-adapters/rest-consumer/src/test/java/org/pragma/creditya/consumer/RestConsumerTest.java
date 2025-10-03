@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.consumer.customer.RestConsumer;
+import org.pragma.creditya.consumer.customer.payload.VerifyCustomerPayload;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,10 +53,10 @@ class RestConsumerTest {
 
         Context context = Context.of("token", TOKEN_EXAMPLE);
 
-        var response = restConsumer.verifyOwnershipCustomer("123", "example@gmail.com");
+        var response = restConsumer.verifyOwnership(new VerifyCustomerPayload("123", "example@gmail.com", TOKEN_EXAMPLE));
 
         StepVerifier.create(response.contextWrite(context))
-                .expectNextMatches(objectResponse -> objectResponse.getDocument().equals("123"))
+                .expectNextMatches(objectResponse -> objectResponse == Boolean.TRUE)
                 .verifyComplete();
     }
 
@@ -70,7 +71,7 @@ class RestConsumerTest {
 
         Context context = Context.of("token", TOKEN_EXAMPLE);
 
-        var response = restConsumer.verifyOwnershipCustomer("123", "example@gmail.com");
+        var response = restConsumer.verifyOwnership(new VerifyCustomerPayload("123", "example@gmail.com", TOKEN_EXAMPLE));
 
         StepVerifier.create(response.contextWrite(context))
                 .expectErrorSatisfies(err ->

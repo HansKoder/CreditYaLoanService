@@ -146,12 +146,12 @@ public class Loan extends AggregateRoot<LoanId> {
 
     private void applyLoanApproved(LoanResolutionApprovedEvent e) {
         this.loanStatus = LoanStatus.APPROVED;
-        // this.responsible = e.getApprovedBy();
+        this.resolution = new Resolution(e.getApprovedBy(), e.getReason(), e.getStatus());
     }
 
     private void applyLoanRejected(LoanResolutionRejectedEvent e) {
         this.loanStatus = LoanStatus.REJECTED;
-        // this.responsible = e.getRejectedBy();
+        this.resolution = new Resolution(e.getRejectedBy(), e.getReason(), e.getStatus());
     }
 
     public List<LoanEvent> getUncommittedEvents() {

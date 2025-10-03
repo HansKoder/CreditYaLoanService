@@ -24,7 +24,7 @@ public class CustomerUseCase implements ICustomerUseCase{
                         return Mono.empty();
 
                     return Mono.error(
-                            new CustomerIsNotIdentifiedDomainException("Customer with the document " + document.value() + " is not identified"));
+                            new CustomerIsNotIdentifiedDomainException("Customer with the document " + document.getValue() + " is not identified"));
                 });
     }
 

@@ -6,12 +6,12 @@ import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import reactor.core.publisher.Flux;
 
 @RequiredArgsConstructor
-public class LoanHandler implements ILoanHandler {
+public class LoanQuery implements ILoanQuery {
 
     private final LoanReadRepository loanReadRepository;
 
     @Override
-    public Flux<LoanSummaryDTO> getLoan (GetLoanQuery query) {
+    public Flux<LoanSummaryDTO> getLoans (GetLoanFilter query) {
         return loanReadRepository.getLoan(query);
     }
 

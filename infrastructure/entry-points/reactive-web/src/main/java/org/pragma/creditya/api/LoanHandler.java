@@ -6,8 +6,8 @@ import org.pragma.creditya.api.dto.request.GetLoanRequest;
 import org.pragma.creditya.api.dto.request.ResolutionApplicationLoanRequest;
 import org.pragma.creditya.api.mapper.GetLoanMapper;
 import org.pragma.creditya.api.mapper.LoanRestMapper;
+import org.pragma.creditya.usecase.query.IQuery;
 import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
-import org.pragma.creditya.usecase.IOrchestratorUseCase;
 import org.pragma.creditya.usecase.service.ILoanApplicationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +21,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class LoanHandler {
 
-    private final IOrchestratorUseCase useCase;
-    private final ILoanApplicationService service;
+    private final ILoanApplicationService command;
+    private final IQuery query;
 
     private final static Logger log = LoggerFactory.getLogger(LoanHandler.class);
 
@@ -30,7 +30,7 @@ public class LoanHandler {
             return serverRequest.bodyToMono(CreateApplicationLoanRequest.class)
                     .map(LoanRestMapper::toCommand)
                     .doOnSuccess(response -> log.info("[infra.reactive-web] (applicationLoan) 1.2 - map to command, payload= command:{}", response))
-                    .flatMap(service::createApplicationSubmitLoan)
+                    .flatMap(command::createApplicationSubmitLoan)
                     .map(LoanRestMapper::toResponse)
                     .doOnSuccess(response -> log.info("[infra.reactive-web] (applicationLoan) 1.3 - application was persisted with successful, payload=response:{}", response))
                     .flatMap(data -> ServerResponse.status(HttpStatus.CREATED).bodyValue(data));
@@ -46,7 +46,7 @@ public class LoanHandler {
 
         log.info("[infra.reactive-web] (getLoansQuery) filters: {}", request);
 
-        return useCase.getLoans(GetLoanMapper.toQuery(request))
+        return query.getLoans(GetLoanMapper.toQuery(request))
                 .doOnNext(response -> log.info("[infra.reactive-web] (getLoansQuery) result: {}", response))
                 .as(data -> ServerResponse.ok().body(data, LoanSummaryDTO.class));
     }
@@ -55,7 +55,7 @@ public class LoanHandler {
         return serverRequest.bodyToMono(ResolutionApplicationLoanRequest.class)
                 .map(LoanRestMapper::toCommand)
                 .doOnSuccess(response -> log.info("[infra.reactive-web] (decisionLoan) 1.2 - map to command, payload= command:{}", response))
-                .flatMap(service::resolutionApplicationLoan)
+                .flatMap(command::resolutionApplicationLoan)
                 .map(LoanRestMapper::toResponse)
                 .doOnSuccess(response -> log.info("[infra.reactive-web] (decisionLoan) 1.3 - loan was resolved with successful, payload=response:{}", response))
                 .flatMap(data -> ServerResponse.status(HttpStatus.CREATED).bodyValue(data));

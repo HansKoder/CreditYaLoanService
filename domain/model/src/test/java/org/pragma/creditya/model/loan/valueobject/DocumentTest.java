@@ -31,7 +31,7 @@ public class DocumentTest {
     void shouldCreateDocumentWithSuccessful () {
         Document document = new Document("123");
 
-        assertEquals("123", document.value());
+        assertEquals("123", document.getValue());
     }
 
 }

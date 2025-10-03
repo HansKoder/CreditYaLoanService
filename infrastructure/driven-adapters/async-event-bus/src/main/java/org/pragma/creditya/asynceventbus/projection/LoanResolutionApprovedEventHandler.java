@@ -3,8 +3,8 @@ package org.pragma.creditya.asynceventbus.projection;
 import org.pragma.creditya.model.loan.bus.EventBus;
 import org.pragma.creditya.model.loan.bus.EventHandler;
 import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.query.LoanRead;
-import org.pragma.creditya.model.query.gateways.LoanReadRepository;
+import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
+import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class LoanResolutionApprovedEventHandler implements EventHandler<LoanReso
                 .subscribe();
     }
 
-    private Mono<LoanRead> mapToUpdateRead (LoanRead loanRead, LoanResolutionApprovedEvent event) {
+    private Mono<LoanSummaryDTO> mapToUpdateRead (LoanSummaryDTO loanRead, LoanResolutionApprovedEvent event) {
         System.out.println("[infra.event.mapping] map to update status ");
         loanRead.setStatus(event.getStatus().name());
         System.out.println("[infra.event.mapping] event was updated payload=" + event);
