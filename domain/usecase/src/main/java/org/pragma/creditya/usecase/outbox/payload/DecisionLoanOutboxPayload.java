@@ -4,16 +4,6 @@ package org.pragma.creditya.usecase.outbox.payload;
 import java.math.BigDecimal;
 import java.util.List;
 
-/***
- export interface DecisionLoanCommand {
- customerSalary: number,
- currentLoanId: string,
- currentLoanAmount: number,
- debts: DebtCommand[]
- }
-
- */
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
