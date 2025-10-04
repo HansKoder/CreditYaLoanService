@@ -1,7 +1,6 @@
 package org.pragma.creditya.model.loan.gateways;
 
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

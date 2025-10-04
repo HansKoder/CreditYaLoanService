@@ -9,9 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.AggregateType;
-import org.pragma.creditya.model.loan.event.EventType;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
@@ -28,7 +26,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,23 +49,19 @@ public class ResolutionTypeHandlerTest {
 
     @Test
     void shouldBeTrue_whenSubmittedTypeIsSelf () {
-        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var payload = ApplicationSubmittedEvent.builder()
                 .resolutionType(ResolutionType.SELF_DECISION)
                 .build();
 
-        assertTrue(handler.apply(submittedEvent));
+        assertTrue(handler.apply(payload));
     }
     @Test
     void shouldBeFalse_whenSubmittedTypeIsManual () {
-        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var payload = ApplicationSubmittedEvent.builder()
                 .resolutionType(ResolutionType.MANUAL_DECISION)
                 .build();
 
-        assertFalse(handler.apply(submittedEvent));
+        assertFalse(handler.apply(payload));
     }
 
     @Test
@@ -86,17 +79,20 @@ public class ResolutionTypeHandlerTest {
         when(loanReadRepository.getActiveDebts(new Document("123")))
                 .thenReturn(Flux.empty());
 
-        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var submittedPayload = ApplicationSubmittedEvent.builder()
                 .typeLoan(1L)
-                .eventType(EventType.LOAN_SUBMITTED)
-                .aggregateType(AggregateType.AGGREGATE_LOAN)
                 .resolutionType(ResolutionType.SELF_DECISION)
                 .status(LoanStatus.PENDING)
                 .document("123")
                 .amount(BigDecimal.valueOf(1500))
                 .period(10)
+                .build();
+
+        var submittedEvent = LoanEvent.builder()
+                .aggregateId(UUID.fromString(AGGREGATE_ID))
+                .eventType(EventType.LOAN_SUBMITTED)
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .payload(submittedPayload)
                 .build();
 
         Loan domain = Loan.LoanBuilder

@@ -2,9 +2,10 @@ package org.pragma.creditya.usecase.outbox.strategy.selfdecision;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
+import org.pragma.creditya.model.loan.event.LoanEventPayload;
 import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.usecase.outbox.payload.OutboxPayload;
@@ -18,13 +19,13 @@ public class SelfDecisionHandler implements OutboxStrategy {
     private final LoanReadRepository loanReadRepository;
 
     @Override
-    public boolean apply(LoanEvent event) {
+    public boolean apply(LoanEventPayload event) {
         System.out.println("[use_case.outbox.strategy] (apply) payload=[ event:{" + event + "}]");
-        return event instanceof LoanApplicationSubmittedEvent
-                && checkIsSelfDecision ((LoanApplicationSubmittedEvent) event);
+        return event instanceof ApplicationSubmittedEvent
+                && checkIsSelfDecision ((ApplicationSubmittedEvent) event);
     }
 
-    private boolean checkIsSelfDecision (LoanApplicationSubmittedEvent submittedEvent) {
+    private boolean checkIsSelfDecision (ApplicationSubmittedEvent submittedEvent) {
         return submittedEvent
                 .getResolutionType()
                 .equals(ResolutionType.SELF_DECISION);

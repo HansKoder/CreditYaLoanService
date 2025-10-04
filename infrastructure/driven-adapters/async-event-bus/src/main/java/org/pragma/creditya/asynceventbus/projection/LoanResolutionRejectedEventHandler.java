@@ -8,18 +8,16 @@ import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoanResolutionRejectedEventHandler implements EventHandler<LoanResolutionRejectedEvent> {
+public class LoanResolutionRejectedEventHandler {
 
     private final LoanReadRepository loanReadRepository;
 
     public LoanResolutionRejectedEventHandler(LoanReadRepository loanReadRepository, EventBus eventBus) {
         this.loanReadRepository = loanReadRepository;
 
-        eventBus.subscribe(LoanResolutionRejectedEvent.class)
-                .subscribe(this::onEvent);
+        // eventBus.subscribe(LoanResolutionRejectedEvent.class).subscribe(this::onEvent);
     }
 
-    @Override
     public void onEvent(LoanResolutionRejectedEvent event) {
         System.out.println("[infra.event.handler] (onEvent) (1) register a new event, payload: " + event);
 

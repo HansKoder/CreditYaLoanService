@@ -9,9 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
-import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
@@ -39,14 +37,12 @@ public class NotificationHandlerTest {
     void setup () {
         notificationHandler = new NotificationHandler(customerClient);
     }
-
     private final String AGGREGATE_ID = "c4fc5172-1cd3-4dfa-aa71-456b50bc9089";
 
     @Test
     void shouldBeFalse_becauseEventIsSubmitted () {
-        LoanApplicationSubmittedEvent submittedEvent = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var submittedEvent = ApplicationSubmittedEvent
+                .builder()
                 .build();
 
         assertFalse(notificationHandler.apply(submittedEvent));
@@ -54,9 +50,7 @@ public class NotificationHandlerTest {
 
     @Test
     void shouldBeTrue_becauseEventIsApprovedLoan () {
-        LoanResolutionApprovedEvent approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder
-                .anApprovedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var approvedEvent = ApplicationApprovedEvent.builder()
                 .build();
 
         assertTrue(notificationHandler.apply(approvedEvent));
@@ -64,9 +58,7 @@ public class NotificationHandlerTest {
 
     @Test
     void shouldBeTrue_becauseEventIsRejectedLoan () {
-        LoanResolutionRejectedEvent rejectedEvent = LoanResolutionRejectedEvent.RejectedBuilder
-                .aRejectedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var rejectedEvent = ApplicationRejectedEvent.builder()
                 .build();
 
         assertTrue(notificationHandler.apply(rejectedEvent));
@@ -82,10 +74,17 @@ public class NotificationHandlerTest {
         when(customerClient.getCustomerByDocument(any()))
                 .thenReturn(Mono.just(customer));
 
+        var approvedPayload = ApplicationApprovedEvent.builder()
+                .approvedBy("doe")
+                .reason("OK")
+                .status(LoanStatus.APPROVED)
+                .build();
+
         LoanResolutionApprovedEvent approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder
                 .anApprovedEvent()
                 .aggregateId(UUID.fromString(AGGREGATE_ID))
                 .status(LoanStatus.APPROVED)
+                .payload(approvedPayload)
                 .build();
 
         Loan domain = Loan.LoanBuilder.aLoan()

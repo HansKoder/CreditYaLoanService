@@ -9,7 +9,7 @@ public class OutboxHelper {
         return LoanOutboxMessage.builder()
                 .aggregateId(event.getAggregateId())
                 .aggregateName(event.getAggregateType().name())
-                .type(event.getClass().getSimpleName())
+                .type(event.getEventType().getEventClass().getSimpleName())
                 .status(OutboxStatus.STARTED)
                 .build();
     }

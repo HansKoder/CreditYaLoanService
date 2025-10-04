@@ -8,7 +8,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.AggregateType;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
@@ -39,11 +40,14 @@ public class OutboxHandlerTest {
     @Test
     void shouldBeExecutedWithSuccess_outboxProcess () {
 
-        var submittedEventMock = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateId(UUID.fromString(AGGREGATE_ID))
+        var eventPayload = ApplicationSubmittedEvent.builder()
                 .status(LoanStatus.APPROVED)
+                .build();
+
+        var submittedEventMock = LoanEvent.builder()
+                .aggregateId(UUID.fromString(AGGREGATE_ID))
                 .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .payload(eventPayload)
                 .build();
 
         var domainMock = Mockito.mock(Loan.class);
@@ -78,10 +82,10 @@ public class OutboxHandlerTest {
         StepVerifier.create(outboxHandler.execute(domainMock))
                 .verifyComplete();
 
-        verify(matchingStrategy).apply(submittedEventMock);
+        verify(matchingStrategy).apply(eventPayload);
         verify(matchingStrategy).handler(domainMock, submittedEventMock);
 
-        verify(noMatchingStrategy).apply(submittedEventMock);
+        verify(noMatchingStrategy).apply(eventPayload);
         verify(noMatchingStrategy, never()).handler(domainMock, submittedEventMock);
 
         verify(outboxRepository).saveOutboxMessage(any(LoanOutboxMessage.class), eq(payload));

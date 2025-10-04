@@ -33,7 +33,7 @@ public class OutboxHandler implements IOutboxHandler {
     private Flux<LoanOutboxMessage> processOutbox(Loan domain, LoanEvent event) {
         System.out.println("[domain.outbox] (processOutbox) payload=[ domain:{" + domain + "}, event:{" + event+ "} ]");
 
-        return Flux.fromStream(strategies.stream().filter(strategy -> strategy.apply(event)))
+        return Flux.fromStream(strategies.stream().filter(strategy -> strategy.apply(event.getPayload())))
                 .flatMap(strategy -> strategy.handler(domain, event))
                 .flatMap(payload -> processPayload(event, payload));
     }

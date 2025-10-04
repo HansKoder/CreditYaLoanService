@@ -4,9 +4,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.pragma.creditya.model.loan.event.AggregateType;
-import org.pragma.creditya.model.loan.event.EventType;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +53,17 @@ public class EventStoringRepositoryIntegrationTest {
     @Test
     void shouldBePersistedWithSuccessful_eventApplicationLoan() {
 
-        LoanApplicationSubmittedEvent event = LoanApplicationSubmittedEvent.SubmittedBuilder
-                .aSubmittedEvent()
-                .aggregateType(AggregateType.AGGREGATE_LOAN)
-                .eventType(EventType.LOAN_SUBMITTED)
+        var payload = ApplicationSubmittedEvent.builder()
                 .document("123")
                 .typeLoan(1L)
                 .amount(BigDecimal.valueOf(1))
                 .status(LoanStatus.PENDING)
+                .build();
+
+        var event = LoanEvent.builder()
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_SUBMITTED)
+                .payload(payload)
                 .build();
 
         StepVerifier.create(eventStoreRepository.saveAll(List.of(event)))

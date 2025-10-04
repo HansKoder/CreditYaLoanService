@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Setter

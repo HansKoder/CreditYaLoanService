@@ -14,14 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoanEventStoringTest {
 
     // Dummy event mock unknowing event
-    static class UnknownLoanEvent extends LoanEvent {
+    static class UnknownLoanEvent implements LoanEventPayload {
         public UnknownLoanEvent() {
         }
     }
 
     @Test
     void shouldThrowException_WhenEventTypeIsUnknown() {
-        LoanEvent unknownEvent = new UnknownLoanEvent();
+        LoanEvent unknownEvent = LoanEvent.builder()
+                .payload(new UnknownLoanEvent())
+                .build();
+
         List<LoanEvent> events = List.of(unknownEvent);
 
         LoanDomainException exception = assertThrows(
@@ -48,17 +51,22 @@ public class LoanEventStoringTest {
     void shouldRehydrateLoan_FromApplicationSubmittedEvent() {
         UUID aggregateId = UUID.randomUUID();
 
-        LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
+        var payload = ApplicationSubmittedEvent
+                .builder()
+                .document("123456789")
+                .status(LoanStatus.PENDING)
+                .amount(new BigDecimal("5000"))
+                .typeLoan(1L)
+                .period(12)
+                .monthlyDebt(new BigDecimal("416.67"))
+                .build();
+
+        var submittedEvent =
+                LoanEvent.builder()
                         .aggregateId(aggregateId)
                         .aggregateType(AggregateType.AGGREGATE_LOAN)
                         .eventType(EventType.LOAN_SUBMITTED)
-                        .document("123456789")
-                        .status(LoanStatus.PENDING)
-                        .amount(new BigDecimal("5000"))
-                        .typeLoan(1L)
-                        .period(12)
-                        .monthlyDebt(new BigDecimal("416.67"))
+                        .payload(payload)
                         .build();
 
         Loan loan = Loan.rehydrate(List.of(submittedEvent));
@@ -74,24 +82,36 @@ public class LoanEventStoringTest {
     void shouldRehydrateLoan_FromApplicationAndApprovedEvent() {
         UUID aggregateId = UUID.randomUUID();
 
-        LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
+        var payload = ApplicationSubmittedEvent
+                .builder()
+                .document("123456789")
+                .status(LoanStatus.PENDING)
+                .amount(new BigDecimal("5000"))
+                .typeLoan(1L)
+                .period(12)
+                .monthlyDebt(new BigDecimal("416.67"))
+                .build();
+
+        var submittedEvent =
+                LoanEvent.builder()
                         .aggregateId(aggregateId)
                         .aggregateType(AggregateType.AGGREGATE_LOAN)
                         .eventType(EventType.LOAN_SUBMITTED)
-                        .document("987654321")
-                        .status(LoanStatus.PENDING)
-                        .amount(new BigDecimal("10000"))
-                        .typeLoan(2L)
-                        .period(24)
-                        .monthlyDebt(new BigDecimal("416.67"))
+                        .payload(payload)
                         .build();
 
-        var approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder.anApprovedEvent()
-                .aggregateId(aggregateId)
+        var approvedPayload = ApplicationApprovedEvent
+                .builder()
                 .approvedBy("manager-user")
                 .reason("All checks passed")
                 .build();
+
+        var approvedEvent = LoanEvent.builder()
+                        .aggregateId(aggregateId)
+                        .aggregateType(AggregateType.AGGREGATE_LOAN)
+                        .eventType(EventType.LOAN_SUBMITTED)
+                        .payload(approvedPayload)
+                        .build();
 
         Loan loan = Loan.rehydrate(List.of(submittedEvent, approvedEvent));
 
@@ -104,23 +124,35 @@ public class LoanEventStoringTest {
     void shouldRehydrateLoan_FromApplicationAndRejectedEvent() {
         UUID aggregateId = UUID.randomUUID();
 
-        LoanApplicationSubmittedEvent submittedEvent =
-                LoanApplicationSubmittedEvent.SubmittedBuilder.aSubmittedEvent()
+        var payload = ApplicationSubmittedEvent
+                .builder()
+                .document("123456789")
+                .status(LoanStatus.PENDING)
+                .amount(new BigDecimal("5000"))
+                .typeLoan(1L)
+                .period(12)
+                .monthlyDebt(new BigDecimal("416.67"))
+                .build();
+
+        var submittedEvent =
+                LoanEvent.builder()
                         .aggregateId(aggregateId)
                         .aggregateType(AggregateType.AGGREGATE_LOAN)
                         .eventType(EventType.LOAN_SUBMITTED)
-                        .document("987654321")
-                        .status(LoanStatus.PENDING)
-                        .amount(new BigDecimal("10000"))
-                        .typeLoan(2L)
-                        .period(24)
-                        .monthlyDebt(new BigDecimal("416.67"))
+                        .payload(payload)
                         .build();
 
-        var rejectedEvent = LoanResolutionRejectedEvent.RejectedBuilder.aRejectedEvent()
-                .aggregateId(aggregateId)
+        var rejectedPayload = ApplicationRejectedEvent
+                .builder()
                 .rejectedBy("manager-user")
                 .reason("All checks passed")
+                .build();
+
+        var rejectedEvent = LoanEvent.builder()
+                .aggregateId(aggregateId)
+                .aggregateType(AggregateType.AGGREGATE_LOAN)
+                .eventType(EventType.LOAN_SUBMITTED)
+                .payload(rejectedPayload)
                 .build();
 
         Loan loan = Loan.rehydrate(List.of(submittedEvent, rejectedEvent));
