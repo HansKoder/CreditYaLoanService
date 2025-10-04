@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loan.event.payload.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationRejectedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.notification.NotificationMapper;

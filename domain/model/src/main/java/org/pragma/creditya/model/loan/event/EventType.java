@@ -1,5 +1,10 @@
 package org.pragma.creditya.model.loan.event;
 
+import org.pragma.creditya.model.loan.event.payload.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationRejectedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.payload.LoanEventPayload;
+
 public enum EventType {
     LOAN_SUBMITTED(ApplicationSubmittedEvent.class),
     LOAN_APPROVED(ApplicationApprovedEvent.class),

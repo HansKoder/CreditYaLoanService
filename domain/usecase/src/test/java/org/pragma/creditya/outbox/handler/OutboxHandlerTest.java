@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.AggregateType;
-import org.pragma.creditya.model.loan.event.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;

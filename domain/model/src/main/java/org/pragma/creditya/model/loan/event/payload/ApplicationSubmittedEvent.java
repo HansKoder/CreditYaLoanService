@@ -1,4 +1,4 @@
-package org.pragma.creditya.model.loan.event;
+package org.pragma.creditya.model.loan.event.payload;
 
 import lombok.*;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Builder
 @Getter
 @AllArgsConstructor
-public class ApplicationSubmittedEvent implements LoanEventPayload{
+public class ApplicationSubmittedEvent implements LoanEventPayload {
 
     private String document;
     private BigDecimal amount;

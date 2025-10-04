@@ -2,7 +2,7 @@ package org.pragma.creditya.asynceventbus.projection.strategy.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.asynceventbus.projection.strategy.ProjectionStrategy;
-import org.pragma.creditya.model.loan.event.ApplicationRejectedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationRejectedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.usecase.query.handler.loan.dto.LoanSummaryDTO;
 import org.pragma.creditya.usecase.query.repository.LoanReadRepository;

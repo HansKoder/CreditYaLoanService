@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.springframework.beans.factory.annotation.Autowired;

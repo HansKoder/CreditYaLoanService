@@ -11,6 +11,7 @@ import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.*;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;

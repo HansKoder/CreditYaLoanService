@@ -1,4 +1,4 @@
-package org.pragma.creditya.model.loan.event;
+package org.pragma.creditya.model.loan.event.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

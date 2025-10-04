@@ -2,10 +2,10 @@ package org.pragma.creditya.usecase.outbox.strategy.selfdecision;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
-import org.pragma.creditya.model.loan.event.LoanEventPayload;
+import org.pragma.creditya.model.loan.event.payload.LoanEventPayload;
 import org.pragma.creditya.usecase.query.repository.LoanReadRepository;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.usecase.outbox.payload.OutboxPayload;

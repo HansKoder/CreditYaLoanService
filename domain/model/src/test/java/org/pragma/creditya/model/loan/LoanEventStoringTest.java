@@ -2,6 +2,10 @@ package org.pragma.creditya.model.loan;
 
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loan.event.payload.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationRejectedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.payload.LoanEventPayload;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 

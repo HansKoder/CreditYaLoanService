@@ -2,6 +2,9 @@ package org.pragma.creditya.model.loan.factory;
 
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loan.event.payload.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationRejectedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 
 public class LoanEventFactory {

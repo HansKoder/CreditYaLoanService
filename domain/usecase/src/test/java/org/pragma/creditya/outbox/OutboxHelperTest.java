@@ -3,6 +3,8 @@ package org.pragma.creditya.outbox;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.event.*;
+import org.pragma.creditya.model.loan.event.payload.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.payload.ApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
 import org.pragma.creditya.usecase.outbox.OutboxStatus;
