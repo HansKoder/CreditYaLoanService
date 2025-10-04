@@ -78,7 +78,6 @@ public class OutboxHandlerTest {
 
         outboxHandler = new OutboxHandler(outboxRepository, Arrays.asList(noMatchingStrategy, matchingStrategy));
 
-        // Act + Assert con StepVerifier
         StepVerifier.create(outboxHandler.execute(domainMock))
                 .verifyComplete();
 

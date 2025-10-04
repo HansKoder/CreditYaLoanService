@@ -46,16 +46,5 @@ public class OutboxMapper {
         return outboxMessage;
     }
 
-    /**
-    private static Class<?> resolvePayloadClass(String eventType) {
-        return switch (eventType) {
-            case "LoanResolutionApprovedEvent" -> NotificationOutboxPayload.class;
-            case "LoanResolutionRejectedEvent" -> NotificationOutboxPayload.class;
-            case "LoanReportGeneratedEvent" -> NotificationOutboxPayload.class;
-            default -> throw new IllegalArgumentException("Unknown eventType: " + eventType);
-        };
-    }
-     */
-
 
 }

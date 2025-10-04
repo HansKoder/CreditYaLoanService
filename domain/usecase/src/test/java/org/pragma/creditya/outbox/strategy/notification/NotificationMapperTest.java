@@ -4,7 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanResolutionApprovedEvent;
+import org.pragma.creditya.model.loan.event.ApplicationApprovedEvent;
+import org.pragma.creditya.model.loan.event.ApplicationSubmittedEvent;
+import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.event.LoanResolutionRejectedEvent;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
 import org.pragma.creditya.usecase.outbox.payload.NotificationOutboxPayload;
@@ -32,9 +34,14 @@ public class NotificationMapperTest {
                 .loanStatus(LoanStatus.APPROVED)
                 .build();
 
-        LoanResolutionApprovedEvent approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder
-                .anApprovedEvent()
+        var payload = ApplicationApprovedEvent.builder()
+                .approvedBy("doe")
+                .build();
+
+        var approvedEvent = LoanEvent
+                .builder()
                 .aggregateId(UUID.fromString(AGGREGATE_ID))
+                .payload(payload)
                 .build();
 
         NotificationOutboxPayload outboxPayload = NotificationMapper.toPayload(

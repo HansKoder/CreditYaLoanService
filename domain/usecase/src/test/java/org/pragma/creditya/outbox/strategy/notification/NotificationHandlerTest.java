@@ -80,10 +80,8 @@ public class NotificationHandlerTest {
                 .status(LoanStatus.APPROVED)
                 .build();
 
-        LoanResolutionApprovedEvent approvedEvent = LoanResolutionApprovedEvent.ApprovedBuilder
-                .anApprovedEvent()
+        var approvedEvent = LoanEvent.builder()
                 .aggregateId(UUID.fromString(AGGREGATE_ID))
-                .status(LoanStatus.APPROVED)
                 .payload(approvedPayload)
                 .build();
 
