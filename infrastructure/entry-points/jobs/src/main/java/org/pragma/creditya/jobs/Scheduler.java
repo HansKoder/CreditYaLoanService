@@ -1,7 +1,7 @@
 package org.pragma.creditya.jobs;
 
+import org.pragma.creditya.jobs.outbox.strategy.OutboxStrategyDispatcher;
 import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
-import org.pragma.creditya.model.loan.gateways.SQSProducer;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,66 +10,55 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.UUID;
 
 @Component
 public class Scheduler {
 
     private final OutboxRepository outboxRepository;
-    private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-    private final SQSProducer sqsProducer;
 
-    public Scheduler(OutboxRepository outboxRepository, SQSProducer sqsProducer) {
+    private final OutboxStrategyDispatcher dispatcher;
+
+    private static final int TIME_PROCESS_OUTBOX = 20; // seconds
+    private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+
+    public Scheduler(OutboxRepository outboxRepository, OutboxStrategyDispatcher dispatcher) {
         this.outboxRepository = outboxRepository;
-        this.sqsProducer = sqsProducer;
+        this.dispatcher = dispatcher;
         startJob();
     }
 
     private void startJob() {
-        int TIME_PROCESS_OUTBOX = 30;
-        logger.info("[infra.entrypoint.scheduler] Running Scheduler Outbox, Payload=[ time (seconds) :{} ]", TIME_PROCESS_OUTBOX);
+        logger.info("[infra.entrypoint.scheduler] (startJob) Scheduler Outbox initialized, payload=[ time (seconds): {} ]", TIME_PROCESS_OUTBOX);
 
         Flux.interval(Duration.ofSeconds(TIME_PROCESS_OUTBOX))
-                .flatMap(tick ->
-                        outboxRepository.findByPending()
-                                .flatMap(data -> processOutbox(data))
-                                .onErrorContinue((err, obj) -> logger.error("[infra.entrypoint.scheduler] Error processing item {}, err={}", obj, err.getMessage(), err))
+                .flatMap(tick -> processPendingOutboxMessages()
+                        .onErrorContinue((err, obj) ->
+                                logger.error("[infra.entrypoint.scheduler] Error processing outbox item={}, err={}", obj, err.getMessage(), err))
                 )
                 .subscribe(
-                        unused -> { },
-                        err -> logger.error("[infra.entrypoint.scheduler] Stream failed unexpectedly", err)
+                        unused -> {}, // handled within pipeline
+                        err -> logger.error("[infra.entrypoint.scheduler] Stream failed unexpectedly", err),
+                        () -> logger.info("[infra.entrypoint.scheduler] Scheduler stream completed (unexpected).")
                 );
     }
 
-    private Mono<Void> processOutbox (LoanOutboxMessage outbox) {
-        logger.info("[infra.entrypoint.scheduler] process outbox payload=[ outbox:{} ]", outbox);
+    private Flux<Void> processPendingOutboxMessages() {
+        logger.info("[infra.entrypoint.scheduler] (processPendingOutboxMessages) Fetching pending outbox messages...");
 
-        UUID outboxId = outbox.getId();
-        logger.info("[infra.entrypoint.scheduler] payload=[ outboxId:{} ]", outboxId);
+        return outboxRepository.findByPending()
+                .flatMap(this::dispatchSafely)
+                .doOnComplete(() -> logger.info("[infra.entrypoint.scheduler] (processPendingOutboxMessages) Completed iteration successfully"));
+    }
 
-        return sqsProducer.sendMessage(outbox.getPayload())
-                // .flatMap(v -> outboxRepository.markAsCompleted(outboxId))
-                .doOnSuccess(v -> logger.info("[infra.entrypoint.scheduler] message send, payload=[ outboxId:{}, message:{} ]", outboxId, outbox.getPayload()))
+    private Mono<Void> dispatchSafely(LoanOutboxMessage outbox) {
+        logger.info("[infra.entrypoint.scheduler] (dispatchSafely) Processing outbox payload=[ {} ]", outbox);
+
+        return dispatcher.dispatch(outbox)
+                .doOnSuccess(v -> logger.info("[infra.entrypoint.scheduler] (dispatchSafely) Outbox processed successfully, id=[ {} ]", outbox.getId()))
                 .onErrorResume(err -> {
-                    logger.info("[infra.entrypoint.scheduler] [ERROR] message was not send, payload=[ errorDetail:{} ]", err.getMessage());
-                    return outboxRepository.markAFailed(outboxId);
-                })
-                .then(outboxRepository.markAsCompleted(outboxId));
-
-        /*
-        return sqsProducer.sendMessage(outbox.getPayload())
-                .retryWhen(Retry.backoff(1, Duration.ofSeconds(5))
-                        .doBeforeRetry(rs -> logger.warn("[infra.entrypoint.scheduler] Retrying outboxId={} attempt={} cause={}",
-                                outboxId, rs.totalRetriesInARow() + 1, rs.failure().getMessage())))
-                .then(outboxRepository.markAsCompleted(outboxId))
-                .onErrorResume(err -> {
-                    logger.error("[infra.entrypoint.scheduler] Outbox should be marked as FAILED, id={}, error={}", outboxId, err.getMessage(), err);
-                    return outboxRepository.markAFailed(outboxId)
-                            .doOnError(e -> logger.error("[infra.entrypoint.scheduler] markAsFailed also failed for id={}, err={}", outboxId, e.getMessage(), e))
-                            .then();
+                    logger.error("[infra.entrypoint.scheduler] (dispatchSafely) [ERROR] Failed processing outbox id=[ {} ], detail=[ {} ]", outbox.getId(), err.getMessage());
+                    return outboxRepository.markAFailed(outbox.getId());
                 });
-
-         */
     }
 
 }

@@ -8,24 +8,29 @@ spring:
   profiles:
     include: null
   jpa:
-    show-sql: ${SPRING_JPA_SHOW_SQL}
+    show-sql: "${SPRING_JPA_SHOW_SQL}"
     properties:
       hibernate:
-        format_sql: ${SPRING_JPA_FORMAT_SQL}
+        format_sql: "${SPRING_JPA_FORMAT_SQL}"
   data:
     mongodb:
-      uri: ${ADAPTER_MONGODB_URI}
+      uri: "${ADAPTER_MONGODB_URI}"
 logging:
   level:
-    org.hibernate.SQL: ${LOGGING_HIBERNATE_SQL}
+    org.hibernate.SQL: "${LOGGING_HIBERNATE_SQL}"
 adapter:
   restconsumer:
-    timeout: ${RESTCONSUMER_TIMEOUT}
-    url: ${RESTCONSUMER_URL}
+    timeout: "${RESTCONSUMER_TIMEOUT}"
+    url: "${RESTCONSUMER_URL}"
   sqs:
-    region: ${ADAPTER_SQS_NOTIFICATION_REGION}
-    queueUrl: ${ADAPTER_SQS_NOTIFICATION_QUEUE_URL}
-    endpoint: ${ADAPTER_SQS_NOTIFICATION_ENDPOINT}
+    notification:
+      region: "${ADAPTER_SQS_NOTIFICATION_REGION}"
+      queueUrl: "${ADAPTER_SQS_NOTIFICATION_QUEUE_URL}"
+      endpoint: "${ADAPTER_SQS_NOTIFICATION_ENDPOINT}"
+    decision:
+      region: "${ADAPTER_SQS_DECISION_REGION}"
+      queueUrl: "${ADAPTER_SQS_DECISION_QUEUE_URL}"
+      endpoint: "${ADAPTER_SQS_DECISION_ENDPOINT}"
 management:
   health:
     circuitbreakers:
@@ -60,24 +65,23 @@ resilience4j:
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
 cors:
-  allowed-origins: ${CORS_ORIGIN_ALLOWED}
+  allowed-origins: "${CORS_ORIGIN_ALLOWED}"
 adapters:
   r2dbc:
-    host: ${POSTGRES_HOST}
-    port: ${POSTGRES_PORT}
-    database: ${POSTGRES_DB}
-    schema: ${POSTGRES_SCHEMA}
-    username: ${POSTGRES_USER:loan_user}
-    password: ${POSTGRES_PASSWORD}
+    host: "${POSTGRES_HOST}"
+    port: "${POSTGRES_PORT}"
+    database: "${POSTGRES_DB}"
+    schema: "${POSTGRES_SCHEMA}"
+    username: "${POSTGRES_USER:loan_user}"
+    password: "${POSTGRES_PASSWORD}"
 jwt:
-  secret: ${JWT_SECRET_KEY}
-  expiration: ${JWT_EXPIRATION}
-
+  secret: "${JWT_SECRET_KEY}"
+  expiration: "${JWT_EXPIRATION}"
 entrypoint:
   sqs:
-    region: "us-east-1"
-    endpoint: "http://localhost:4566"
-    queueUrl: "http://localhost:4566/000000000000/sample"
+    region: "${ENTRYPOINT_SQS_DECISION_REGION}"
+    queueUrl: "${ENTRYPOINT_SQS_DECISION_QUEUE_URL}"
+    endpoint: "${ENTRYPOINT_SQS_DECISION_ENDPOINT}"
     waitTimeSeconds: 20
     maxNumberOfMessages: 10
     visibilityTimeoutSeconds: 10
