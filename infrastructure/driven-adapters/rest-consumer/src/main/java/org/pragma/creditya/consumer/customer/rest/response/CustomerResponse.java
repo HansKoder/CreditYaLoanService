@@ -1,4 +1,4 @@
-package org.pragma.creditya.consumer.customer.response;
+package org.pragma.creditya.consumer.customer.rest.response;
 
 import java.math.BigDecimal;
 

@@ -1,12 +1,12 @@
 package org.pragma.creditya.consumer.customer.adapter;
 
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.consumer.customer.RestConsumer;
-import org.pragma.creditya.consumer.customer.RestHelper;
-import org.pragma.creditya.consumer.customer.mapper.RestConsumerMapper;
-import org.pragma.creditya.consumer.customer.payload.GetCustomerPayload;
-import org.pragma.creditya.consumer.customer.payload.VerifyCustomerPayload;
-import org.pragma.creditya.consumer.customer.response.VerifyCustomerResponse;
+import org.pragma.creditya.consumer.customer.rest.RestConsumer;
+import org.pragma.creditya.consumer.customer.rest.RestHelper;
+import org.pragma.creditya.consumer.customer.rest.mapper.RestConsumerMapper;
+import org.pragma.creditya.consumer.customer.rest.payload.GetCustomerPayload;
+import org.pragma.creditya.consumer.customer.rest.payload.VerifyCustomerPayload;
+import org.pragma.creditya.consumer.customer.rest.response.VerifyCustomerResponse;
 import org.pragma.creditya.model.customer.entity.Customer;
 import org.pragma.creditya.model.customer.gateway.CustomerRepository;
 import org.pragma.creditya.model.customer.valueobject.Document;
