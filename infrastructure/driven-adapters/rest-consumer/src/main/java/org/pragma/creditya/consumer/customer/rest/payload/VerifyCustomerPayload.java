@@ -1,4 +1,4 @@
-package org.pragma.creditya.consumer.customer.payload;
+package org.pragma.creditya.consumer.customer.rest.payload;
 
 public record VerifyCustomerPayload(String document, String email, String token) {
 }

@@ -1,28 +1,31 @@
-package org.pragma.creditya.consumer.customer;
+package org.pragma.creditya.consumer.customer.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.pragma.creditya.consumer.InfrastructureException;
-import org.pragma.creditya.consumer.cons.RestConstant;
-import org.pragma.creditya.consumer.customer.payload.GetCustomerPayload;
-import org.pragma.creditya.consumer.customer.payload.VerifyCustomerPayload;
-import org.pragma.creditya.consumer.customer.response.VerifyCustomerResponse;
-import org.pragma.creditya.consumer.exception.*;
-import org.pragma.creditya.consumer.customer.response.CustomerResponse;
+import org.pragma.creditya.consumer.customer.cons.CustomerRestConstant;
+import org.pragma.creditya.consumer.customer.rest.payload.GetCustomerPayload;
+import org.pragma.creditya.consumer.customer.rest.payload.VerifyCustomerPayload;
+import org.pragma.creditya.consumer.customer.rest.response.VerifyCustomerResponse;
+import org.pragma.creditya.consumer.customer.rest.response.CustomerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
 public class RestConsumer {
 
+    @Qualifier("CustomerGetWebClient")
     private final WebClient userWebClient;
 
     private final static Logger log = LoggerFactory.getLogger(RestConsumer.class);
+
+    public RestConsumer(@Qualifier("CustomerGetWebClient") WebClient userWebClient) {
+        this.userWebClient = userWebClient;
+    }
 
     public Mono<VerifyCustomerResponse> verifyOwnership(VerifyCustomerPayload payload) {
         log.info("[infra.rest-consumer] (verify-customer) (step-0) payload=[ doc:{} email:{} token:{} ]",
@@ -32,11 +35,11 @@ public class RestConsumer {
 
         return userWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(RestConstant.CUSTOMER_ENDPOINT_VERIFY)
-                        .queryParam(RestConstant.CUSTOMER_PARAM_DOCUMENT, payload.document())
-                        .queryParam(RestConstant.CUSTOMER_PARAM_EMAIL, payload.email())
+                        .path(CustomerRestConstant.CUSTOMER_ENDPOINT_VERIFY)
+                        .queryParam(CustomerRestConstant.CUSTOMER_PARAM_DOCUMENT, payload.document())
+                        .queryParam(CustomerRestConstant.CUSTOMER_PARAM_EMAIL, payload.email())
                         .build())
-                .header(HttpHeaders.AUTHORIZATION, RestConstant.BEARER + payload.token())
+                .header(HttpHeaders.AUTHORIZATION, CustomerRestConstant.BEARER + payload.token())
                 .retrieve()
                 // .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
                 .bodyToMono(VerifyCustomerResponse.class)
@@ -49,10 +52,10 @@ public class RestConsumer {
         log.info("[infra.rest-consumer] (getConsumer) (step-0) payload=[ doc:{} token:{} ]", payload.document(), payload.token());
         return userWebClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(RestConstant.CUSTOMER_ENDPOINT_GET_DOCUMENT)
-                        .queryParam(RestConstant.CUSTOMER_PARAM_DOCUMENT, payload.document())
+                        .path(CustomerRestConstant.CUSTOMER_ENDPOINT_GET_DOCUMENT)
+                        .queryParam(CustomerRestConstant.CUSTOMER_PARAM_DOCUMENT, payload.document())
                         .build())
-                .header(HttpHeaders.AUTHORIZATION, RestConstant.BEARER + payload.token())
+                .header(HttpHeaders.AUTHORIZATION, CustomerRestConstant.BEARER + payload.token())
                 .retrieve()
                 // .onStatus(HttpStatusCode::isError, RestHelper::handleErrors)
                 .bodyToMono(CustomerResponse.class)

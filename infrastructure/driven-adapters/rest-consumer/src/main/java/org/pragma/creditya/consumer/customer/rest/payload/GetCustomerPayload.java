@@ -1,3 +1,3 @@
-package org.pragma.creditya.consumer.customer.payload;
+package org.pragma.creditya.consumer.customer.rest.payload;
 
 public record GetCustomerPayload (String document, String token) { }

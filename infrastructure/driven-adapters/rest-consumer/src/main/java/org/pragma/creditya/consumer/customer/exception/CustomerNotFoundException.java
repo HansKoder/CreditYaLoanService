@@ -1,4 +1,4 @@
-package org.pragma.creditya.consumer.exception;
+package org.pragma.creditya.consumer.customer.exception;
 
 import org.pragma.creditya.consumer.InfrastructureException;
 

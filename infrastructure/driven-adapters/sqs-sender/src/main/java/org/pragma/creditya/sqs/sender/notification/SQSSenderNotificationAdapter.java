@@ -2,7 +2,6 @@ package org.pragma.creditya.sqs.sender.notification;
 
 import org.pragma.creditya.model.loan.gateways.SQSProducer;
 import org.pragma.creditya.sqs.sender.notification.config.SQSSenderNotificationProperties;
-import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +12,6 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 
 @Service("SQSSenderNotificationAdapter")
-@Log4j2
 public class SQSSenderNotificationAdapter implements SQSProducer {
     private final SQSSenderNotificationProperties properties;
 
@@ -31,7 +29,7 @@ public class SQSSenderNotificationAdapter implements SQSProducer {
     public Mono<String> send(String message) {
         return Mono.fromCallable(() -> buildRequest(message))
                 .flatMap(request -> Mono.fromFuture(client.sendMessage(request)))
-                .doOnNext(response -> log.debug("Message sent {}", response.messageId()))
+                .doOnNext(response -> logger.debug("Message sent {}", response.messageId()))
                 .map(SendMessageResponse::messageId);
     }
 
@@ -46,8 +44,8 @@ public class SQSSenderNotificationAdapter implements SQSProducer {
     public Mono<Void> sendMessage(String payload) {
         logger.info("[infra.sqs-sender.notification] (producer) (step-1) send message, payload=[ payload:{} ]", payload);
         return this.send(payload)
-                .doOnSuccess(messageId -> log.info("[infra.sqs-sender.notification] (producer) (step-2) message was sent, response=[  messageId:{} ]", messageId))
-                .doOnError(err -> log.error("[infra.sqs-sender.notification] [ERROR] (producer) (step-2) it was not impossible to send message, response=[  errorDetail:{} ]", err.getMessage()))
+                .doOnSuccess(messageId -> logger.info("[infra.sqs-sender.notification] (producer) (step-2) message was sent, response=[  messageId:{} ]", messageId))
+                .doOnError(err -> logger.error("[infra.sqs-sender.notification] [ERROR] (producer) (step-2) it was not impossible to send message, response=[  errorDetail:{} ]", err.getMessage()))
                 .then();
     }
 }

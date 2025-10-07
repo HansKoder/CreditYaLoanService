@@ -20,8 +20,12 @@ logging:
     org.hibernate.SQL: "${LOGGING_HIBERNATE_SQL}"
 adapter:
   restconsumer:
-    timeout: "${RESTCONSUMER_TIMEOUT}"
-    url: "${RESTCONSUMER_URL}"
+    customer:
+      timeout: "${CUSTOMER_REST_CONSUMER_TIMEOUT}"
+      url: "${CUSTOMER_REST_CONSUMER_URL}"
+    machine:
+      timeout: "${MACHINE_REST_CONSUMER_TIMEOUT}"
+      url: "${MACHINE_REST_CONSUMER_URL}"
   sqs:
     notification:
       region: "${ADAPTER_SQS_NOTIFICATION_REGION}"
@@ -86,3 +90,8 @@ entrypoint:
     maxNumberOfMessages: 10
     visibilityTimeoutSeconds: 10
     numberOfThreads: 1
+
+machine:
+  client:
+    id: "credit-ya"
+    secret: "s3cr3t-123"

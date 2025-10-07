@@ -1,10 +1,10 @@
-package org.pragma.creditya.consumer.customer;
+package org.pragma.creditya.consumer.customer.rest;
 
-import org.pragma.creditya.consumer.customer.response.CustomerErrorResponse;
-import org.pragma.creditya.consumer.exception.CustomerBadRequestException;
-import org.pragma.creditya.consumer.exception.CustomerServiceException;
-import org.pragma.creditya.consumer.exception.CustomerUnauthorizedException;
-import org.pragma.creditya.consumer.exception.TokenIsMissingException;
+import org.pragma.creditya.consumer.customer.rest.response.CustomerErrorResponse;
+import org.pragma.creditya.consumer.customer.exception.CustomerBadRequestException;
+import org.pragma.creditya.consumer.customer.exception.CustomerServiceException;
+import org.pragma.creditya.consumer.customer.exception.CustomerUnauthorizedException;
+import org.pragma.creditya.consumer.customer.exception.TokenIsMissingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.ClientResponse;

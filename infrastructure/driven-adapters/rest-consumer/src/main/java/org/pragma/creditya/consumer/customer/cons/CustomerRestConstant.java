@@ -1,8 +1,8 @@
-package org.pragma.creditya.consumer.cons;
+package org.pragma.creditya.consumer.customer.cons;
 
-public class RestConstant {
+public class CustomerRestConstant {
 
-    private RestConstant() {}
+    private CustomerRestConstant() {}
 
     // Endpoints
     public final static String CUSTOMER_ENDPOINT_GET_DOCUMENT = "/api/v1/users/document";
