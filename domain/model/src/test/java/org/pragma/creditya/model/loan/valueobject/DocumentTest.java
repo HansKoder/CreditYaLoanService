@@ -1,6 +1,7 @@
 package org.pragma.creditya.model.loan.valueobject;
 
 import org.junit.jupiter.api.Test;
+import org.pragma.creditya.model.customer.valueobject.Document;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class DocumentTest {
     void shouldCreateDocumentWithSuccessful () {
         Document document = new Document("123");
 
-        assertEquals("123", document.value());
+        assertEquals("123", document.getValue());
     }
 
 }

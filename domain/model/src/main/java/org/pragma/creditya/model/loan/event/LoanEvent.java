@@ -1,21 +1,21 @@
 package org.pragma.creditya.model.loan.event;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.pragma.creditya.model.loan.Loan;
+import org.pragma.creditya.model.loan.event.payload.LoanEventPayload;
 import org.pragma.creditya.model.shared.domain.event.DomainEvent;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @ToString
-@Getter
-@RequiredArgsConstructor
-public abstract class LoanEvent implements DomainEvent<Loan> {
-    private final UUID aggregateId;
-    private final int version;
-    private final Instant timestamp;
-    private final String eventType;
-    private final String aggregateType;
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class LoanEvent implements DomainEvent<Loan> {
+    private UUID id;
+    private UUID aggregateId;
+    private EventType eventType;
+    private AggregateType aggregateType;
+    private LoanEventPayload payload;
 }

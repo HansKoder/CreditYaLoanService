@@ -5,6 +5,6 @@ import org.pragma.creditya.model.loantype.valueobject.LoanTypeId;
 import reactor.core.publisher.Mono;
 
 public interface LoanTypeRepository {
-    Mono<Boolean> existLoanType (LoanTypeId loanTypeId);
-    Mono<LoanType> findById (Long id);
+    Mono<Boolean> existLoanType (LoanTypeId id);
+    Mono<LoanType> findById (LoanTypeId id);
 }

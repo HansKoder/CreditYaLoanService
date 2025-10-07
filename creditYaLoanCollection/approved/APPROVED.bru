@@ -1,0 +1,24 @@
+meta {
+  name: APPROVED
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU5NTQxMzUwLCJleHAiOjE3NTk1NDQ5NTB9.2vI0A4InPC7vUXmti4Gme29eh_QVpY83lc39NgjC6Tw
+}
+
+body:json {
+  {
+    "loanId": "44a66c28-c136-4a19-a151-ece1b33c2fac",
+    "decision": "APPROVED",
+    "reason": "",
+    "resolutionType": "MANUAL_DECISION"
+  }
+}

@@ -1,0 +1,24 @@
+meta {
+  name: REJECTED
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:9082/api/v1/loan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZHZpc29yQGNyZWRpdC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQURWSVNPUiJ9XSwiaWF0IjoxNzU5NTI3MDQ3LCJleHAiOjE3NTk1MzA2NDd9.J627YA5t_rDZ-wyKnQCqESH0bxbFjfH-VEaEtApsTzc
+}
+
+body:json {
+  {
+    "loanId": "6f3e8de4-beb8-41bc-9564-8d41eb0fd0c8",
+    "decision": "REJECTED",
+    "reason": "",
+    "resolutionType": "MANUAL_DECISION"
+  }
+}

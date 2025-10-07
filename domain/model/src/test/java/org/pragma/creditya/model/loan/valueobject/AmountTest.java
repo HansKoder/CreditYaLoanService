@@ -2,6 +2,7 @@ package org.pragma.creditya.model.loan.valueobject;
 
 import org.junit.jupiter.api.Test;
 import org.pragma.creditya.model.loan.exception.LoanDomainException;
+import org.pragma.creditya.model.shared.domain.model.valueobject.Amount;
 
 import java.math.BigDecimal;
 

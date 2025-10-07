@@ -13,8 +13,7 @@ import org.springframework.web.reactive.function.server.HandlerFilterFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
@@ -25,6 +24,9 @@ public class LoanRouterRest {
                 .filter(domainHandlerExceptions())
                 .filter(infraHandlerExceptions())
                 .andRoute(GET("/api/v1/loans"), handler::getLoans)
+                .filter(domainHandlerExceptions())
+                .filter(infraHandlerExceptions())
+                .andRoute(PUT("/api/v1/loan"), handler::resolutionApplicationLoan)
                 .filter(domainHandlerExceptions())
                 .filter(infraHandlerExceptions());
     }

@@ -25,9 +25,11 @@ public class SecurityConfig {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchangeSpec -> exchangeSpec.pathMatchers("/api/v1/loan")
+                .authorizeExchange(exchangeSpec -> exchangeSpec.pathMatchers(HttpMethod.POST, "/api/v1/loan")
                         .hasAnyAuthority("CUSTOMER")
                         .pathMatchers(HttpMethod.GET, "/api/v1/loans")
+                        .hasAnyAuthority("ADVISOR")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/loan")
                         .hasAnyAuthority("ADVISOR")
                         .anyExchange().authenticated())
                 .addFilterAfter(jwtFilter, SecurityWebFiltersOrder.FIRST)

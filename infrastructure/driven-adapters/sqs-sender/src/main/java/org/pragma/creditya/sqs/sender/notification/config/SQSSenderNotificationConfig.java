@@ -1,0 +1,50 @@
+package org.pragma.creditya.sqs.sender.notification.config;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.*;
+import software.amazon.awssdk.metrics.MetricPublisher;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+
+import java.net.URI;
+
+@Configuration
+public class SQSSenderNotificationConfig {
+
+    @Bean("notificationSqsClient")
+    public SqsAsyncClient configNotificationSqs(SQSSenderNotificationProperties properties, MetricPublisher publisher) {
+        return SqsAsyncClient.builder()
+                .endpointOverride(resolveEndpoint(properties))
+                .region(Region.of(properties.region()))
+                .overrideConfiguration(o -> o.addMetricPublisher(publisher))
+                // .credentialsProvider(getProviderChain()) // [Prod]
+                .credentialsProvider(getLocalstackProvider()) // [Local using localstack]
+                .build();
+    }
+
+    private AwsCredentialsProvider getLocalstackProvider() {
+        return StaticCredentialsProvider.create(
+                AwsBasicCredentials.create("test", "test")
+        );
+    }
+
+    private AwsCredentialsProviderChain getProviderChain() {
+        return AwsCredentialsProviderChain.builder()
+                .addCredentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                .addCredentialsProvider(SystemPropertyCredentialsProvider.create())
+                .addCredentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
+                .addCredentialsProvider(ProfileCredentialsProvider.create())
+                .addCredentialsProvider(ContainerCredentialsProvider.builder().build())
+                .addCredentialsProvider(InstanceProfileCredentialsProvider.create())
+                .build();
+    }
+
+    private URI resolveEndpoint(SQSSenderNotificationProperties properties) {
+        if (properties.endpoint() != null) {
+            return URI.create(properties.endpoint());
+        }
+        return null;
+    }
+}

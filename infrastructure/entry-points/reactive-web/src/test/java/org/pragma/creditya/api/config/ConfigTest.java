@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.pragma.creditya.api.dto.request.CreateApplicationLoanRequest;
 import org.pragma.creditya.model.loan.Loan;
 import org.pragma.creditya.model.loan.valueobject.LoanStatus;
-import org.pragma.creditya.usecase.IOrchestratorUseCase;
-import org.pragma.creditya.usecase.loan.ILoanUseCase;
-import org.pragma.creditya.usecase.command.CreateRequestLoanCommand;
+import org.pragma.creditya.usecase.command.CreateApplicationLoanCommand;
+import org.pragma.creditya.usecase.query.IQuery;
+import org.pragma.creditya.usecase.service.ILoanApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
@@ -33,7 +33,10 @@ class ConfigTest {
     private WebTestClient webTestClient;
 
     @MockitoBean
-    IOrchestratorUseCase useCase;
+    ILoanApplicationService command;
+
+    @MockitoBean
+    IQuery query;
 
     private final String URL_POST_APPLICATION_LOAN = "/api/v1/loan";
 
@@ -41,7 +44,7 @@ class ConfigTest {
 
     private final Loan LOAN_EXAMPLE = Loan.LoanBuilder.aLoan()
             .id(LOAN_ID_EXAMPLE)
-            .loanTypeCode(1L)
+            .loanTypeId(1L)
             .loanStatus(LoanStatus.PENDING)
             .document("103")
             .period(1,0)
@@ -59,7 +62,7 @@ class ConfigTest {
 
     @Test
     void corsConfigurationShouldAllowOrigins() {
-        when(useCase.applicationLoan(any(CreateRequestLoanCommand.class)))
+        when(command.createApplicationSubmitLoan(any(CreateApplicationLoanCommand.class)))
                 .thenReturn(Mono.just(LOAN_EXAMPLE));
 
         webTestClient.post()

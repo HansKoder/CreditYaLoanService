@@ -1,8 +1,10 @@
 package org.pragma.creditya.r2dbc.persistence.loantype.mapper;
 
 import org.pragma.creditya.model.loantype.LoanType;
+import org.pragma.creditya.model.loantype.valueobject.ResolutionType;
 import org.pragma.creditya.r2dbc.helper.CustomMapper;
 import org.pragma.creditya.r2dbc.persistence.loantype.entity.LoanTypeEntity;
+import org.pragma.creditya.r2dbc.persistence.loantype.entity.ResolutionTypeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ public class LoanTypeMapper implements CustomMapper<LoanType, LoanTypeEntity> {
                 .id(entity.getId().getValue())
                 .description(entity.getDescription().value())
                 .interestRate(entity.getInterestRate().value())
+                .resolutionType(ResolutionTypeEntity.valueOf(entity.getResolutionType().name()))
                 .build();
     }
 
@@ -31,6 +34,7 @@ public class LoanTypeMapper implements CustomMapper<LoanType, LoanTypeEntity> {
                 .id(data.getId())
                 .description(data.getDescription())
                 .interestRate(data.getInterestRate())
+                .resolutionType(ResolutionType.valueOf(data.getResolutionType().name()))
                 .build();
     }
 

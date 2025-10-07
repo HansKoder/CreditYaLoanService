@@ -1,13 +1,12 @@
 package org.pragma.creditya.r2dbc.persistence.eventstoring.adapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.r2dbc.postgresql.codec.Json;
 import lombok.RequiredArgsConstructor;
-import org.pragma.creditya.model.loan.Loan;
-import org.pragma.creditya.model.loan.event.LoanApplicationSubmittedEvent;
 import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.model.loan.gateways.EventStoreRepository;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.entity.EventEntity;
+import org.pragma.creditya.r2dbc.persistence.eventstoring.helper.EventSerializerHelper;
+import org.pragma.creditya.r2dbc.persistence.eventstoring.mapper.EventSourcingMapper;
 import org.pragma.creditya.r2dbc.persistence.eventstoring.repository.EventReactiveRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,22 +22,17 @@ import java.util.UUID;
 public class EventRepositoryAdapter implements EventStoreRepository {
 
     private final EventReactiveRepository repository;
-    private final ObjectMapper objectMapper;
+    private final EventSourcingMapper mapper;
+    // private final EventSerializerHelper eventSerializerHelper;
 
     private final Logger log = LoggerFactory.getLogger(EventRepositoryAdapter.class);
 
-
     @Override
-    public Mono<Loan> findByAggregateIdLast(UUID aggregateId) {
-        return null;
-    }
-
-    @Override
-    public Mono<Void> saveEvent(LoanApplicationSubmittedEvent event) {
-        log.info("[infra.r2dbc] (event) save event payload: {}", event);
-        return Mono.fromCallable(() -> this.mapToPersist(event))
-                .flatMap(repository::save)
-                .then();
+    public Flux<LoanEvent> findByAggregateId(UUID aggregateId) {
+        log.info("[infra.r2dbc.event] (findByAggregateId) payload=[ aggregateId:{} ]", aggregateId.toString());
+        return repository.findByAggregateId(aggregateId)
+                .map(mapper::toEntity);
+                //.map(eventSerializerHelper::deserialize);
     }
 
     @Override
@@ -50,9 +44,10 @@ public class EventRepositoryAdapter implements EventStoreRepository {
     }
 
 
-    public Mono<Void> saveEvent(LoanEvent event) {
+    private Mono<Void> saveEvent(LoanEvent event) {
         log.info("[infra.r2dbc] (event) save event  payload: {}", event);
-        return Mono.fromCallable(() -> this.mapToPersist(event))
+        // return Mono.fromCallable(() -> this.mapToPersist(event))
+        return Mono.fromCallable(() -> mapper.toData(event))
                 .flatMap(e -> {
                     log.info("[infra.r2dbc] (save) this entity will be persisted {}", e);
                     return repository.save(e);
@@ -61,31 +56,23 @@ public class EventRepositoryAdapter implements EventStoreRepository {
                 .then();
     }
 
+    /**
     private EventEntity mapToPersist (LoanEvent event) {
         log.info("[infra.r2dbc] (mapper) map to persist: {}", event);
         UUID aggregateId = event.getAggregateId() == null ? null : event.getAggregateId();
 
         EventEntity entity = EventEntity.builder()
                 .aggregateId(aggregateId)
-                .aggregateType(event.getAggregateType())
-                .eventType(event.getEventType())
-                .payload(Json.of(serialize(event)))
+                .aggregateType(event.getAggregateType().name())
+                .eventType(event.getEventType().getEventClass().getSimpleName())
+                .payload(Json.of(eventSerializerHelper.serialize(event)))
                 .build();
 
         log.info("[infra.r2dbc] (mapper) from event to entity, payload: {}", entity);
 
         return entity;
     }
+     */
 
-    private String serialize(LoanEvent event) {
-        log.info("[infra.r2dbc] (object-mapper) serialize: {}", event);
-        try {
-            String payload = objectMapper.writeValueAsString(event);
-            log.info("[infra.r2dbc] (object-mapper) serialized this is the payload: {}", payload);
-            return payload;
-        } catch (Exception e) {
-            throw new RuntimeException("Error serializing event", e);
-        }
-    }
 
 }
