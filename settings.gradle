@@ -42,5 +42,3 @@ include ':sqs-sender'
 project(':sqs-sender').projectDir = file('./infrastructure/driven-adapters/sqs-sender')
 include ':sqs-listener'
 project(':sqs-listener').projectDir = file('./infrastructure/entry-points/sqs-listener')
-include ':machine'
-project(':machine').projectDir = file('./infrastructure/driven-adapters/machine')
