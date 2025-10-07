@@ -1,6 +1,7 @@
 package org.pragma.creditya.consumer.customer.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.pragma.creditya.consumer.customer.helper.TokenResolver;
 import org.pragma.creditya.consumer.customer.rest.RestConsumer;
 import org.pragma.creditya.consumer.customer.rest.RestHelper;
 import org.pragma.creditya.consumer.customer.rest.mapper.RestConsumerMapper;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class CustomerRestConsumerAdapter implements CustomerRepository {
 
     private final RestConsumer restConsumer;
+    private final TokenResolver tokenResolver;
 
     @Override
     public Mono<Boolean> verifyCustomerByDocument(Document document) {
@@ -26,7 +28,7 @@ public class CustomerRestConsumerAdapter implements CustomerRepository {
 
     @Override
     public Mono<Customer> getCustomerByDocument(Document document) {
-        return RestHelper.extractToken()
+        return tokenResolver.resolveToken()
                 .map(token -> new GetCustomerPayload(document.getValue(), token))
                 .flatMap(restConsumer::getCustomer)
                 .map(RestConsumerMapper::toEntity);

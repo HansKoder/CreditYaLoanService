@@ -1,4 +1,4 @@
-package org.pragma.creditya.consumer.customer.config;
+package org.pragma.creditya.consumer.machine.config;
 
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -17,24 +17,23 @@ import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Configuration
-public class CustomerRestConsumerConfig {
+public class MachineRestConsumerConfig {
 
     private final String url;
-
     private final int timeout;
 
-    private final Logger logger = LoggerFactory.getLogger(CustomerRestConsumerConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(MachineRestConsumerConfig.class);
 
-    public CustomerRestConsumerConfig(@Value("${adapter.restconsumer.customer.url}") String url,
-                                      @Value("${adapter.restconsumer.customer.timeout}") int timeout) {
-        logger.info("[infra.rest-consumer.customer] (construct) extract env vars payload=[ url:{}, timeout:{} ]", url, timeout);
+    public MachineRestConsumerConfig(@Value("${adapter.restconsumer.machine.url}") String url,
+                                     @Value("${adapter.restconsumer.machine.timeout}") int timeout) {
+        logger.info("[infra.rest-consumer.machine] (construct) extract env vars payload=[ url:{}, timeout:{} ]", url, timeout);
         this.url = url;
         this.timeout = timeout;
     }
 
-    @Bean("CustomerGetWebClient")
+    @Bean("MachineGetWebClient")
     public WebClient getWebClient(WebClient.Builder builder) {
-        logger.info("[infra.rest-consumer.customer] (getWebClient) consume user-service to check identify payload [ url:{}, timeout:{} ]", url, timeout);
+        logger.info("[infra.rest-consumer.machine] (getWebClient) consume user-service to check identify payload [ url:{}, timeout:{} ]", url, timeout);
 
         return builder
             .baseUrl(url)

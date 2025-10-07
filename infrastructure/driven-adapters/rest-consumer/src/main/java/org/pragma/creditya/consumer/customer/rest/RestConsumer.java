@@ -9,18 +9,23 @@ import org.pragma.creditya.consumer.customer.rest.response.VerifyCustomerRespons
 import org.pragma.creditya.consumer.customer.rest.response.CustomerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
 public class RestConsumer {
 
+    @Qualifier("CustomerGetWebClient")
     private final WebClient userWebClient;
 
     private final static Logger log = LoggerFactory.getLogger(RestConsumer.class);
+
+    public RestConsumer(@Qualifier("CustomerGetWebClient") WebClient userWebClient) {
+        this.userWebClient = userWebClient;
+    }
 
     public Mono<VerifyCustomerResponse> verifyOwnership(VerifyCustomerPayload payload) {
         log.info("[infra.rest-consumer] (verify-customer) (step-0) payload=[ doc:{} email:{} token:{} ]",
