@@ -6,6 +6,7 @@ import org.pragma.creditya.model.loan.event.LoanEvent;
 import org.pragma.creditya.usecase.outbox.gateway.OutboxRepository;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
 import org.pragma.creditya.usecase.outbox.OutboxHelper;
+import org.pragma.creditya.usecase.outbox.payload.OutboxPayload;
 import org.pragma.creditya.usecase.outbox.strategy.OutboxStrategy;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,9 +39,9 @@ public class OutboxHandler implements IOutboxHandler {
                 .flatMap(payload -> processPayload(event, payload));
     }
 
-    private <T> Mono<LoanOutboxMessage> processPayload(LoanEvent event, T payload) {
+    private Mono<LoanOutboxMessage> processPayload(LoanEvent event, OutboxPayload payload) {
         System.out.println("[domain.outbox] (processPayload) payload=[ event:{" + event + "}, payload:{" + payload+ "} ]");
-        LoanOutboxMessage outboxMessage = OutboxHelper.toOutboxMessage(event);
+        LoanOutboxMessage outboxMessage = OutboxHelper.toOutboxMessage(event, payload);
 
         return outboxRepository.saveOutboxMessage(outboxMessage, payload)
                 .thenReturn(outboxMessage);

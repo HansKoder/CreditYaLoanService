@@ -12,7 +12,7 @@ public class LoanOutboxMessage{
 
     private UUID id;
     private UUID aggregateId;
-    private String type;
+    private OutboxTypeEvent type;
     private String aggregateName;
     private OutboxStatus status;
     private String payload;

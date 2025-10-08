@@ -3,6 +3,7 @@ package org.pragma.creditya.r2dbc.persistence.outbox.mapper;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxEntity;
 import org.pragma.creditya.r2dbc.persistence.outbox.entity.OutboxStatus;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.OutboxTypeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ public class OutboxMapper {
         OutboxEntity entity = OutboxEntity.builder()
                 .aggregateId(outboxMessage.getAggregateId().toString())
                 .aggregateName(outboxMessage.getAggregateName())
-                .eventType(outboxMessage.getType())
+                .eventType(outboxMessage.getType().name())
                 .status(OutboxStatus.valueOf(outboxMessage.getStatus().name()))
                 .build();
 
@@ -37,7 +38,7 @@ public class OutboxMapper {
                 .id(outboxEntity.getId())
                 .aggregateId(UUID.fromString(outboxEntity.getAggregateId()))
                 .aggregateName(outboxEntity.getAggregateName())
-                .type(outboxEntity.getEventType())
+                .type(OutboxTypeEvent.valueOf(outboxEntity.getEventType()))
                 .payload(outboxEntity.getPayload().asString())
                 .build();
 

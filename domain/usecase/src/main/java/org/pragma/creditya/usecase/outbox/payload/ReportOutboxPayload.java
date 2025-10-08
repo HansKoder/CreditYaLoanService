@@ -1,4 +1,24 @@
 package org.pragma.creditya.usecase.outbox.payload;
 
-public class ReportOutboxPayload {
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.pragma.creditya.usecase.outbox.OutboxTypeEvent;
+
+import java.math.BigDecimal;
+
+@ToString
+@Getter
+@Setter
+@Builder
+public class ReportOutboxPayload implements OutboxPayload {
+
+    private String loanId;
+    private BigDecimal amount;
+
+    @Override
+    public OutboxTypeEvent getType() {
+        return OutboxTypeEvent.REPORT;
+    }
 }

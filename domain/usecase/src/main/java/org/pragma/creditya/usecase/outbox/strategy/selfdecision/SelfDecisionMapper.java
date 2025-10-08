@@ -14,7 +14,7 @@ public class SelfDecisionMapper {
         return DecisionLoanOutboxPayload
                 .builder()
                 .currentLoanId(domain.getId().getValue().toString())
-                .currentLoanAmount(domain.getAmount().amount())
+                .currentLoanAmount(domain.getMonthlyDebt().amount())
                 .customerSalary(customer.getBaseSalary().amount())
                 .debts(toPayload(debts))
                 .build();

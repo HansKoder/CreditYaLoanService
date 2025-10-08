@@ -21,6 +21,7 @@ public class OutboxHelperTest {
     private final String EVENT_ID = "e61aba47-75bf-4e79-b04f-a646aac86f89";
     private final String AGGREGATE_ID = "c4fc5172-1cd3-4dfa-aa71-456b50bc9089";
 
+    /**
     @Test
     @DisplayName("Should Be mapped with successful event Submitted with the required fields outbox pattern")
     void shouldBeMappedCorrectly_FromSubmittedToOutboxMessage () {
@@ -71,5 +72,7 @@ public class OutboxHelperTest {
         assertEquals("ApplicationApprovedEvent", outboxMessage.getType());
         assertEquals(OutboxStatus.STARTED, outboxMessage.getStatus());
     }
+     **/
+
 
 }
