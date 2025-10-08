@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.pragma.creditya.usecase.outbox.OutboxTypeEvent;
 
 @ToString
 @Getter
@@ -20,4 +21,8 @@ public class DecisionLoanOutboxPayload implements OutboxPayload{
     private BigDecimal currentLoanAmount;
     private List<DebtPayload> debts;
 
+    @Override
+    public OutboxTypeEvent getType() {
+        return OutboxTypeEvent.DECISION;
+    }
 }

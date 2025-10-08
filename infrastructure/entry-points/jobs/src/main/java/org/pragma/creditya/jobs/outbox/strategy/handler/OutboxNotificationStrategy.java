@@ -4,6 +4,7 @@ import org.pragma.creditya.jobs.outbox.strategy.OutboxProcessStrategy;
 import org.pragma.creditya.jobs.outbox.helper.SQSHelper;
 import org.pragma.creditya.model.loan.gateways.SQSProducer;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.OutboxTypeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,7 +37,7 @@ public class OutboxNotificationStrategy implements OutboxProcessStrategy {
     }
 
     private Boolean shouldBeSentAnyQueue (LoanOutboxMessage outboxMessage) {
-        return outboxMessage.getType().equals(APPROVED_EVENT) || outboxMessage.getType().equals(REJECTED_EVENT);
+        return outboxMessage.getType().equals(OutboxTypeEvent.NOTIFICATION);
     }
 
     @Override

@@ -4,13 +4,12 @@ import org.pragma.creditya.jobs.outbox.helper.SQSHelper;
 import org.pragma.creditya.jobs.outbox.strategy.OutboxProcessStrategy;
 import org.pragma.creditya.model.loan.gateways.SQSProducer;
 import org.pragma.creditya.usecase.outbox.LoanOutboxMessage;
+import org.pragma.creditya.usecase.outbox.OutboxTypeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import static org.pragma.creditya.jobs.outbox.constant.OutboxConstant.APPROVED_EVENT;
 
 @Component
 public class OutboxReportStrategy implements OutboxProcessStrategy {
@@ -38,7 +37,7 @@ public class OutboxReportStrategy implements OutboxProcessStrategy {
     }
 
     private Boolean shouldBeSentAnyQueue (LoanOutboxMessage outboxMessage) {
-        return outboxMessage.getType().equals(APPROVED_EVENT);
+        return outboxMessage.getType().equals(OutboxTypeEvent.REPORT);
     }
 
     @Override
