@@ -35,6 +35,10 @@ adapter:
       region: "${ADAPTER_SQS_DECISION_REGION}"
       queueUrl: "${ADAPTER_SQS_DECISION_QUEUE_URL}"
       endpoint: "${ADAPTER_SQS_DECISION_ENDPOINT}"
+    report:
+      region: "${ADAPTER_SQS_REPORT_REGION}"
+      queueUrl: "${ADAPTER_SQS_REPORT_QUEUE_URL}"
+      endpoint: "${ADAPTER_SQS_REPORT_ENDPOINT}"
 management:
   health:
     circuitbreakers:
